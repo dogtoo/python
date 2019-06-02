@@ -1,0 +1,118 @@
+"01|02|20"
+"03|21|12"
+"04|18|14"
+"28"
+"05|22"
+"06|08|09"
+"10|11"
+"15|25"
+"31|27"
+"26|29|39"
+"23|16|17"
+
+
+python3 stock.py TWSE 01,02,20
+python3 stock.py TWSE 03,21,12
+python3 stock.py TWSE 04,18,14
+python3 stock.py TWSE 28
+python3 stock.py TWSE 05,22
+python3 stock.py TWSE 06,08,09
+python3 stock.py TWSE 10,11
+python3 stock.py TWSE 15,25
+python3 stock.py TWSE 24
+python3 stock.py TWSE 31,27
+python3 stock.py TWSE 26,29,39
+python3 stock.py TWSE 23,16,17
+
+"01|02|20|03|21|12|04"
+"18|14|28|05|22|06|08"
+"09|10|11|15|25|24|31"
+"27|26|29|39|23|16|17"
+"03|21|12|04|18|14|28|05|22|06|08|09|10|11|15|25|24|31|27|26|29|39|23|16|17"
+
+
+db.realtime.find({'date':"20190416",'trade_volume':{$type:2}},{}).forEach(function(x){
+        if (x.accumulate_trade_volume == null)
+            x.accumulate_trade_volume = 0;
+        x.accumulate_trade_volume = new NumberInt(x.accumulate_trade_volume);
+        if (x.final_trade_volume == null)
+            x.final_trade_volume = 0;
+        x.final_trade_volume = new NumberInt(x.final_trade_volume);
+        
+        x.high = parseFloat(x.high);
+        x.low = parseFloat(x.low);
+        x.open = parseFloat(x.open);
+        x.latest_trade_price = parseFloat(x.latest_trade_price);
+        x.trade_volume = new NumberInt(x.trade_volume);
+        
+        if (x.best_ask_price != null) {
+            x.best_ask_price[0] = parseFloat(x.best_ask_price[0]);
+            x.best_ask_price[1] = parseFloat(x.best_ask_price[1]);
+            x.best_ask_price[2] = parseFloat(x.best_ask_price[2]);
+            x.best_ask_price[3] = parseFloat(x.best_ask_price[3]);
+            x.best_ask_price[4] = parseFloat(x.best_ask_price[4]);
+        }
+        if (x.best_ask_volume != null) {
+            x.best_ask_volume[0] = parseFloat(x.best_ask_volume[0]);
+            x.best_ask_volume[1] = parseFloat(x.best_ask_volume[1]);
+            x.best_ask_volume[2] = parseFloat(x.best_ask_volume[2]);
+            x.best_ask_volume[3] = parseFloat(x.best_ask_volume[3]);
+            x.best_ask_volume[4] = parseFloat(x.best_ask_volume[4]);
+        }
+
+        if (x.best_bid_price != null) {
+            x.best_bid_price[0] =  parseFloat(x.best_bid_price[0]);
+            x.best_bid_price[1] =  parseFloat(x.best_bid_price[1]);
+            x.best_bid_price[2] =  parseFloat(x.best_bid_price[2]);
+            x.best_bid_price[3] =  parseFloat(x.best_bid_price[3]);
+            x.best_bid_price[4] =  parseFloat(x.best_bid_price[4]);
+        }
+
+        if (x.best_bid_volume != null) {
+            x.best_bid_volume[0] = parseFloat(x.best_bid_volume[0]);
+            x.best_bid_volume[1] = parseFloat(x.best_bid_volume[1]);
+            x.best_bid_volume[2] = parseFloat(x.best_bid_volume[2]);
+            x.best_bid_volume[3] = parseFloat(x.best_bid_volume[3]);
+            x.best_bid_volume[4] = parseFloat(x.best_bid_volume[4]);
+        }
+        db.realtime.save(x);
+})
+
+
+        
+db.realtime.find({'code':'2330','date':'20190418'},{_id:0,final_time:1,time:1,trade_volume:1,accumulate_trade_volume:1,final_trade_volume:1}).sort({'accumulate_trade_volume':-1})
+
+db.realtime.find({'date':'20190417','final_time':'14:30:00'},{_id:0,code:1,accumulate_trade_volume:1}).sort({accumulate_trade_volume:-1 })
+
+ db.realtime.find({'code':'1101','date':'20190422'},
+ {'_id':0,'time':1,'trade_volume':1,'accumulate_trade_volume':1,'best_bid_price':{$slice:1},'best_bid_volume':{$slice:1},
+ 'best_ask_price':{$slice:1},'best_ask_volume':{$slice:1},'latest_trade_price':1}
+ ).sort({'final_time':-1})
+ 
+ twStockTest
+localtime: 1555635603 , Str time: 1555635000 , End time: 1555651920
+***Fri Apr 19 01:00:03 2019*** ( 15 )
+Traceback (most recent call last):
+  File "/python/stock/app/stock.py", line 57, in <module>
+    stock = twstock.realtime.get(stockCodeL)
+  File "/usr/local/lib/python3.7/site-packages/twstock/realtime.py", line 132, in get
+    data['info']['code']: data for data in map(_format_stock_info, data['msgArray'])
+  File "/usr/local/lib/python3.7/site-packages/twstock/realtime.py", line 131, in <dictcomp>
+    result = {
+  File "/usr/local/lib/python3.7/site-packages/twstock/realtime.py", line 58, in _format_stock_info
+    result['realtime']['latest_trade_price'] = float(data.get('z', None)) #最後成交價
+TypeError: float() argument must be a string or a number, not 'NoneType'
+
+db.realtime.find({'date':"20190418"},{}).forEach(function(x){
+    var t
+})
+
+db.realtime.mapReduce( 
+   function() { emit(this.accumulate_trade_volume,1); }, 
+   function(key, values) {return Array.sum(values)-1}, 
+      {  
+         query:{code:"2330",date:"20190418"},  
+         out:"post_total" 
+      }
+)
+https://www.cnblogs.com/chenpingzhao/p/7913247.html
