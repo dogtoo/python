@@ -1,0 +1,1 @@
+http://www.twse.com.tw/fund/T86?response=json&date=20190528&selectType=01&_=1559145215220
