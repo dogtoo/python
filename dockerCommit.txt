@@ -1,3 +1,5 @@
+ 
+#不用 
  docker commit \
  --change='ENV STOCKNAME TWSE' \
  --change='ENV STOCKGROUPLIST 01' \
