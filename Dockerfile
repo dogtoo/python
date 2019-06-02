@@ -94,6 +94,8 @@ RUN pip install analytics
 
 RUN pip install lxml
 
+RUN pip install pymongo
+
 COPY /module/ /python/
 
 RUN cd /python/twstock \
