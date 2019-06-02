@@ -20,7 +20,7 @@ b7082bcc4cc5 python3.7/stock
 #0 9 * * * docker run --rm -e STOCKNAME="TWSE" -e STOCKGROUPLIST="27|26|29|30|23|16|17" -v ~/python:/python python3.7/stock >> /home/dogtoo/python/log/stock4.log
 #0 9 * * * docker run --rm -e STOCKNAME="TWSE" -e STOCKGROUPLIST="00" -v ~/python:/python python3.7/stock >> /home/dogtoo/python/stock/log/stock5.log
 
-0 9 * * * docker run --rm -v ~/python:/python python3.7/stock >> /home/dogtoo/python/log/stock1.log
+0 9 * * * docker run --rm -v ~/python:/python python3:1.0 >> /home/dogtoo/python/log/stock1.log
 
 
 "01|02|20|03|21|12|04"
