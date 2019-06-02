@@ -90,6 +90,10 @@ RUN set -ex; \
 # flit
 RUN pip install flit
 
+RUN pip install analytics
+
+RUN pip install lxml
+
 COPY /module/ /python/
 
 RUN cd /python/twstock \
