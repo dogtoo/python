@@ -4,12 +4,12 @@ import twstock
 import pymongo
 import time
 import sys
-debug = True 
+debug = False 
 stockName = sys.argv[1]
 runGroupStr = sys.argv[2]
 if len(runGroupStr) == 0:
     debug = True
-    runGroupStr = "01|02" 
+    runGroupStr = "24" 
 client = pymongo.MongoClient("mongodb://172.17.0.3:27017")
 db = client["twStock"]
 db.authenticate("twstock", "twstock123")
