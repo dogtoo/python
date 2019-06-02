@@ -93,6 +93,6 @@ RUN pip install flit
 COPY /module/ /python/
 
 RUN cd /python/twstock \
-    && flit install
+    && FLIT_ROOT_INSTALL=1 flit install
 
 CMD ["python3"]
