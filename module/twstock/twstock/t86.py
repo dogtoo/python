@@ -9,7 +9,7 @@ STOCKINFO_URL = 'http://www.twse.com.tw/fund/T86'
 req = requests.Session()
 req.get(STOCKINFO_URL)
 time=int(time.time()) * 1000
-p = {'response': 'json', 'date': '20190501', 'selectType':'01', '_':time}
+p = {'response': 'json', 'date': '20190502', 'selectType':'01', '_':time}
 r = req.get(STOCKINFO_URL, params=p)
 print(r.url)
 print(r.json)
