@@ -12,4 +12,4 @@ time=int(time.time()) * 1000
 p = {'response': 'json', 'date': '20190502', 'selectType':'01', '_':time}
 r = req.get(STOCKINFO_URL, params=p)
 print(r.url)
-print(r.json)
+print(r.json())
