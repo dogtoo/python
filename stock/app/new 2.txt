@@ -31,7 +31,7 @@ python3 stock.py TWSE 23,16,17
 "03|21|12|04|18|14|28|05|22|06|08|09|10|11|15|25|24|31|27|26|29|39|23|16|17"
 
 
-db.realtime.find({'date':"20190416",'trade_volume':{$type:2}},{}).forEach(function(x){
+db.realtime.find({'date':"20190603",'trade_volume':{$type:2}},{}).forEach(function(x){
         if (x.accumulate_trade_volume == null)
             x.accumulate_trade_volume = 0;
         x.accumulate_trade_volume = new NumberInt(x.accumulate_trade_volume);
@@ -80,7 +80,7 @@ db.realtime.find({'date':"20190416",'trade_volume':{$type:2}},{}).forEach(functi
 
 
         
-db.realtime.find({'code':'2330','date':'20190418'},{_id:0,final_time:1,time:1,trade_volume:1,accumulate_trade_volume:1,final_trade_volume:1}).sort({'accumulate_trade_volume':-1})
+db.realtime.find({'code':'2330','date':'20190603'},{_id:0,final_time:1,time:1,trade_volume:1,accumulate_trade_volume:1,final_trade_volume:1}).sort({'accumulate_trade_volume':-1})
 
 db.realtime.find({'date':'20190417','final_time':'14:30:00'},{_id:0,code:1,accumulate_trade_volume:1}).sort({accumulate_trade_volume:-1 })
 
