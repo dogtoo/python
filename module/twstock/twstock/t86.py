@@ -7,7 +7,8 @@ import sys
 #http://www.twse.com.tw/fund/T86?response=json&date=20190528&selectType=01&_=1559145215220
 #https://godoc.org/github.com/toomore/gogrs/twse go的方式取股票
 STOCKINFO_URL = 'http://www.twse.com.tw/fund/T86'
-global date_v = datetime.datetime.now().strftime("%Y%m%d")
+global date_v
+date_v = datetime.datetime.now().strftime("%Y%m%d")
 def _format_stock_info(data) -> dict:
     result = {
         'code': ''
