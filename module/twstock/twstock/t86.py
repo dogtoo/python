@@ -44,7 +44,7 @@ def get_raw(group, date, resType) -> dict:
     try:
         req = requests.Session()
         req.get(STOCKINFO_URL)
-        time=int(time.time()) * 1000
+        global time=int(time.time()) * 1000
         p = {'response': resType, 'date': date, 'selectType':group, '_':time}
         r = req.get(STOCKINFO_URL, params=p)
         if r.stat != 'OK':
