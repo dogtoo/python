@@ -98,3 +98,5 @@ class t86():
 
         self.get(group, date, resType)
     
+a = t86('01','20190620','json')
+print(a.json())
