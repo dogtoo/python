@@ -85,10 +85,11 @@ def get(group, date, resType, retry=3):
         data['rtcode'] = -1
         return data
     # Return multiple stock data
-    data = [d for d in map(_format_stock_info, data['data'])]
+    data['data'] = [d for d in map(_format_stock_info, data['data'])]
 
     data['rtcode'] = 0
     print(data.rtcode)
+    print(data['data'])
     return data
 
 a = get('01','20190620','json')
