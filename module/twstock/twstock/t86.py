@@ -65,6 +65,9 @@ def get(group, date, resType, retry=3):
     
     if data['stat'] != 'OK':
         return {'rtmessage': 'get requests data Error', 'rtcode': 1}
+    
+    if data['stat'] != '很抱歉，沒有符合條件的資料!':
+        return {'rtmessage': 'Empty Query.', 'rtcode': -1}
 
     # JSONdecode error, could be too fast, retry
     if 'rtcode' in data and data['rtcode'] == 1:
@@ -82,8 +85,8 @@ def get(group, date, resType, retry=3):
     data['data'] = [d for d in map(_format_stock_info, data['data'])]
 
     data['rtcode'] = 0
-    print(data['rtcode'])
-    print(data['data'])
+    #print(data['rtcode'])
+    #print(data['data'])
     return data
 
 #a = get('01','20190620','json')
