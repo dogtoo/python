@@ -22,23 +22,17 @@ def _format_stock_info(data) -> dict:
       , 'DHedge_O': 0 #自營商(避險)
     }
     
-    try:
-        result['code'] = data[0]
-        result['date'] = date_v
-        result['FII_I'] = data[2] + data[5]
-        result['FII_O'] = data[3] + data[6]
-        result['SIT_I'] = data[8]
-        result['SIT_O'] = data[9]
-        result['DProp_I'] = data[12]
-        result['DProp_O'] = data[13]
-        result['DHedge_I'] = data[15]
-        result['DHedge_O'] = data[16]
+    result['code'] = data[0]
+    result['date'] = date_v
+    result['FII_I'] = data[2] + data[5]
+    result['FII_O'] = data[3] + data[6]
+    result['SIT_I'] = data[8]
+    result['SIT_O'] = data[9]
+    result['DProp_I'] = data[12]
+    result['DProp_O'] = data[13]
+    result['DHedge_I'] = data[15]
+    result['DHedge_O'] = data[16]
     
-        # Success fetching
-        result['rtcode'] = 0
-    except:
-        result['rtcode'] = -1
-        
     return result
 
 def get_raw(group, date, resType) -> dict:
@@ -92,5 +86,4 @@ def get(group, date, resType, retry=3):
     print(data['data'])
     return data
 
-a = get('01','20190620','json')
-print(a.json())
+#a = get('01','20190620','json')
