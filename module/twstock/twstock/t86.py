@@ -75,7 +75,7 @@ def get(group, date, resType, retry=3):
         if retry:
             return get(group, date, resType, retry - 1)
         return data
-    date_v = date
+    global date_v = date
     # Check have data
     if not len(data['data']):
         data['rtmessage'] = 'Empty Query.'
