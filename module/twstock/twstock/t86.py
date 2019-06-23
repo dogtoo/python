@@ -3,6 +3,7 @@ import json
 import time
 import requests
 import twstock
+import sys
 #http://www.twse.com.tw/fund/T86?response=json&date=20190528&selectType=01&_=1559145215220
 #https://godoc.org/github.com/toomore/gogrs/twse go的方式取股票
 STOCKINFO_URL = 'http://www.twse.com.tw/fund/T86'
