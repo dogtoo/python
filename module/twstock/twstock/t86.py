@@ -89,14 +89,5 @@ def get(group, date, resType, retry=3):
     print(data.rtcode)
     return data
 
-class t86():
-
-    def __init__(self, group: str, date: str, resType:str):
-        self.group = group
-        self.date = date
-        self.resType = resType
-
-        self.get(group, date, resType)
-    
-a = t86('01','20190620','json')
+a = get('01','20190620','json')
 print(a.json())
