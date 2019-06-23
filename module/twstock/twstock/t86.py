@@ -88,7 +88,7 @@ def get(group, date, resType, retry=3):
     data['data'] = [d for d in map(_format_stock_info, data['data'])]
 
     data['rtcode'] = 0
-    print(data.rtcode)
+    print(data['rtcode'])
     print(data['data'])
     return data
 
