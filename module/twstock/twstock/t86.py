@@ -47,9 +47,6 @@ def get_raw(group, date, resType) -> dict:
         t=int(time.time()) * 1000
         p = {'response': resType, 'date': date, 'selectType':group, '_':t}
         r = req.get(STOCKINFO_URL, params=p)
-        print(r.stat)
-        if r['stat'] != 'OK':
-            return {'rtmessage': 'get requests data Error', 'rtcode': 1}
         
         if sys.version_info < (3, 5):
             try:
@@ -70,6 +67,9 @@ def get(group, date, resType, retry=3):
 
     # Prepare data
     data = get_raw(group, date, resType)
+    
+    if data['stat'] != 'OK':
+        return {'rtmessage': 'get requests data Error', 'rtcode': 1}
 
     # JSONdecode error, could be too fast, retry
     if data['rtcode'] == 1:
