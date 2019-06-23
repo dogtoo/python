@@ -73,7 +73,7 @@ def get(group, date, resType, retry=3):
         return {'rtmessage': 'get requests data Error', 'rtcode': 1}
 
     # JSONdecode error, could be too fast, retry
-    if data['rtcode'] == 1:
+    if 'rtcode' in data && data['rtcode'] == 1:
         # XXX: Stupit retry, you will dead here
         if retry:
             return get(group, date, resType, retry - 1)
