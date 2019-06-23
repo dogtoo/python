@@ -21,7 +21,7 @@ def _format_stock_info(data) -> dict:
       , 'DHedge_O': 0 #自營商(避險)
     }
     
-    try
+    try:
         result['code'] = data[0]
         result['date'] = date_v
         result['FII_I'] = data[2] + data[5]
