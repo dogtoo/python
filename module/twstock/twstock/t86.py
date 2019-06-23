@@ -47,6 +47,7 @@ def get_raw(group, date, resType) -> dict:
         t=int(time.time()) * 1000
         p = {'response': resType, 'date': date, 'selectType':group, '_':t}
         r = req.get(STOCKINFO_URL, params=p)
+        print(r.json())
         if r['stat'] != 'OK':
             return {'rtmessage': 'get requests data Error', 'rtcode': 1}
         
