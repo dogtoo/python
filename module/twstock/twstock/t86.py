@@ -38,7 +38,8 @@ def _format_stock_info(data) -> dict:
 
 def get_raw(group, date, resType) -> dict:
     try:
-        req = requests.Session()
+        if not req:
+            req = requests.Session()
         req.get(STOCKINFO_URL)
         t=int(time.time()) * 1000
         p = {'response': resType, 'date': date, 'selectType':group, '_':t}
