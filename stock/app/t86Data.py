@@ -5,9 +5,9 @@ import time
 import sys
 import pandas as pd
 
-#bDate = sys.argv[1]
-#eDate = sys.argv[2]
-#groupCode = sys.argv[3]
+bDate = sys.argv[1]
+eDate = sys.argv[2]
+groupCode = sys.argv[3]
 groupCode=""
 group = []
 
@@ -22,9 +22,10 @@ else:
     #抓群組代碼
     group = collRT.distinct('groupCode')
 print(group)
-bDate = '20190601'
-eDate = '20190630'
+#bDate = '20190601'
+#eDate = '20190630'
 datelist = pd.bdate_range(bDate, eDate).tolist()    
-for date in datelist:
+for date in datelist.strftime("%Y%m%d"):
     print(date)
-#data = twstock.t86.get('01', '20190620', 'json')
+    #for code in group:
+    #    data = twstock.t86.get(code, date, 'json')
