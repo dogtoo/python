@@ -30,8 +30,9 @@ for date in datelist:
     #print(date)
     for code in group:
         data = twstock.t86.get(code, date, 'json')['data']
-        print(data)
+        #print(data)
         query = {"code":data['code'],"date":data['date']}
         value = { "$set": data }
         collT86.update_one(query, value, upsert=True)
+        time.sleep(5)
         
