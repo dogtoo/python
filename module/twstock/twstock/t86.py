@@ -36,10 +36,9 @@ def _format_stock_info(data) -> dict:
     
     return result
 
-def get_raw(group, date, resType, req) -> dict:
+def get_raw(group, date, resType) -> dict:
     try:
-        if not req:
-            req = requests.Session()
+        #req = requests.Session()
         req.get(STOCKINFO_URL)
         t=int(time.time()) * 1000
         p = {'response': resType, 'date': date, 'selectType':group, '_':t}
@@ -58,12 +57,12 @@ def get_raw(group, date, resType, req) -> dict:
     except requests.ConnectionError:
         return {'rtmessage': 'ConnectionError', 'rtcode': 1}
 
-def get(group, date, resType, req, retry=3):
+def get(group, date, resType, retry=3):
     if date == '':
         date = date_v
 
     # Prepare data
-    data = get_raw(group, date, resType, req)
+    data = get_raw(group, date, resType)
 
     if 'stat' in data and data['stat'] != 'OK':
         return {'rtmessage': 'get requests data Error', 'rtcode': 1}

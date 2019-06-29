@@ -27,12 +27,11 @@ print(group)
 #bDate = '20190601'
 #eDate = '20190630'
 datelist = pd.bdate_range(bDate, eDate).strftime("%Y%m%d")
-req = requests.Session()
 for date in datelist:
     print(date)
     for code in group:
         print("  " + code)
-        r = twstock.t86.get(code, date, 'json', req)
+        r = twstock.t86.get(code, date, 'json')
         if 'data' in r:
             data = r['data']
             for h in data:
