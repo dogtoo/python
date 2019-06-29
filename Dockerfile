@@ -96,6 +96,8 @@ RUN pip install lxml
 
 RUN pip install pymongo
 
+RUN pip install pandas
+
 COPY /module/ /python/
 
 RUN cd /python/twstock \
