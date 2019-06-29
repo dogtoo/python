@@ -40,7 +40,7 @@ for date in datelist:
             #value = { "$set": data }
             #collT86.update_one(query, value, upsert=True)
             time.sleep(1)
-        else
+        else:
             print(r)
         
         
