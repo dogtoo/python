@@ -32,10 +32,15 @@ for date in datelist:
     print(date)
     for code in group:
         print("  " + code)
-        data = twstock.t86.get(code, date, 'json', req)['data']
-        print(data)
-        #query = {"code":data['code'],"date":data['date']}
-        #value = { "$set": data }
-        #collT86.update_one(query, value, upsert=True)
-        time.sleep(1)
+        r = twstock.t86.get(code, date, 'json', req)
+        if 'data' in r:
+            data = r['data']
+            print(data)
+            #query = {"code":data['code'],"date":data['date']}
+            #value = { "$set": data }
+            #collT86.update_one(query, value, upsert=True)
+            time.sleep(1)
+        else
+            print(r)
+        
         
