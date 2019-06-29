@@ -25,5 +25,5 @@ bDate = '20190601'
 eDate = '20190630'
 datelist = pd.date_range(bDate, eDate).tolist()    
 for date in datelist:
-    print date
+    print(date)
 #data = twstock.t86.get('01', '20190620', 'json')
