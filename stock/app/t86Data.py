@@ -4,6 +4,7 @@ import pymongo
 import time
 import sys
 import pandas as pd
+import requests
 
 bDate = sys.argv[1]
 eDate = sys.argv[2]
@@ -26,12 +27,13 @@ print(group)
 #bDate = '20190601'
 #eDate = '20190630'
 datelist = pd.bdate_range(bDate, eDate).strftime("%Y%m%d")
+req = requests.Session()
 for date in datelist:
     print(date)
     for code in group:
         print("  " + code)
-        #data = twstock.t86.get(code, date, 'json')['data']
-        #print(data)
+        data = twstock.t86.get(code, date, 'json', req)['data']
+        print(data)
         #query = {"code":data['code'],"date":data['date']}
         #value = { "$set": data }
         #collT86.update_one(query, value, upsert=True)
