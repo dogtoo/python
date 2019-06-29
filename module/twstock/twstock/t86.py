@@ -88,7 +88,7 @@ def get(group, date, resType, req, retry=3):
         return data
     # Return multiple stock data
     runDate = data['date']
-    data['data'] = [(d['date'] = runDate) for d in map(_format_stock_info, data['data'])]
+    data['data'] = [ print(d['code']) for d in map(_format_stock_info, data['data'])]
 
     data['rtcode'] = 0
     #print(data['rtcode'])
