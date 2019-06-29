@@ -95,4 +95,4 @@ def get(group, date, resType, req, retry=3):
     #print(data['data'])
     return data
 
-a = get('01','20190620','json')
+a = get('01','20190620','json','')
