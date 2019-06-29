@@ -24,8 +24,8 @@ else:
 print(group)
 #bDate = '20190601'
 #eDate = '20190630'
-datelist = pd.bdate_range(bDate, eDate).tolist()    
-for date in datelist.strftime("%Y%m%d"):
+datelist = pd.bdate_range(bDate, eDate).strftime("%Y%m%d")
+for date in datelist:
     print(date)
     #for code in group:
     #    data = twstock.t86.get(code, date, 'json')
