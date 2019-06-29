@@ -16,7 +16,7 @@ collRT = db["TWSE"]
 
 if groupCode:
     group[0] = groupCode
-else
+else:
     #抓群組代碼
     group = collRT.distinct('groupCode')
     
