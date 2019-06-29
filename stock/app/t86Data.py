@@ -15,6 +15,7 @@ client = pymongo.MongoClient("mongodb://172.17.0.3:27017")
 db = client["twStock"]
 db.authenticate("twstock", "twstock123")
 collRT = db["TWSE"]
+collT86 = db["t86"]
 
 if groupCode:
     group = [groupCode]
@@ -28,5 +29,9 @@ datelist = pd.bdate_range(bDate, eDate).strftime("%Y%m%d")
 for date in datelist:
     #print(date)
     for code in group:
-        data = twstock.t86.get(code, date, 'json')
-        print(data['data'])
+        data = twstock.t86.get(code, date, 'json')['data']
+        print(data)
+        query = {"code":data['code'],"date":data['date']}
+        value = { "$set": data }
+        collT86.update_one(query, value, upsert=True)
+        
