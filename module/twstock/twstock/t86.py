@@ -9,6 +9,7 @@ import sys
 STOCKINFO_URL = 'http://www.twse.com.tw/fund/T86'
 global date_v
 date_v = datetime.datetime.now().strftime("%Y%m%d")
+global runDate
 def _format_stock_info(data) -> dict:
     result = {
         'code': ''
@@ -24,7 +25,7 @@ def _format_stock_info(data) -> dict:
     }
     
     result['code'] = data[0]
-    result['date'] = date_v
+    result['date'] = runDate
     result['FII_I'] = data[2] + data[5]
     result['FII_O'] = data[3] + data[6]
     result['SIT_I'] = data[8]
@@ -75,18 +76,19 @@ def get(group, date, resType, req, retry=3):
         return data
 
     # JSONdecode error, could be too fast, retry
-    if 'rtcode' in data and data['rtcode'] == 1:
+    #if 'rtcode' in data and data['rtcode'] == 1:
         # XXX: Stupit retry, you will dead here
-        if retry:
-            return get(group, date, resType, retry - 1)
-        return data
-    date_v = date
+        #if retry:
+            #return get(group, date, resType, retry - 1)
+        #return data
+    #date_v = date
     # Check have data
     if not len(data['data']):
         data['rtmessage'] = 'Empty Query.'
         data['rtcode'] = -1
         return data
     # Return multiple stock data
+    runDate = data['date']
     data['data'] = [d for d in map(_format_stock_info, data['data'])]
 
     data['rtcode'] = 0
