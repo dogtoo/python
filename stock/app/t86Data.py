@@ -29,4 +29,4 @@ for date in datelist:
     #print(date)
     for code in group:
         data = twstock.t86.get(code, date, 'json')
-        print(data)
+        print(data['data'])
