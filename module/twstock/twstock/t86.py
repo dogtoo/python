@@ -97,7 +97,7 @@ def get(group, date, resType, req, retry=3):
 
     data['rtcode'] = 0
     #print(data['rtcode'])
-    print(data['data'])
+    #print(data['data'])
     return data
 
-a = get('01','20190620','json','')
+#a = get('01','20190620','json','')
