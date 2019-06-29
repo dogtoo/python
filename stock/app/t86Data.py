@@ -36,10 +36,10 @@ for date in datelist:
         if 'data' in r:
             data = r['data']
             print(data)
-            #query = {"code":data['code'],"date":data['date']}
-            #value = { "$set": data }
-            #collT86.update_one(query, value, upsert=True)
-            time.sleep(1)
+            query = {"code":data['code'],"date":data['date']}
+            value = { "$set": data }
+            collT86.update_one(query, value, upsert=True)
+            time.sleep(5)
         else:
             print(r)
         
