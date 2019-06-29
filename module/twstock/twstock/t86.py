@@ -63,7 +63,7 @@ def get(group, date, resType, retry=3):
 
     # Prepare data
     data = get_raw(group, date, resType)
-print(data)
+    print(data)
     if data['stat'] != 'OK':
         return {'rtmessage': 'get requests data Error', 'rtcode': 1}
     
