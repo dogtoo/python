@@ -9,7 +9,6 @@ import sys
 STOCKINFO_URL = 'http://www.twse.com.tw/fund/T86'
 global date_v
 date_v = datetime.datetime.now().strftime("%Y%m%d")
-global runDate
 def _format_stock_info(data) -> dict:
     result = {
         'code': ''
@@ -25,7 +24,7 @@ def _format_stock_info(data) -> dict:
     }
     
     result['code'] = data[0]
-    result['date'] = runDate
+    result['date'] = ''
     result['FII_I'] = data[2] + data[5]
     result['FII_O'] = data[3] + data[6]
     result['SIT_I'] = data[8]
@@ -89,11 +88,11 @@ def get(group, date, resType, req, retry=3):
         return data
     # Return multiple stock data
     runDate = data['date']
-    data['data'] = [d for d in map(_format_stock_info, data['data'])]
+    data['data'] = [d['date'] = runDate for d in map(_format_stock_info, data['data'])]
 
     data['rtcode'] = 0
     #print(data['rtcode'])
     #print(data['data'])
     return data
 
-#a = get('01','20190620','json')
+a = get('01','20190620','json')
