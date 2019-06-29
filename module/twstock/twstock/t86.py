@@ -63,11 +63,11 @@ def get(group, date, resType, retry=3):
 
     # Prepare data
     data = get_raw(group, date, resType)
-    print(data)
+
     if data['stat'] != 'OK':
         return {'rtmessage': 'get requests data Error', 'rtcode': 1}
     
-    if data['stat'] != '很抱歉，沒有符合條件的資料!':
+    if data['stat'] == '很抱歉，沒有符合條件的資料!':
         return {'rtmessage': 'Empty Query.', 'rtcode': -1}
 
     # JSONdecode error, could be too fast, retry
