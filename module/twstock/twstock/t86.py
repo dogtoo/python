@@ -88,11 +88,16 @@ def get(group, date, resType, req, retry=3):
         return data
     # Return multiple stock data
     runDate = data['date']
-    data['data'] = [ print(d['date']=runDate) for d in map(_format_stock_info, data['data'])]
+    aryData=[]
+    for d in map(_format_stock_info, data['data']):
+        d['date']=runDate
+        aryData.append(d)
+        
+    data['data'] = aryData
 
     data['rtcode'] = 0
     #print(data['rtcode'])
-    #print(data['data'])
+    print(data['data'])
     return data
 
 a = get('01','20190620','json','')
