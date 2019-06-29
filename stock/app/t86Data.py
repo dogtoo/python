@@ -26,6 +26,7 @@ print(group)
 #eDate = '20190630'
 datelist = pd.bdate_range(bDate, eDate).strftime("%Y%m%d")
 for date in datelist:
-    print(date)
-    #for code in group:
-    #    data = twstock.t86.get(code, date, 'json')
+    #print(date)
+    for code in group:
+        data = twstock.t86.get(code, date, 'json')
+        print(data)
