@@ -4,7 +4,6 @@ import pymongo
 import time
 import sys
 import pandas as pd
-import requests
 
 bDate = sys.argv[1]
 eDate = sys.argv[2]
