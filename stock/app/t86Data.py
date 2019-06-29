@@ -35,10 +35,10 @@ for date in datelist:
         r = twstock.t86.get(code, date, 'json', req)
         if 'data' in r:
             data = r['data']
-            print(data)
-            query = {"code":data['code'],"date":data['date']}
-            value = { "$set": data }
-            collT86.update_one(query, value, upsert=True)
+            for h in data:
+                query = {"code":h['code'],"date":h['date']}
+                value = { "$set": h }
+                collT86.update_one(query, value, upsert=True)
             time.sleep(5)
         else:
             print(r)
