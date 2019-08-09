@@ -13,7 +13,7 @@ else:
     print("input code:", stockGroupCode, " in " + runGroupStr)
 
 
-client = pymongo.MongoClient("mongodb://172.17.0.5:27017")
+client = pymongo.MongoClient("mongodb://172.17.0.3:27017")
 db = client["twStock"]
 db.authenticate("twstock", "twstock123")
 
