@@ -11,7 +11,7 @@ groupCode = sys.argv[3]
 groupCode=""
 group = []
 
-client = pymongo.MongoClient("mongodb://172.17.0.3:27017")
+client = pymongo.MongoClient("mongodb://172.17.0.5:27017")
 db = client["twStock"]
 db.authenticate("twstock", "twstock123")
 collRT = db["TWSE"]
@@ -37,7 +37,7 @@ for date in datelist:
                 query = {"code":h['code'],"date":h['date']}
                 value = { "$set": h }
                 collT86.update_one(query, value, upsert=True)
-            time.sleep(10)
+            time.sleep(30)
         else:
             print(r)
         

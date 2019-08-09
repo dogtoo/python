@@ -10,7 +10,7 @@ runGroupStr = sys.argv[2]
 if len(runGroupStr) == 0:
     debug = True
     runGroupStr = "24" 
-client = pymongo.MongoClient("mongodb://172.17.0.3:27017")
+client = pymongo.MongoClient("mongodb://172.17.0.5:27017")
 db = client["twStock"]
 db.authenticate("twstock", "twstock123")
 collRT = db["realtime"]
