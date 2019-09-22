@@ -7,7 +7,7 @@ import sys
 
 stockName = sys.argv[1]
 runGroupStr = sys.argv[2]
-client = pymongo.MongoClient("mongodb://172.17.0.3:27017")
+client = pymongo.MongoClient("mongodb://172.18.0.2:27017")
 db = client["twStock"]
 db.authenticate("twstock", "twstock123")
 collRT = db["realtime"]
