@@ -55,5 +55,5 @@ for date_ in daterange(start_date, end_date):
     fdate = date_.strftime("%Y%m%d")
     print(fdate)
     #collRTBak.insert_many( collRT.find({'date':fdate}))
-    run_backup(fdate);
+    run_backup(fdate)
     collRTBak.delete_many({})
