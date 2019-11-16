@@ -2,12 +2,13 @@ import pymongo
 from datetime import timedelta, date
 import sys
 import time
-#import os
-from bson.json_util import dumps
 import json
+import os
+import re
 
-startDate = str(sys.argv[1])
-endDate = str(sys.argv[2])
+bakComm = str(sys.argv[1])
+startDate = str(sys.argv[2])
+endDate = str(sys.argv[3])
 
 host = "172.18.0.2"
 port = "27017"
@@ -35,16 +36,27 @@ def render_output_locations(date_):
 
 def run_backup(date_):
     jsonpath = render_output_locations(date_)
-    with open(jsonpath, 'w') as jsonfile:
+    with open(jsonpath, 'w') as f:
         for d in collRT.find({'date':fdate},{'_id':0}):
-            jsonfile.write(json.dumps(d))
-    jsonfile.close()
+            f.write(json.dumps(d))
+    f.close()
+    
+def run_restore(date_):
+    for f in os.listdir(outputs_dir);
+        if re.search(date_, f)
+            print(f)
+            jsObj = json.load(open(f, 'r'))
+            print(jsObj)
     
 start_date = date(int(startDate[0:4]), int(startDate[5:6]), int(startDate[6:8]))
 end_date = date(int(endDate[0:4]), int(endDate[5:6]), int(endDate[6:8]))
 for date_ in daterange(start_date, end_date):
     fdate = date_.strftime("%Y%m%d")
     print(fdate)
-    #collRTBak.insert_many( collRT.find({'date':fdate}))
-    run_backup(fdate)
-    #collRTBak.delete_many({})
+    if bakComm == 'bak':
+        run_backup(fdate)
+    elif bakComm == 'res':
+        run_restore(fdate)
+    else:
+        print ('function error argv[3] need "bak" or "res"')
+    
