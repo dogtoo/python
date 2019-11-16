@@ -34,13 +34,12 @@ def render_output_locations(date_):
   return outputs_dir + date_ + "_" + time.strftime("%d-%m-%Y-%H:%M:%S") + ".bak"
 
 def run_backup(date_):
-    
     jsonpath = render_output_locations(date_)
     with open(jsonpath, 'wb') as jsonfile:
-        for d in collRT.find({'date':fdate}):
-            print(d)
-            jsonfile.write(dumps(str(d)))
-
+        for d in collRT.find({'date':fdate},{'_id':-1}):
+            jsonfile.write(json.dups(d))
+    jsonfile.close()
+    
 start_date = date(int(startDate[0:4]), int(startDate[5:6]), int(startDate[6:8]))
 end_date = date(int(endDate[0:4]), int(endDate[5:6]), int(endDate[6:8]))
 for date_ in daterange(start_date, end_date):
