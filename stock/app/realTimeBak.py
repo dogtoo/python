@@ -14,8 +14,8 @@ def daterange(start_date, end_date):
     for n in range(int ((end_date - start_date).days)):
         yield start_date + timedelta(n)
 
-start_date = date(startDate[0:4], startDate[5:6], startDate[6:8])
-end_date = date(endDate[0:4], endDate[5:6], endDate[6:8])
+start_date = date(int(startDate[0:4]), int(startDate[5:6]), int(startDate[6:8]))
+end_date = date(int(endDate[0:4]), int(endDate[5:6]), int(endDate[6:8]))
 for date_ in daterange(start_date, end_date):
     print(date_.strftime("%Y%m%d"))
     quryRT = collRTBak.insertMany( collSt.find({'date':date_.strftime("%Y%m%d")}).toArray())
