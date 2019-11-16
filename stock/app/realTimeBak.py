@@ -2,6 +2,7 @@ import pymongo
 from datetime import timedelta, date
 import sys
 import time
+import os
 
 startDate = str(sys.argv[1])
 endDate = str(sys.argv[2])
