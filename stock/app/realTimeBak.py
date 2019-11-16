@@ -68,31 +68,29 @@ def run_backup(date_):
     f.close()
 
 def restore_file(file):
-    with open(file, 'r') as jsonData:
-        try:
-            line = jsonData.readline();
-            while line:
-                jsObj = json.loads(line)
-                value = { "$set": jsObj }
-                if "final_trade_volume" not in jsObj:
-                    query = {"code":jsObj.get('code'),"date":jsObj.get('date'),"accumulate_trade_volume":{"$gte":jsObj.get('accumulate_trade_volume')}}
-                else:
-                    query = {"code":jsObj.get('code'),"date":jsObj.get('date'),"final_trade_volume":jsObj.get('final_trade_volume')}
-                
-                if mode:
-                    collRTBak.update_one(query, value, upsert=True)
-                else:
-                    collRT.update_one(query, value, upsert=True)
-                #print(jsObj)
-                #print(type(jsObj)) 
-                #for key in jsObj.keys(): 
-                #    print('key: %s  value: %s' % (key,jsObj.get(key))) 
-                line = jsonData.readline();
-        except BaseException:
-            print(file + " load error ")
-        else:
-            jsonData.close()
-            print(file + " load success")
+    try:
+        jsonData = open(file, 'r')
+        for line in jsonData:
+            jsObj = json.loads(line)
+            value = { "$set": jsObj }
+            if "final_trade_volume" not in jsObj:
+                query = {"code":jsObj.get('code'),"date":jsObj.get('date'),"accumulate_trade_volume":{"$gte":jsObj.get('accumulate_trade_volume')}}
+            else:
+                query = {"code":jsObj.get('code'),"date":jsObj.get('date'),"final_trade_volume":jsObj.get('final_trade_volume')}
+            
+            if mode:
+                collRTBak.update_one(query, value, upsert=True)
+            else:
+                collRT.update_one(query, value, upsert=True)
+            #print(jsObj)
+            #print(type(jsObj)) 
+            #for key in jsObj.keys(): 
+            #    print('key: %s  value: %s' % (key,jsObj.get(key))) 
+    except BaseException:
+        print(file + " load error ")
+    else:
+        jsonData.close()
+        print(file + " load success")
     
 def run_restore(date_):
     if len(filename) > 0:
