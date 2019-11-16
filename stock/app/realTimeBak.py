@@ -43,7 +43,7 @@ def run_backup(date_):
     
 def run_restore(date_):
     for f in os.listdir(outputs_dir):
-        if re.search(date_, f)
+        if re.search(date_, f):
             print(f)
             jsObj = json.load(open(f, 'r'))
             print(jsObj)
