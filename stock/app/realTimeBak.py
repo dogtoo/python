@@ -52,10 +52,17 @@ def run_restore(date_):
                         line = jsonData.readline();
                         while line:
                             jsObj = json.loads(line)
-                            print(jsObj)
-                            print(type(jsObj)) 
-                            for key in jsObj.keys(): 
-                                print('key: %s  value: %s' % (key,jsObj.get(key))) 
+                            query = {"code":jsObj.get('code'),"date":jsObj.get('date'),"accumulate_trade_volume":{"$gte":jsObj.get('accumulate_trade_volume')}}
+                            value = { "$set": jsObj }
+                            if "final_trade_volume" not in jsObj:
+                                collRTBak.update_one(query, value, upsert=True)
+                            else:
+                                query = {"code":jsObj.get('code'),"date":jsObj.get('date'),"final_trade_volume":jsObj.get('final_trade_volume')}
+                                collRTBak.update_one(query, value, upsert=True)
+                            #print(jsObj)
+                            #print(type(jsObj)) 
+                            #for key in jsObj.keys(): 
+                            #    print('key: %s  value: %s' % (key,jsObj.get(key))) 
                             line = jsonData.readline();
                     except BaseException:
                         print(f + " load error ")
