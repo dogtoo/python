@@ -53,10 +53,10 @@ def run_restore(date_):
                 for key in jsObj.keys(): 
                     print('key: %s  value: %s' % (key,jsObj.get(key))) 
             except BaseException:
-                print f + " load error"
+                print(f + " load error")
             else:
                 jsonData.close()
-                print f + " load success"
+                print(f + " load success")
     
 start_date = date(int(startDate[0:4]), int(startDate[5:6]), int(startDate[6:8]))
 end_date = date(int(endDate[0:4]), int(endDate[5:6]), int(endDate[6:8]))
