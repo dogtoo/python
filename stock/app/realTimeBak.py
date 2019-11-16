@@ -25,7 +25,7 @@ if len(bakComm) == 0:
     sys.exit(0)
 
 if len(sys.argv) == 3:
-    if bakComm == 'bak'
+    if bakComm == 'bak':
         print("filename not in bak")
         sys.exit(0)
     filename = str(sys.argv[2])
