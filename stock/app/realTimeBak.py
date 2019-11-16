@@ -2,8 +2,8 @@ import pymongo
 from datetime import timedelta, date
 import sys
 
-startDate = sys.argv[1]
-endDate = sys.argv[2]
+startDate = str(sys.argv[1])
+endDate = str(sys.argv[2])
 client = pymongo.MongoClient("mongodb://172.18.0.2:27017")
 db = client["twStock"]
 db.authenticate("twstock", "twstock123")
