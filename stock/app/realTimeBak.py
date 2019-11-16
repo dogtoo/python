@@ -48,15 +48,15 @@ def run_restore(date_):
             if int(os.stat(outputs_dir + f).st_size) > 0:
                 jsonData = open(outputs_dir + f)
                 #try:
-                    jsObj = json.load(jsonData)
-                    print(jsObj)
-                    print(type(jsObj)) 
-                    for key in jsObj.keys(): 
-                        print('key: %s  value: %s' % (key,jsObj.get(key))) 
+                jsObj = json.load(jsonData)
+                print(jsObj)
+                print(type(jsObj)) 
+                for key in jsObj.keys(): 
+                    print('key: %s  value: %s' % (key,jsObj.get(key))) 
                 #except BaseException:
                 #    print(f + " load error ")
                 #else:
-                    jsonData.close()
+                jsonData.close()
                 #    print(f + " load success")
     
 start_date = date(int(startDate[0:4]), int(startDate[5:6]), int(startDate[6:8]))
