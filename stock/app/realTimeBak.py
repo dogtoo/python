@@ -52,7 +52,7 @@ def run_restore(date_):
                 print(jsObj)
                 print(type(jsObj)) 
                 for key in jsObj.keys(): 
-                print('key: %s  value: %s' % (key,jsObj.get(key))) 
+                    print('key: %s  value: %s' % (key,jsObj.get(key))) 
     
 start_date = date(int(startDate[0:4]), int(startDate[5:6]), int(startDate[6:8]))
 end_date = date(int(endDate[0:4]), int(endDate[5:6]), int(endDate[6:8]))
