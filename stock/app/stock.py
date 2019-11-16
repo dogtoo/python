@@ -1,5 +1,5 @@
 #!/usr/bin/python
-print("twStockTest")
+#print("twStockTest")
 import twstock
 import pymongo
 import time
@@ -25,7 +25,7 @@ localtime = int(time.mktime(localtime)) #系統時間
 strtime = int(time.mktime(time.strptime(today + ' 00:50:00', '%Y%m%d %H:%M:%S'))) # 8:50 起
 endtime = int(time.mktime(time.strptime(today + ' 05:32:00', '%Y%m%d %H:%M:%S'))) # 13:30 結束
 twoEndtime = int(time.mktime(time.strptime(today + ' 06:50:00', '%Y%m%d %H:%M:%S'))) # 14:30 
-print("localtime:", localtime, ", Str time:", strtime, ", End time:", endtime, flush=True)
+#print("localtime:", localtime, ", Str time:", strtime, ", End time:", endtime, flush=True)
 
 group = {}
 stockCodeL = []
@@ -59,7 +59,7 @@ while (localtime >= strtime and localtime <= endtime) or debug == True or (local
     sleep = 5 #間隔5秒
     b = time.time()
     stock = twstock.realtime.get(stockCodeL)
-    print(runGroupStr,stock["success"])
+    #print(runGroupStr,stock["success"])
     if stock["success"]:
         #轉換格式
         for code, v in stock.items():
@@ -109,7 +109,7 @@ while (localtime >= strtime and localtime <= endtime) or debug == True or (local
     sleep = sleep - (e-b) #間隔時間含有執行時間
     if sleep > 0:
         time.sleep(sleep)
-    print("===" + time.ctime() + "===", e-b, flush=True)
+    #print("===" + time.ctime() + "===", e-b, flush=True)
 #print(time.ctime());
 """
 python3 stock.py TWSE 01,02,20
