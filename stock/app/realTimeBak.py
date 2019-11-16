@@ -48,7 +48,7 @@ def run_restore(date_):
             if int(os.stat(outputs_dir + f).st_size) > 0:
                 jsonData = open(outputs_dir + f)
                 #try:
-                jsObj = json.load(jsonData)
+                jsObj = json.loads(jsonData)
                 print(jsObj)
                 print(type(jsObj)) 
                 for key in jsObj.keys(): 
