@@ -44,9 +44,9 @@ def run_backup(date_):
     if collname != 'NA':
         command += " --collection " + collname 
   
-  command += " --out " + render_output_locations(date_)
+    command += " --out " + render_output_locations(date_)
   
-  os.system(command)
+    os.system(command)
 
 
 start_date = date(int(startDate[0:4]), int(startDate[5:6]), int(startDate[6:8]))
