@@ -9,7 +9,8 @@ import re
 bakComm = str(sys.argv[1])
 startDate = str(sys.argv[2])
 endDate = str(sys.argv[3])
-mode = bool(sys.argv[4])
+if len(sys.argv[4]) > 0:
+    mode = bool(sys.argv[4])
 
 if len(sys.argv) == 0:
     print("need give argv[1] bakComm{'bak','res'} \n")
