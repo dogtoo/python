@@ -45,7 +45,7 @@ def run_restore(date_):
     for f in os.listdir(outputs_dir):
         if re.search(date_, f):
             print(f)
-            jsObj = json.load(open(f, 'r'))
+            jsObj = json.load(open(outputs_dir + f, 'r'))
             print(jsObj)
     
 start_date = date(int(startDate[0:4]), int(startDate[5:6]), int(startDate[6:8]))
@@ -58,5 +58,5 @@ for date_ in daterange(start_date, end_date):
     elif bakComm == 'res':
         run_restore(fdate)
     else:
-        print ('function error argv[3] need "bak" or "res"')
+        print ('function error argv[1] need "bak" or "res"')
     
