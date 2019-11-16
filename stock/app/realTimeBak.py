@@ -2,7 +2,9 @@ import pymongo
 from datetime import timedelta, date
 import sys
 import time
-import os
+#import os
+from bson.json_util import dumps
+import json
 
 startDate = str(sys.argv[1])
 endDate = str(sys.argv[2])
@@ -32,24 +34,10 @@ def render_output_locations(date_):
   return outputs_dir + date_ + "_" + time.strftime("%d-%m-%Y-%H:%M:%S") + ".bak"
 
 def run_backup(date_):
-    command = "mongodump"
-    if host != 'NA':
-        command += " --host " + host
-    if port != 'NA':
-        command += " --port " + port
-    if username != 'NA':
-        command += " --username " + username
-    if password != 'NA':
-        command += " --password " + password
-    if dbname != 'NA':
-        command += " --db " + dbname
-    if collname != 'NA':
-        command += " --collection " + collname 
-  
-    command += " --out " + render_output_locations(date_)
-  
-    os.system(command)
-
+    d = collRT.find({'date':fdate})
+    jsonpath = render_output_locations(date_)
+    with open(jsonpath, 'wb') as jsonfile:
+        jsonfile.write(dumps(d))
 
 start_date = date(int(startDate[0:4]), int(startDate[5:6]), int(startDate[6:8]))
 end_date = date(int(endDate[0:4]), int(endDate[5:6]), int(endDate[6:8]))
