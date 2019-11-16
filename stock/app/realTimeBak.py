@@ -38,7 +38,7 @@ def run_backup(date_):
     jsonpath = render_output_locations(date_)
     with open(jsonpath, 'wb') as jsonfile:
         for d in collRT.find({'date':fdate}):
-        jsonfile.write(d)
+            jsonfile.write(d)
 
 start_date = date(int(startDate[0:4]), int(startDate[5:6]), int(startDate[6:8]))
 end_date = date(int(endDate[0:4]), int(endDate[5:6]), int(endDate[6:8]))
