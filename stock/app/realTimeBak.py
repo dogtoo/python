@@ -8,7 +8,7 @@ import re
 
 bakComm = str(sys.argv[1])
 startDate = str(sys.argv[2])
-if len(sys.argv) == 4:
+if len(sys.argv) >= 4:
     endDate = str(sys.argv[3])
 if len(sys.argv) == 5:
     mode = bool(sys.argv[4])
