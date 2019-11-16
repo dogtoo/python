@@ -18,5 +18,5 @@ start_date = date(int(startDate[0:4]), int(startDate[5:6]), int(startDate[6:8]))
 end_date = date(int(endDate[0:4]), int(endDate[5:6]), int(endDate[6:8]))
 for date_ in daterange(start_date, end_date):
     print(date_.strftime("%Y%m%d"))
-    collRTBak.insertMany( collRT.find({'date':date_.strftime("%Y%m%d")}, {"_id": 0}))
+    collRTBak.insert_many( collRT.find({'date':date_.strftime("%Y%m%d")}))
     
