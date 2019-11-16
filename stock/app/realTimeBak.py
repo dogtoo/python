@@ -16,7 +16,7 @@ password = "twstock123"
 dbname = "twStock"
 collname = "realtime"
 bkcollname = "realtime_bak"
-outputs_dir = '/python/bak/'
+outputs_dir = '/python/stock/bak/'
 
 client = pymongo.MongoClient("mongodb://"+host+":"+port)
 db = client[dbname]
