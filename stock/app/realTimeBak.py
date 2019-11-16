@@ -37,8 +37,8 @@ def render_output_locations(date_):
 def run_backup(date_):
     jsonpath = render_output_locations(date_)
     with open(jsonpath, 'w') as f:
-        for d in collRT.find({'date':fdate},{'_id':0}):
-            f.write(json.dumps(d))
+        #for d in collRT.find({'date':fdate},{'_id':0}):
+        f.write(json.dump(collRT.find({'date':fdate},{'_id':0})))
     f.close()
     
 def run_restore(date_):
@@ -48,7 +48,7 @@ def run_restore(date_):
             if int(os.stat(outputs_dir + f).st_size) > 0:
                 jsonData = open(outputs_dir + f)
                 #try:
-                jsObj = json.loads(jsonData)
+                jsObj = json.load(jsonData)
                 print(jsObj)
                 print(type(jsObj)) 
                 for key in jsObj.keys(): 
