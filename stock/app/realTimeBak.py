@@ -37,7 +37,7 @@ def run_backup(date_):
     jsonpath = render_output_locations(date_)
     with open(jsonpath, 'wb') as jsonfile:
         for d in collRT.find({'date':fdate},{'_id':-1}):
-            jsonfile.write(json.dups(d))
+            jsonfile.write(json.dumps(d))
     jsonfile.close()
     
 start_date = date(int(startDate[0:4]), int(startDate[5:6]), int(startDate[6:8]))
@@ -47,4 +47,4 @@ for date_ in daterange(start_date, end_date):
     print(fdate)
     #collRTBak.insert_many( collRT.find({'date':fdate}))
     run_backup(fdate)
-    collRTBak.delete_many({})
+    #collRTBak.delete_many({})
