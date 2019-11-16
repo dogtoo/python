@@ -52,8 +52,8 @@ def run_restore(date_):
                 print(type(jsObj)) 
                 for key in jsObj.keys(): 
                     print('key: %s  value: %s' % (key,jsObj.get(key))) 
-            except BaseException:
-                print(f + " load error " + BaseException)
+            except BaseException, Argument:
+                print(f + " load error ", Argument)
             else:
                 jsonData.close()
                 print(f + " load success")
