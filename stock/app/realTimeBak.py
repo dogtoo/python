@@ -89,7 +89,7 @@ def restore_file(file):
             print(f + " load success")
     
 def run_restore(date_):
-    if len(filename) > 0
+    if len(filename) > 0:
         restore_file(outputs_dir + filename)
     else:
         for f in os.listdir(outputs_dir):
