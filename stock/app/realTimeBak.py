@@ -45,7 +45,7 @@ def run_restore(date_):
     for f in os.listdir(outputs_dir):
         if re.search(date_, f):
             print(f)
-            jsonData = open(outputs_dir + f, 'r')
+            jsonData = open(outputs_dir + f)
             try:
                 jsObj = json.load(jsonData)
                 print(jsObj)
@@ -53,7 +53,7 @@ def run_restore(date_):
                 for key in jsObj.keys(): 
                     print('key: %s  value: %s' % (key,jsObj.get(key))) 
             except BaseException:
-                print(f + " load error")
+                print(f + " load error " + BaseException)
             else:
                 jsonData.close()
                 print(f + " load success")
