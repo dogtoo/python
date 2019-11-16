@@ -36,7 +36,7 @@ def render_output_locations(date_):
 def run_backup(date_):
     jsonpath = render_output_locations(date_)
     with open(jsonpath, 'wb') as jsonfile:
-        for d in collRT.find({'date':fdate},{'_id':-1}):
+        for d in collRT.find({'date':fdate},{'_id':0}):
             jsonfile.write(json.dumps(d))
     jsonfile.close()
     
