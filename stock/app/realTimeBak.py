@@ -89,10 +89,10 @@ def restore_file(file):
                 #    print('key: %s  value: %s' % (key,jsObj.get(key))) 
                 line = jsonData.readline();
         except BaseException:
-            print(f + " load error ")
+            print(file + " load error ")
         else:
             jsonData.close()
-            print(f + " load success")
+            print(file + " load success")
     
 def run_restore(date_):
     if len(filename) > 0:
