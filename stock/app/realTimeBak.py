@@ -45,8 +45,14 @@ def run_restore(date_):
     for f in os.listdir(outputs_dir):
         if re.search(date_, f):
             print(f)
-            jsObj = json.load(open(outputs_dir + f, 'r'))
-            print(jsObj)
+            jsonData = open(outputs_dir + f, 'r')
+            print(type(jsonData))
+            if type(jsonData) == 'dict':
+                jsObj = json.load()
+                print(jsObj)
+                print(type(jsObj)) 
+                for key in jsObj.keys(): 
+                print('key: %s  value: %s' % (key,jsObj.get(key))) 
     
 start_date = date(int(startDate[0:4]), int(startDate[5:6]), int(startDate[6:8]))
 end_date = date(int(endDate[0:4]), int(endDate[5:6]), int(endDate[6:8]))
