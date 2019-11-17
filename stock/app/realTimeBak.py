@@ -85,7 +85,7 @@ def restore_file(file):
             if len(jsonList) == 1000:
                 print("jsonList = 1000")
                 #collInsert(jsonList)
-                jsonList.clear
+                jsonList = []
             """
             value = { "$set": jsObj }
             if "final_trade_volume" not in jsObj:
