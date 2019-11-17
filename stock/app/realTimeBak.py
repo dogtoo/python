@@ -21,6 +21,11 @@ if len(sys.argv) == 0:
     print("          argv[4] mode{1:test} not need \n")
     print("  or give two argv for filename")
 
+print("argv[1] :" + bakComm + "\n")
+print("argv[2] :" + startDate + "\n")
+print("argv[3] :" + endDate + "\n")
+print("argv[4] :" + mode + "\n")
+
 if len(bakComm) == 0:
     sys.exit(0)
 
