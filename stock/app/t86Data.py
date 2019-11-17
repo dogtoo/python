@@ -3,7 +3,7 @@ import twstock
 import pymongo
 import time
 import sys
-import pandas as pd
+#import pandas as pd
 
 bDate = sys.argv[1]
 eDate = sys.argv[2]
