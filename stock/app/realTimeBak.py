@@ -84,7 +84,7 @@ def restore_file(file):
             
             if len(jsonList) == 1000:
                 print("jsonList = 1000")
-                #collInsert(jsonList)
+                collInsert(jsonList)
                 jsonList = []
             """
             value = { "$set": jsObj }
@@ -105,7 +105,7 @@ def restore_file(file):
             
         if len(jsonList) != 0:
             print("jsonList last")
-            #collInsert(jsonList)
+            collInsert(jsonList)
             jsonList.clear
             
     except BaseException:
