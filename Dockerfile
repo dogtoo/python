@@ -106,5 +106,3 @@ RUN cd /python/twstock \
 CMD ["python3"]
 
 CMD ["cd", "python"]
-
-CMD ["sh", "-c", "python3 /python/stock/app/realTimeRun.py"]

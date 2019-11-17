@@ -3,14 +3,14 @@ import twstock
 import pymongo
 import time
 import sys
-from datetime import timedelta, date
-#import pandas as pd
+import pandas as pd
 
 bDate = sys.argv[1]
 eDate = sys.argv[2]
 groupCode=""
 if len(sys.argv) >= 4:
     groupCode = sys.argv[3]
+
 group = []
 
 client = pymongo.MongoClient("mongodb://172.18.0.2:27017")
@@ -18,13 +18,6 @@ db = client["twStock"]
 db.authenticate("twstock", "twstock123")
 collRT = db["TWSE"]
 collT86 = db["t86"]
-
-def daterange(start_date, end_date):
-    if int ((end_date - start_date).days) == 0:
-        yield start_date
-    else:
-        for n in range(int ((end_date - start_date).days) + 1 ):
-            yield start_date + timedelta(n)
 
 if groupCode:
     group = [groupCode]
@@ -34,16 +27,12 @@ else:
 print(group)
 #bDate = '20190601'
 #eDate = '20190630'
-#datelist = pd.bdate_range(bDate, eDate).strftime("%Y%m%d")
-#for date in datelist:
-start_date = date(int(bDate[0:4]), int(bDate[4:6]), int(bDate[6:8]))
-end_date = date(int(eDate[0:4]), int(eDate[4:6]), int(eDate[6:8]))
-for date_ in daterange(start_date, end_date):
-    fdate = date_.strftime("%Y%m%d")
-    print(fdate)
+datelist = pd.bdate_range(bDate, eDate).strftime("%Y%m%d")
+for date in datelist:
+    print(date)
     for code in group:
         print("  " + code)
-        r = twstock.t86.get(code, fdate, 'json')
+        r = twstock.t86.get(code, date, 'json')
         if 'data' in r:
             data = r['data']
             for h in data:
