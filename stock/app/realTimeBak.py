@@ -53,8 +53,9 @@ collRTBak = db[bkcollname]
 def daterange(start_date, end_date):
     if int ((end_date - start_date).days) == 0:
         yield start_date
-    for n in range(int ((end_date - start_date).days) + 1):
-        yield start_date + timedelta(n)
+    else:
+        for n in range(int ((end_date - start_date).days) + 1):
+            yield start_date + timedelta(n)
 
 def render_output_locations(date_):
   return outputs_dir + date_ + "_" + time.strftime("%d-%m-%Y-%H:%M:%S") + ".bak"
