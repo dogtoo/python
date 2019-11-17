@@ -67,7 +67,7 @@ def run_backup(date_):
             
     f.close()
 
-def collInsert(jsonList)
+def collInsert(jsonList):
     if mode:
         collRTBak.insert_many(jsonList)
     else:
