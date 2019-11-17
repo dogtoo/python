@@ -65,7 +65,7 @@ def daterange(start_date, end_date):
             yield start_date + timedelta(n)
 
 def render_output_locations(date_):
-  return outputs_dir + date_ + "_" + time.strftime("%d-%m-%Y-%H:%M:%S") + ".bak"
+  return outputs_dir + date_ + "_" + time.strftime("%d-%m-%Y-%H-%M-%S") + ".bak"
 
 def run_backup(date_):
     jsonpath = render_output_locations(date_)
