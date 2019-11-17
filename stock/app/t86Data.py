@@ -8,7 +8,7 @@ import sys
 bDate = sys.argv[1]
 eDate = sys.argv[2]
 groupCode=""
-if len(sys.argv) >= 3:
+if len(sys.argv) >= 4:
     groupCode = sys.argv[3]
 group = []
 
