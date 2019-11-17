@@ -58,11 +58,13 @@ collRT = db[collname]
 collRTBak = db[bkcollname]
 
 def daterange(start_date, end_date):
+    """
     if int ((end_date - start_date).days) == 0:
         yield start_date
     else:
-        for n in range(int ((end_date - start_date).days) + 1):
-            yield start_date + timedelta(n)
+    """
+    for n in range(int ((end_date - start_date).days)):
+        yield start_date + timedelta(n)
 
 def render_output_locations(date_):
   return outputs_dir + date_ + "_" + time.strftime("%d-%m-%Y-%H:%M:%S") + ".bak"
@@ -148,8 +150,8 @@ else:
     print(startDate[0:4])
     print(startDate[5:6])
     print(startDate[6:8])
-    start_date = date(int(startDate[0:4]), int(startDate[5:6]), int(startDate[6:8]))
-    end_date = date(int(endDate[0:4]), int(endDate[5:6]), int(endDate[6:8]))
+    start_date = date(int(startDate[0:4]), int(startDate[4:6]), int(startDate[6:8]))
+    end_date = date(int(endDate[0:4]), int(endDate[4:6]), int(endDate[6:8]))
     for date_ in daterange(start_date, end_date):
         fdate = date_.strftime("%Y%m%d")
         print(fdate)
