@@ -101,7 +101,7 @@ def restore_file(file):
             #for key in jsObj.keys(): 
             #    print('key: %s  value: %s' % (key,jsObj.get(key)))
             
-        if len(jsonList) != 0
+        if len(jsonList) != 0:
             collInsert(jsonList)
             jsonList.clear
             
