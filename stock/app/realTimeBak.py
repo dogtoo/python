@@ -15,16 +15,17 @@ if len(sys.argv) == 5:
 filename = ""
 
 if len(sys.argv) == 0:
-    print("need give argv[1] bakComm{'bak','res'} \n")
-    print("          argv[2] startDate{'YYYYMMDD'} \n")
-    print("          argv[3] endDate{'YYYYMMDD'} \n")
-    print("          argv[4] mode{1:test} not need \n")
+    print("need give argv[1] bakComm{'bak','res'}")
+    print("          argv[2] startDate{'YYYYMMDD'}")
+    print("          argv[3] endDate{'YYYYMMDD'}")
+    print("          argv[4] mode{1:test} not need")
     print("  or give two argv for filename")
 
-print("argv[1] :" + bakComm + "\n")
-print("argv[2] :" + startDate + "\n")
-print("argv[3] :" + endDate + "\n")
-print("argv[4] :" + mode + "\n")
+print("argv[1] :" + bakComm)
+print("argv[2] :" + startDate)
+print("argv[3] :" + endDate)
+if mode:
+    print("argv[4] :true")
 
 if len(bakComm) == 0:
     sys.exit(0)
