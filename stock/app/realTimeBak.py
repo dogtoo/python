@@ -67,11 +67,24 @@ def run_backup(date_):
             
     f.close()
 
+def collInsert(jsonList)
+    if mode:
+        collRTBak.insert_many(jsonList)
+    else:
+        collRT.insert_many(jsonList)
+
 def restore_file(file):
     try:
         jsonData = open(file, 'r')
+        jsonList = []
         for line in jsonData:
             jsObj = json.loads(line)
+            jsonList.append(jsObj)
+            
+            if len(jsonList) == 1000:
+                collInsert(jsonList)
+                jsonList.clear
+            """
             value = { "$set": jsObj }
             if "final_trade_volume" not in jsObj:
                 query = {"code":jsObj.get('code'),"date":jsObj.get('date'),"accumulate_trade_volume":{"$gte":jsObj.get('accumulate_trade_volume')}}
@@ -82,10 +95,16 @@ def restore_file(file):
                 collRTBak.update_one(query, value, upsert=True)
             else:
                 collRT.update_one(query, value, upsert=True)
+            """
             #print(jsObj)
             #print(type(jsObj)) 
             #for key in jsObj.keys(): 
-            #    print('key: %s  value: %s' % (key,jsObj.get(key))) 
+            #    print('key: %s  value: %s' % (key,jsObj.get(key)))
+            
+        if len(jsonList) != 0
+            collInsert(jsonList)
+            jsonList.clear
+            
     except BaseException:
         print(file + " load error ")
     else:
@@ -98,6 +117,11 @@ def run_restore(date_):
     else:
         for f in os.listdir(outputs_dir):
             if re.search(date_, f):
+                query = {"date":date_}
+                if mode:
+                    collRTBak.delete_many(query)
+                else:
+                    collRT.delete_many(query)
                 print(f)
                 if int(os.stat(outputs_dir + f).st_size) > 0:
                     restore_file(outputs_dir + f)
