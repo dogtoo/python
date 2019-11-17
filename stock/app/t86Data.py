@@ -37,7 +37,7 @@ for date in datelist:
                 query = {"code":h['code'],"date":h['date']}
                 value = { "$set": h }
                 collT86.update_one(query, value, upsert=True)
-            time.sleep(10)
+            time.sleep(30)
         else:
             print(r)
         
