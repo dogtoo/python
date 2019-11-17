@@ -39,10 +39,11 @@ print(group)
 start_date = date(int(bDate[0:4]), int(bDate[4:6]), int(bDate[6:8]))
 end_date = date(int(eDate[0:4]), int(eDate[4:6]), int(eDate[6:8]))
 for date_ in daterange(start_date, end_date):
-    print(date_)
+    fdate = date_.strftime("%Y%m%d")
+    print(fdate)
     for code in group:
         print("  " + code)
-        r = twstock.t86.get(code, date_, 'json')
+        r = twstock.t86.get(code, fdate, 'json')
         if 'data' in r:
             data = r['data']
             for h in data:
