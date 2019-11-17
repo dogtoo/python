@@ -105,4 +105,3 @@ RUN cd /python/twstock \
 
 CMD ["python3"]
 
-CMD ["cd", "python"]
