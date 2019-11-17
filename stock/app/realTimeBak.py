@@ -7,27 +7,32 @@ import os
 import re
 
 bakComm = str(sys.argv[1])
-startDate = str(sys.argv[2])
+type = str(sys.argv[2])
+startDate = str(sys.argv[3])
 #if len(sys.argv) >= 4:
-endDate = str(sys.argv[3])
+endDate = str(sys.argv[4])
 #if len(sys.argv) == 5:
-mode = bool(sys.argv[4])
+mode = bool(sys.argv[5])
 filename = ""
 
 if len(sys.argv) == 0:
     print("need give argv[1] bakComm{'bak','res'}")
-    print("          argv[2] startDate{'YYYYMMDD'}")
-    print("          argv[3] endDate{'YYYYMMDD'}")
-    print("          argv[4] mode{1:test} not need")
+    print("          argv[2] type{'realtime','t86'}")
+    print("          argv[3] startDate{'YYYYMMDD'}")
+    print("          argv[4] endDate{'YYYYMMDD'}")
+    print("          argv[5] mode{1:test} not need")
     print("  or give two argv for filename")
 
 print("argv[1] :" + bakComm)
-print("argv[2] :" + startDate)
-print("argv[3] :" + endDate)
+print("argv[2] :" + type)
+print("argv[3] :" + startDate)
+print("argv[4] :" + endDate)
 if mode:
-    print("argv[4] :true")
+    print("argv[5] :true")
 
 if len(bakComm) == 0:
+    sys.exit(0)
+if len(type) == 0:
     sys.exit(0)
 """
 if len(sys.argv) == 3:
@@ -47,15 +52,21 @@ port = "27017"
 username = "twstock"
 password = "twstock123"
 dbname = "twStock"
-collname = "realtime"
-bkcollname = "realtime_bak"
+collname = ""
+bkcollname = ""
+if type == 'realtime':
+    collname = "realtime"
+    bkcollname = "realtime_bak"
+elif type == 't86':
+    collname = "t86"
+    bkcollname = "t86_bak"
 outputs_dir = '/python/stock/bak/'
 
 client = pymongo.MongoClient("mongodb://"+host+":"+port)
 db = client[dbname]
 db.authenticate(username, password)
-collRT = db[collname]
-collRTBak = db[bkcollname]
+coll = db[collname]
+collBak = db[bkcollname]
 
 def daterange(start_date, end_date):
     if int ((end_date - start_date).days) == 0:
@@ -65,21 +76,21 @@ def daterange(start_date, end_date):
             yield start_date + timedelta(n)
 
 def render_output_locations(date_):
-  return outputs_dir + date_ + "_" + time.strftime("%d-%m-%Y-%H-%M-%S") + ".bak"
+  return outputs_dir + date_ + "_" + collname + "_" + time.strftime("%d-%m-%Y-%H-%M-%S") + ".bak"
 
 def run_backup(date_):
     jsonpath = render_output_locations(date_)
     with open(jsonpath, 'w') as f:
-        for d in collRT.find({'date':fdate},{'_id':0}):
+        for d in coll.find({'date':fdate},{'_id':0}):
             f.write(json.dumps(d) + "\n")
             
     f.close()
 
 def collInsert(jsonList):
     if mode:
-        collRTBak.insert_many(jsonList)
+        collBak.insert_many(jsonList)
     else:
-        collRT.insert_many(jsonList)
+        coll.insert_many(jsonList)
 
 def restore_file(file):
     try:
@@ -129,9 +140,9 @@ def run_restore(date_):
             if re.search(date_, f):
                 query = {"date":date_}
                 if mode:
-                    collRTBak.delete_many(query)
+                    collBak.delete_many(query)
                 else:
-                    collRT.delete_many(query)
+                    coll.delete_many(query)
                 print(f)
                 if int(os.stat(outputs_dir + f).st_size) > 0:
                     restore_file(outputs_dir + f)
