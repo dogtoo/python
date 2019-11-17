@@ -137,7 +137,7 @@ def run_restore(date_):
         restore_file(outputs_dir + filename)
     else:
         for f in os.listdir(outputs_dir):
-            if re.search(date_, f):
+            if re.search(date_ + "_" + type, f):
                 query = {"date":date_}
                 if mode:
                     collBak.delete_many(query)
