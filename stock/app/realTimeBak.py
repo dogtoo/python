@@ -37,10 +37,10 @@ if len(sys.argv) == 3:
     filename = str(sys.argv[2])
 else:
 """
-    if len(startDate) == 0:
-        sys.exit(0)
-    if len(endDate) == 0:
-        sys.exit(0)
+if len(startDate) == 0:
+    sys.exit(0)
+if len(endDate) == 0:
+    sys.exit(0)
 
 host = "172.18.0.2"
 port = "27017"
