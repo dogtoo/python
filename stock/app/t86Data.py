@@ -7,8 +7,9 @@ import sys
 
 bDate = sys.argv[1]
 eDate = sys.argv[2]
-groupCode = sys.argv[3]
 groupCode=""
+if len(sys.argv) >= 3:
+    groupCode = sys.argv[3]
 group = []
 
 client = pymongo.MongoClient("mongodb://172.18.0.2:27017")
