@@ -3,6 +3,7 @@ import twstock
 import pymongo
 import time
 import sys
+from datetime import timedelta, date
 #import pandas as pd
 
 bDate = sys.argv[1]
@@ -37,11 +38,11 @@ print(group)
 #for date in datelist:
 start_date = date(int(bDate[0:4]), int(bDate[4:6]), int(bDate[6:8]))
 end_date = date(int(eDate[0:4]), int(eDate[4:6]), int(eDate[6:8]))
-for date in daterange(start_date, end_date):
-    print(date)
+for date_ in daterange(start_date, end_date):
+    print(date_)
     for code in group:
         print("  " + code)
-        r = twstock.t86.get(code, date, 'json')
+        r = twstock.t86.get(code, date_, 'json')
         if 'data' in r:
             data = r['data']
             for h in data:
