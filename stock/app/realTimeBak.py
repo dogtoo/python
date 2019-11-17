@@ -82,6 +82,7 @@ def restore_file(file):
             jsonList.append(jsObj)
             
             if len(jsonList) == 1000:
+                print("jsonList = 1000")
                 collInsert(jsonList)
                 jsonList.clear
             """
