@@ -11,6 +11,7 @@ type = str(sys.argv[2])
 startDate = str(sys.argv[3])
 #if len(sys.argv) >= 4:
 endDate = str(sys.argv[4])
+mode = False
 if len(sys.argv) == 6:
     mode = bool(sys.argv[5])
 filename = ""
