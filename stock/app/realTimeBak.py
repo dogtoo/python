@@ -11,8 +11,9 @@ type = str(sys.argv[2])
 startDate = str(sys.argv[3])
 #if len(sys.argv) >= 4:
 endDate = str(sys.argv[4])
-#if len(sys.argv) == 5:
-mode = bool(sys.argv[5])
+mode = False
+if len(sys.argv) == 6:
+    mode = bool(sys.argv[5])
 filename = ""
 
 if len(sys.argv) == 0:
@@ -83,7 +84,7 @@ def run_backup(date_):
     with open(jsonpath, 'w') as f:
         for d in coll.find({'date':fdate},{'_id':0}):
             f.write(json.dumps(d) + "\n")
-            
+
     f.close()
 
 def collInsert(jsonList):
@@ -99,7 +100,7 @@ def restore_file(file):
         for line in jsonData:
             jsObj = json.loads(line)
             jsonList.append(jsObj)
-            
+
             if len(jsonList) == 1000:
                 print("jsonList = 1000")
                 collInsert(jsonList)
@@ -110,28 +111,28 @@ def restore_file(file):
                 query = {"code":jsObj.get('code'),"date":jsObj.get('date'),"accumulate_trade_volume":{"$gte":jsObj.get('accumulate_trade_volume')}}
             else:
                 query = {"code":jsObj.get('code'),"date":jsObj.get('date'),"final_trade_volume":jsObj.get('final_trade_volume')}
-            
+
             if mode:
                 collRTBak.update_one(query, value, upsert=True)
             else:
                 collRT.update_one(query, value, upsert=True)
             """
             #print(jsObj)
-            #print(type(jsObj)) 
-            #for key in jsObj.keys(): 
+            #print(type(jsObj))
+            #for key in jsObj.keys():
             #    print('key: %s  value: %s' % (key,jsObj.get(key)))
-            
+
         if len(jsonList) != 0:
             print("jsonList last")
             collInsert(jsonList)
             jsonList.clear
-            
+
     except BaseException:
         print(file + " load error ")
     else:
         jsonData.close()
         print(file + " load success")
-    
+
 def run_restore(date_):
     if len(filename) > 0:
         restore_file(outputs_dir + filename)
@@ -167,4 +168,3 @@ else:
             run_restore(fdate)
         else:
             print ('function error argv[1] need "bak" or "res"')
-    
