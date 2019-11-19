@@ -9,11 +9,12 @@ import logging
 logging.basicConfig(level=logging.WARNING,
                     format='%(asctime)s - %(levelname)s : %(message)s',
                     datefmt='%Y-%m-%dT %H:%M:%S',
-                    filename='../../log/realTime_{:%Y-%m-%d}.log'.format(datetime.now()))
+                    #filename='../../log/realTime_{:%Y-%m-%d}.log'.format(datetime.now()))
+                    filename='/python/log/realTime_{:%Y-%m-%d}.log'.format(datetime.now()))
 
 stockList = ["01|02","20","03","21","12","04|18|14","28","05|22","06|08|09","10|11|15","25|24","31|27","26|29","39|23|16|17","00"]
 
-cmd = 'python3 ./stock.py TWSE "{}"'
+cmd = 'python3 /python/stock/app/stock.py TWSE "{}"'
 #cmd = 'python ./stock.py TWSE "{}"'
 cwd = os.getcwd()  # Get the current working directory (cwd)
 files = os.listdir(cwd)  # Get all the files in that directory
