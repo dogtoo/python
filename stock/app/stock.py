@@ -17,7 +17,7 @@ if len(runGroupStr) == 0:
     debug = True
     runGroupStr = "24" 
 
-logging.basicConfig(level=logging.WARNING,
+logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s : %(message)s',
                     datefmt='%Y-%m-%dT %H:%M:%S',
                     filename='../../log/' + stockName + '_' + '{:%Y-%m-%d}'.format(datetime.now()) + '_' + '{}.log'.format(runGroupStr.replace("|","_")) )
@@ -88,12 +88,12 @@ twoEndtime = int(time.mktime(time.strptime(today + ' 06:50:00', '%Y%m%d %H:%M:%S
 def chkRun(runcnt):
     sysTime = int( '{:%d%H%M}'.format(datetime.now()) )
     # 9:00 起
-    strTime = int( '{:%d}'.format(datetime.now()) + '0900' )
+    strTime = int( '{:%d}'.format(datetime.now()) + '0100' )
     # 13:40 結束
-    endTime = int( '{:%d}'.format(datetime.now()) + '1340' )
+    endTime = int( '{:%d}'.format(datetime.now()) + '0540' )
     # 15:00 零股結算
-    secBTime = int( '{:%d}'.format(datetime.now()) + '1500' )
-    secETime = int( '{:%d}'.format(datetime.now()) + '1510' )
+    secBTime = int( '{:%d}'.format(datetime.now()) + '0700' )
+    secETime = int( '{:%d}'.format(datetime.now()) + '0710' )
     logging.debug("sysTime = " + str(sysTime) + ", strTime = " + str(strTime) + ", endTime = " + str(endTime) + ", secBTime = " + str(secBTime) + ", secETime = " + str(secETime))
     if runcnt == 0 and debug:
         return True
