@@ -17,7 +17,7 @@ cmd = 'python3 ./stock.py TWSE "{}"'
 #cmd = 'python ./stock.py TWSE "{}"'
 cwd = os.getcwd()  # Get the current working directory (cwd)
 files = os.listdir(cwd)  # Get all the files in that directory
-logging.error("Files in '%s': %s" % (cwd, files))
+logging.debug("Files in '%s': %s" % (cwd, files))
 
 def runCom(L):
     return subprocess.Popen(cmd.format(L), shell=True)
