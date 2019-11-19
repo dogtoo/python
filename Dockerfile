@@ -102,7 +102,7 @@ COPY /module/ /python/
 
 RUN cd /python/twstock \
     && FLIT_ROOT_INSTALL=1 flit install
-
+# pip uninstall twstock
 CMD ["python3"]
 
 CMD ["cd", "python"]
