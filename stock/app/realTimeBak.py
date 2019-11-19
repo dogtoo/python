@@ -10,7 +10,8 @@ import logging
 logging.basicConfig(level=logging.WARNING,
                     format='%(asctime)s - %(levelname)s : %(message)s',
                     datefmt='%Y-%m-%dT %H:%M:%S',
-                    filename='../../log/bak_{:%Y-%m-%d}.log'.format(datetime.now()))
+                    #filename='../../log/bak_{:%Y-%m-%d}.log'.format(datetime.now()))
+                    filename='/python/log/bak_{:%Y-%m-%d}.log'.format(datetime.now()))
 
 bakComm = str(sys.argv[1])
 type = str(sys.argv[2])
@@ -71,7 +72,8 @@ if type == 'realtime':
 elif type == 't86':
     collname = "t86"
     bkcollname = "t86_bak"
-outputs_dir = '../bak/'
+#outputs_dir = '../bak/'
+outputs_dir = '/python/stock/bak/'
 
 client = pymongo.MongoClient("mongodb://"+host+":"+port)
 db = client[dbname]

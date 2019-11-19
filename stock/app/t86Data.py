@@ -10,7 +10,8 @@ from datetime import datetime
 logging.basicConfig(level=logging.WARNING,
                     format='%(asctime)s - %(levelname)s : %(message)s',
                     datefmt='%Y-%m-%dT %H:%M:%S',
-                    filename='../../log/t86_{:%Y-%m-%d}.log'.format(datetime.now()))
+                    #filename='../../log/t86_{:%Y-%m-%d}.log'.format(datetime.now()))
+                    filename='/python/log/t86_{:%Y-%m-%d}.log'.format(datetime.now()))
 
 bDate = sys.argv[1]
 eDate = sys.argv[2]
