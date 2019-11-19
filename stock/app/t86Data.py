@@ -63,6 +63,8 @@ for date in datelist:
                     value = { "$set": h }
                     collT86.update_one(query, value, upsert=True)
                 cnt = 10
+            elif r['stat'] == '很抱歉，沒有符合條件的資料!':
+                cnt = 10
             else:
                 logging.error("date: " + date)
                 logging.error("groupCode: " + code)
