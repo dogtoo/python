@@ -1,10 +1,16 @@
 import pymongo
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 import sys
 import time
 import json
 import os
 import re
+import logging
+
+logging.basicConfig(level=logging.WARNING,
+                    format='%(asctime)s - %(levelname)s : %(message)s',
+                    datefmt='%Y-%m-%dT %H:%M:%S',
+                    filename='../../log/bak_{:%Y-%m-%d}.log'.format(datetime.now()))
 
 bakComm = str(sys.argv[1])
 type = str(sys.argv[2])
@@ -17,19 +23,22 @@ if len(sys.argv) == 6:
 filename = ""
 
 if len(sys.argv) == 0:
-    print("need give argv[1] bakComm{'bak','res'}")
-    print("          argv[2] type{'realtime','t86'}")
-    print("          argv[3] startDate{'YYYYMMDD'}")
-    print("          argv[4] endDate{'YYYYMMDD'}")
-    print("          argv[5] mode{1:test} not need")
-    print("  or give two argv for filename")
+    logging.error("======================================")
+    logging.error("need give argv[1] bakComm{'bak','res'}")
+    logging.error("          argv[2] type{'realtime','t86'}")
+    logging.error("          argv[3] startDate{'YYYYMMDD'}")
+    logging.error("          argv[4] endDate{'YYYYMMDD'}")
+    logging.error("          argv[5] mode{1:test} not need")
+    logging.error("  or give two argv for filename")
+    sys.exit(0)
 
-print("argv[1] :" + bakComm)
-print("argv[2] :" + type)
-print("argv[3] :" + startDate)
-print("argv[4] :" + endDate)
+logging.error("======================================")
+logging.error("argv[1] :" + bakComm)
+logging.error("argv[2] :" + type)
+logging.error("argv[3] :" + startDate)
+logging.error("argv[4] :" + endDate)
 if mode:
-    print("argv[5] :true")
+    logging.error("argv[5] :true")
 
 if len(bakComm) == 0:
     sys.exit(0)
@@ -49,6 +58,7 @@ if len(endDate) == 0:
     sys.exit(0)
 
 host = "172.18.0.2"
+#host = "192.168.1.5"
 port = "27017"
 username = "twstock"
 password = "twstock123"
@@ -61,7 +71,7 @@ if type == 'realtime':
 elif type == 't86':
     collname = "t86"
     bkcollname = "t86_bak"
-outputs_dir = '/python/stock/bak/'
+outputs_dir = '../bak/'
 
 client = pymongo.MongoClient("mongodb://"+host+":"+port)
 db = client[dbname]
@@ -77,7 +87,7 @@ def daterange(start_date, end_date):
             yield start_date + timedelta(n)
 
 def render_output_locations(date_):
-  return outputs_dir + date_ + "_" + collname + "_" + time.strftime("%d-%m-%Y-%H-%M-%S") + ".bak"
+  return outputs_dir + date_ + "_" + collname + "_" + time.strftime("%Y%m%d_%H%M%S") + ".bak"
 
 def run_backup(date_):
     jsonpath = render_output_locations(date_)
@@ -102,7 +112,7 @@ def restore_file(file):
             jsonList.append(jsObj)
 
             if len(jsonList) == 1000:
-                print("jsonList = 1000")
+                logging.error("jsonList = 1000")
                 collInsert(jsonList)
                 jsonList = []
             """
@@ -123,15 +133,15 @@ def restore_file(file):
             #    print('key: %s  value: %s' % (key,jsObj.get(key)))
 
         if len(jsonList) != 0:
-            print("jsonList last")
+            logging.error("jsonList last")
             collInsert(jsonList)
             jsonList.clear
 
     except BaseException:
-        print(file + " load error ")
+        logging.error(file + " load error ")
     else:
         jsonData.close()
-        print(file + " load success")
+        logging.error(file + " load success")
 
 def run_restore(date_):
     if len(filename) > 0:
@@ -139,32 +149,32 @@ def run_restore(date_):
     else:
         for f in os.listdir(outputs_dir):
             if re.search(date_ + "_" + type, f):
-                query = {"date":date_}
-                if mode:
-                    collBak.delete_many(query)
-                else:
-                    coll.delete_many(query)
-                print(f)
                 if int(os.stat(outputs_dir + f).st_size) > 0:
+                    logging.error(f)
+                    query = {"date":date_}
+                    if mode:
+                        collBak.delete_many(query)
+                    else:
+                        coll.delete_many(query)
                     restore_file(outputs_dir + f)
 
 if len(filename) > 0 :
-    print(filename)
+    logging.error(filename)
     if bakComm == 'bak':
         run_backup(filename)
     elif bakComm == 'res':
         run_restore(filename)
     else:
-        print ('function error argv[1] need "bak" or "res"')
+        logging.error ('function error argv[1] need "bak" or "res"')
 else:
     start_date = date(int(startDate[0:4]), int(startDate[4:6]), int(startDate[6:8]))
     end_date = date(int(endDate[0:4]), int(endDate[4:6]), int(endDate[6:8]))
     for date_ in daterange(start_date, end_date):
         fdate = date_.strftime("%Y%m%d")
-        print(fdate)
+        logging.error(fdate)
         if bakComm == 'bak':
             run_backup(fdate)
         elif bakComm == 'res':
             run_restore(fdate)
         else:
-            print ('function error argv[1] need "bak" or "res"')
+            logging.error('function error argv[1] need "bak" or "res"')

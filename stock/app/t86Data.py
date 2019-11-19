@@ -26,8 +26,8 @@ group = []
 print("bDate = " + bDate + ", eDate = " + eDate + ", groupCode = " + groupCode)
 if model:
     print("model = true")
-#client = pymongo.MongoClient("mongodb://172.18.0.2:27017")
-client = pymongo.MongoClient("mongodb://192.168.1.5:27017")
+client = pymongo.MongoClient("mongodb://172.18.0.2:27017")
+#client = pymongo.MongoClient("mongodb://192.168.1.5:27017")
 db = client["twStock"]
 db.authenticate("twstock", "twstock123")
 collRT = db["TWSE"]

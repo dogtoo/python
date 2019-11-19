@@ -26,7 +26,9 @@ b7082bcc4cc5 python3.7/stock
 #0 9 * * * docker run --rm -e STOCKNAME="TWSE" -e STOCKGROUPLIST="00" -v ~/python:/python python3.7/stock >> /home/dogtoo/python/stock/log/stock5.log
 
 #星期1-6 每日9點 收即時價格
-0 9 * * 1-6 docker run --rm --network mongoNetwork -v ~/python:/python python3:1.0 >> /home/dogtoo/python/log/stock1.log
+0 9 * * 1-6 docker run --rm --network mongoNetwork -v ~/python:/python python3:1.0
+#星期1-6 每日15點 收零股結算價格
+0 15 * * 1-6 docker run --rm --network mongoNetwork -v ~/python:/python python3:1.0
 #星期1-6 每日下午6點 bak 今日價格資料
 0 18 * * 1-6 docker run --rm -d --network mongoNetwork  -v ~/python:/python python3:latest python3 /python/stock/app/realTimeBak.py bak realtime `date +20\%y\%m\%d` `date +20\%y\%m\%d` 0 >> /home/dogtoo/python/log/bak.log
 
