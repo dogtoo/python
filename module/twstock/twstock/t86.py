@@ -47,7 +47,7 @@ def get_raw(group, date, resType) -> dict:
         req.get(STOCKINFO_URL, proxies=proxies)
         t=int(time.time()) * 1000
         p = {'response': resType, 'date': date, 'selectType':group, '_':t}
-        r = req.get(STOCKINFO_URL, params=p, , proxies=proxies)
+        r = req.get(STOCKINFO_URL, params=p, proxies=proxies)
         
         if sys.version_info < (3, 5):
             try:
