@@ -38,11 +38,16 @@ def _format_stock_info(data) -> dict:
 
 def get_raw(group, date, resType) -> dict:
     try:
+        proxies = {
+            "http": "http://105.235.203.114:8080",
+            "https": "http://105.235.203.114:8080",
+        }
+    
         req = requests
-        req.get(STOCKINFO_URL)
+        req.get(STOCKINFO_URL, proxies=proxies)
         t=int(time.time()) * 1000
         p = {'response': resType, 'date': date, 'selectType':group, '_':t}
-        r = req.get(STOCKINFO_URL, params=p)
+        r = req.get(STOCKINFO_URL, params=p, , proxies=proxies)
         
         if sys.version_info < (3, 5):
             try:
