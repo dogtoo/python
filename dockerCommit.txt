@@ -27,6 +27,7 @@ b7082bcc4cc5 python3.7/stock
 
 #星期1-6 每日9點 收即時價格
 0 9 * * 1-6 docker run --rm --network mongoNetwork -v ~/python:/python python3:1.0
+0 15 * * 1-6 docker run --rm --network mongoNetwork -v ~/python:/python python3:1.0
 #星期1-6 每日15點 收零股結算價格
 0 15 * * 1-6 docker run --rm --network mongoNetwork -v ~/python:/python python3:1.0
 #星期1-6 每日下午6點 bak 今日價格資料
