@@ -9,6 +9,8 @@ import sys
 STOCKINFO_URL = 'http://www.twse.com.tw/fund/T86'
 global date_v
 date_v = datetime.datetime.now().strftime("%Y%m%d")
+req = requests
+
 def _format_stock_info(data) -> dict:
     result = {
         'code': ''
@@ -36,6 +38,14 @@ def _format_stock_info(data) -> dict:
     
     return result
 
+def dataChk(res):
+    if 'stat' in res and res['stat'] == 'OK':
+        datalist = res['data']
+        for d in datalist:
+            if len(d) != 18:
+                return False
+    return True
+
 def get_raw(group, date, resType, proxies) -> dict:
     try:
         """
@@ -44,32 +54,42 @@ def get_raw(group, date, resType, proxies) -> dict:
             "https": "http://105.235.203.114:8080",
         }
         """
-    
-        req = requests
-        if 'http' in proxies:
-            req.get(STOCKINFO_URL, proxies=proxies)
-        else:
-            req.get(STOCKINFO_URL)
-        t=int(time.time()) * 1000
-        p = {'response': resType, 'date': date, 'selectType':group, '_':t}
-        if 'http' in proxies:
-            r = req.get(STOCKINFO_URL, proxies=proxies, params=p)
-        else:
-            r = req.get(STOCKINFO_URL, params=p)
-        
-        if r.status_code != 200:
-            return {'rtmessage': str(r.status_code), 'rtcode': 1}
+        i = 0
+        res = {'rtmessage': 'get error', 'rtcode': 1}
+        while i < 10:
+            if 'http' in proxies:
+                req.get(STOCKINFO_URL, proxies=proxies)
+            else:
+                req.get(STOCKINFO_URL)
+            t=int(time.time()) * 1000
+            p = {'response': resType, 'date': date, 'selectType':group, '_':t}
+            if 'http' in proxies:
+                res = req.get(STOCKINFO_URL, proxies=proxies, params=p)
+            else:
+                res = req.get(STOCKINFO_URL, params=p)
+
+            if sys.version_info < (3, 5):
+                try:
+                    res = res.json()
+                except ValueError:
+                    res = {'rtmessage': 'json decode error:' + str(res), 'rtcode': 1}
+                    break
+            else:
+                try:
+                    res = res.json()
+                except json.decoder.JSONDecodeError:
+                    res = {'rtmessage': 'json decode error:' + str(res), 'rtcode': 1}
+                    break
             
-        if sys.version_info < (3, 5):
-            try:
-                return r.json()
-            except ValueError:
-                return {'rtmessage': 'json decode error:' + str(r), 'rtcode': 1}
-        else:
-            try:
-                return r.json()
-            except json.decoder.JSONDecodeError:
-                return {'rtmessage': 'json decode error:' + str(r), 'rtcode': 1}
+            if 'status_code' in res and res.status_code != 200:
+                res = {'rtmessage': str(res.status_code), 'rtcode': 1}
+                break
+            
+            if dataChk(res):
+                break
+            i = i + 1
+        
+        return res
     except requests.ConnectionError as e:
         return {'rtmessage': 'ConnectionError: ' + str(e), 'rtcode': 1}
 

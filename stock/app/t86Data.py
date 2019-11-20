@@ -53,10 +53,10 @@ proxList = ['', 'home',
     '43.245.223.35:80'
   , '219.85.125.190:80'
   , '122.201.144.219:3128'
-  , '106.104.12.180:80'
-  , '220.130.205.58:8080'
+ # , '106.104.12.180:80'
+ # , '220.130.205.58:8080'
   , '59.120.72.249:8080'
-  , '118.163.13.200:8080'
+ # , '118.163.13.200:8080'
   , '114.32.215.139:8080'
   , '118.171.24.73:3128'
   , '118.171.24.171:3128'
@@ -64,39 +64,43 @@ proxList = ['', 'home',
 proxidx = 1
 
 logging.error("============" + bDate + ", " + eDate + ", groupCode = " + groupCode + "============")
-for date in datelist:
-    logging.error("date = " + date)
-    for code in group:
-        logging.error("groupCode = " + code)
-        cnt = 0
-        while cnt < 10:
-            if proxList[proxidx] != '' and proxList[proxidx] != 'home':
-                proxies = {"http": proxList[proxidx]}
-            else:
-                proxies = {}
-            logging.error("prox server = " + proxList[proxidx] + ", cnt = " + str(proxidx))
-            r = twstock.t86.get(code, date, 'json', proxies)
-            if 'data' in r:
-                data = r['data']
-                for h in data:
-                    query = {"code":h['code'],"date":h['date']}
-                    value = { "$set": h }
-                    collT86.update_one(query, value, upsert=True)
-                cnt = 10
-                proxidx = (proxidx + 1) % len(proxList)
-            elif 'rtcode' in r and r['rtcode'] == -1:
-                cnt = 10
-                #logging.error("date: " + date)
-                logging.error(r['rtmessage'])
-            else:
-                #logging.error("date: " + date)
-                #logging.error("groupCode: " + code)
-                logging.error("    error: " + str(r))
-                if model:
-                    exit()
+try:
+    for date in datelist:
+        logging.error("date = " + date)
+        for code in group:
+            logging.error("    groupCode = " + code)
+            cnt = 0
+            while cnt < 10:
+                if proxList[proxidx] != '' and proxList[proxidx] != 'home':
+                    proxies = {"http": proxList[proxidx]}
                 else:
-                    time.sleep(1)
-                cnt = cnt + 1
-                proxidx = (proxidx + 1) % len(proxList)
-                
-        time.sleep(5)
+                    proxies = {}
+                logging.error("    prox server = " + proxList[proxidx] + ", cnt = " + str(proxidx))
+                r = twstock.t86.get(code, date, 'json', proxies)
+                logging.error("    t86 get")
+                if 'data' in r:
+                    data = r['data']
+                    for h in data:
+                        query = {"code":h['code'],"date":h['date']}
+                        value = { "$set": h }
+                        collT86.update_one(query, value, upsert=True)
+                    cnt = 10
+                    proxidx = (proxidx + 1) % len(proxList)
+                elif 'rtcode' in r and r['rtcode'] == -1:
+                    cnt = 10
+                    #logging.error("date: " + date)
+                    logging.error("    " + r['rtmessage'])
+                else:
+                    #logging.error("date: " + date)
+                    #logging.error("groupCode: " + code)
+                    logging.error("    error: " + str(r))
+                    if model:
+                        exit()
+                    else:
+                        time.sleep(1)
+                    cnt = cnt + 1
+                    proxidx = (proxidx + 1) % len(proxList)
+            logging.error("sleep 5")
+            time.sleep(5)
+except BaseException as e:
+    logging.error("    error: " + str(e))
