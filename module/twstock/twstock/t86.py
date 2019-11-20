@@ -57,6 +57,7 @@ def get_raw(group, date, resType, proxies) -> dict:
         res = {'rtmessage': 'get error', 'rtcode': 1}
         while i < 10:
             req = requests
+            #req.keep_alive = False
             if 'http' in proxies:
                 req.get(STOCKINFO_URL, proxies=proxies)
             else:
@@ -67,7 +68,7 @@ def get_raw(group, date, resType, proxies) -> dict:
                 res = req.get(STOCKINFO_URL, proxies=proxies, params=p)
             else:
                 res = req.get(STOCKINFO_URL, params=p)
-
+            print(str(res.json))
             if sys.version_info < (3, 5):
                 try:
                     res = res.json()
