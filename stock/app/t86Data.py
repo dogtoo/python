@@ -83,7 +83,7 @@ for date in datelist:
                     value = { "$set": h }
                     collT86.update_one(query, value, upsert=True)
                 cnt = 10
-                proxidx = (proxidx + 1) % (len(proxList) + 1)
+                proxidx = (proxidx + 1) % len(proxList)
             elif 'rtcode' in r and r['rtcode'] == -1:
                 cnt = 10
                 #logging.error("date: " + date)
