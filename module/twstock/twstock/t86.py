@@ -36,46 +36,55 @@ def _format_stock_info(data) -> dict:
     
     return result
 
-def get_raw(group, date, resType) -> dict:
+def get_raw(group, date, resType, proxies) -> dict:
     try:
+        """
         proxies = {
             "http": "http://105.235.203.114:8080",
             "https": "http://105.235.203.114:8080",
         }
+        """
     
         req = requests
-        #req.get(STOCKINFO_URL, proxies=proxies)
-        req.get(STOCKINFO_URL)
+        if 'http' in proxies:
+            req.get(STOCKINFO_URL, proxies=proxies)
+        else:
+            req.get(STOCKINFO_URL)
         t=int(time.time()) * 1000
         p = {'response': resType, 'date': date, 'selectType':group, '_':t}
-        #r = req.get(STOCKINFO_URL, proxies=proxies, params=p)
-        r = req.get(STOCKINFO_URL, params=p)
+        if 'http' in proxies:
+            r = req.get(STOCKINFO_URL, proxies=proxies, params=p)
+        else:
+            r = req.get(STOCKINFO_URL, params=p)
         
+        if r.status_code != 200:
+            return {'rtmessage': str(r.status_code), 'rtcode': 1}
+            
         if sys.version_info < (3, 5):
             try:
                 return r.json()
             except ValueError:
-                return {'rtmessage': 'json decode error', 'rtcode': 1}
+                return {'rtmessage': 'json decode error:' + str(r), 'rtcode': 1}
         else:
             try:
                 return r.json()
             except json.decoder.JSONDecodeError:
-                return {'rtmessage': 'json decode error', 'rtcode': 1}
-    except requests.ConnectionError:
-        return {'rtmessage': 'ConnectionError', 'rtcode': 1}
+                return {'rtmessage': 'json decode error:' + str(r), 'rtcode': 1}
+    except requests.ConnectionError as e:
+        return {'rtmessage': 'ConnectionError: ' + str(e), 'rtcode': 1}
 
-def get(group, date, resType, retry=3):
+def get(group, date, resType, proxies, retry=3):
     if date == '':
         date = date_v
 
     # Prepare data
-    data = get_raw(group, date, resType)
+    data = get_raw(group, date, resType, proxies)
 
-    if 'stat' in data and data['stat'] != 'OK':
-        return {'rtmessage': 'get requests data Error', 'rtcode': 1}
-    
     if 'stat' in data and data['stat'] == '很抱歉，沒有符合條件的資料!':
         return {'rtmessage': 'Empty Query.', 'rtcode': -1}
+
+    if 'stat' in data and data['stat'] != 'OK':
+        return {'rtmessage': 'get requests data Error :' + str(data), 'rtcode': 1}
         
     if 'rtcode' in data and data['rtcode'] != 0:
         return data
