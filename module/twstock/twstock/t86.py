@@ -9,7 +9,6 @@ import sys
 STOCKINFO_URL = 'http://www.twse.com.tw/fund/T86'
 global date_v
 date_v = datetime.datetime.now().strftime("%Y%m%d")
-req = requests
 
 def _format_stock_info(data) -> dict:
     result = {
@@ -57,6 +56,7 @@ def get_raw(group, date, resType, proxies) -> dict:
         i = 0
         res = {'rtmessage': 'get error', 'rtcode': 1}
         while i < 10:
+            req = requests
             if 'http' in proxies:
                 req.get(STOCKINFO_URL, proxies=proxies)
             else:
