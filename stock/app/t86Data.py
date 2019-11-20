@@ -50,9 +50,9 @@ logging.info("接收群組List: " + ', '.join(group))
 datelist = pd.bdate_range(bDate, eDate).strftime("%Y%m%d")
 logging.error("============" + bDate + ", " + eDate + "============")
 for date in datelist:
-    logging.info("date = " + date)
+    logging.error("date = " + date)
     for code in group:
-        logging.info("groupCode = " + code)
+        logging.error("groupCode = " + code)
         cnt = 0
         while cnt < 10:
             r = twstock.t86.get(code, date, 'json')
