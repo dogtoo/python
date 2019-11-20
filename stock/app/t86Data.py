@@ -10,8 +10,8 @@ from datetime import datetime
 logging.basicConfig(level=logging.WARNING,
                     format='%(asctime)s - %(levelname)s : %(message)s',
                     datefmt='%Y-%m-%dT %H:%M:%S',
-                    filename='../../log/t86_{:%Y-%m-%d}.log'.format(datetime.now()))
-                    #filename='/python/log/t86_{:%Y-%m-%d}.log'.format(datetime.now()))
+                    #filename='../../log/t86_{:%Y-%m-%d}.log'.format(datetime.now()))
+                    filename='/python/log/t86_{:%Y-%m-%d}.log'.format(datetime.now()))
 
 bDate = sys.argv[1]
 eDate = sys.argv[2]
@@ -21,14 +21,14 @@ if len(sys.argv) >= 4:
     if len(sys.argv[3]) == 1:
         model = True
     elif len(sys.argv[3]) == 2:
-        groupCode = sys.argv[3]
+        groupCode = str(sys.argv[3])
 
 group = []
-print("bDate = " + bDate + ", eDate = " + eDate + ", groupCode = " + groupCode)
+#print("bDate = " + bDate + ", eDate = " + eDate + ", groupCode = " + groupCode)
 if model:
     print("model = true")
-#client = pymongo.MongoClient("mongodb://172.18.0.2:27017")
-client = pymongo.MongoClient("mongodb://192.168.1.5:27017")
+client = pymongo.MongoClient("mongodb://172.18.0.2:27017")
+#client = pymongo.MongoClient("mongodb://192.168.1.5:27017")
 db = client["twStock"]
 db.authenticate("twstock", "twstock123")
 collRT = db["TWSE"]
@@ -57,14 +57,13 @@ proxList = ['', 'home',
   , '220.130.205.58:8080'
   , '59.120.72.249:8080'
   , '118.163.13.200:8080'
-  , '211.21.120.163:8080'
   , '114.32.215.139:8080'
   , '118.171.24.73:3128'
   , '118.171.24.171:3128'
 ]
 proxidx = 1
 
-logging.error("============" + bDate + ", " + eDate + "============")
+logging.error("============" + bDate + ", " + eDate + ", groupCode = " + groupCode + "============")
 for date in datelist:
     logging.error("date = " + date)
     for code in group:
@@ -98,6 +97,6 @@ for date in datelist:
                 else:
                     time.sleep(1)
                 cnt = cnt + 1
-                proxidx = (proxidx + 1) % (len(proxList) + 1)
+                proxidx = (proxidx + 1) % len(proxList)
                 
         time.sleep(5)
