@@ -112,6 +112,8 @@ def get_raw(group, date, resType, proxies) -> dict:
         return res
     except requests.ConnectionError as e:
         return {'rtmessage': 'ConnectionError: ' + str(e), 'rtcode': 1}
+    except requests.exceptions.RequestException as e:
+        return {'rtmessage': 'RequestException: ' + str(e), 'rtcode': 1}
 
 def get(group, date, resType, proxies, log_, retry=3):
     log = log_
