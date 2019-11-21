@@ -7,7 +7,7 @@ import pandas as pd
 import logging
 from datetime import datetime
 
-logging.basicConfig(level=logging.WARNING,
+logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s : %(message)s',
                     datefmt='%Y-%m-%dT %H:%M:%S',
                     filename='../../log/t86_{:%Y-%m-%d}.log'.format(datetime.now()))
@@ -49,8 +49,16 @@ logging.info("接收群組List: " + ', '.join(group))
 #eDate = '20190630'
 datelist = pd.bdate_range(bDate, eDate).strftime("%Y%m%d")
 
-proxList = ['', 'home', 
-    '43.245.223.35:80'
+proxList = ['', 'home'
+  , '167.99.159.6:8080'
+  , '157.230.112.218:8080'
+  , '167.71.103.168:3128'
+  , '45.5.150.3:9090'
+  , '64.74.98.214:3128'
+  , '45.6.92.18:8080'
+  , '184.183.3.211:8080'
+  , '198.98.54.241:8080'
+  , '43.245.223.35:80'
   , '219.85.125.190:80'
   , '122.201.144.219:3128'
   , '106.104.12.180:80'
@@ -60,24 +68,24 @@ proxList = ['', 'home',
   , '114.32.215.139:8080'
   , '118.171.24.73:3128'
   , '118.171.24.171:3128'
+  
 ]
 proxidx = 1
 
-logging.error("============" + bDate + ", " + eDate + ", groupCode = " + groupCode + "============")
+logging.info("============" + bDate + ", " + eDate + ", groupCode = " + groupCode + "============")
 try:
     for date in datelist:
-        logging.error("date = " + date)
+        logging.info("date = " + date)
         for code in group:
-            logging.error("    groupCode = " + code)
+            logging.info("    groupCode = " + code)
             cnt = 0
             while cnt < 10:
                 if proxList[proxidx] != '' and proxList[proxidx] != 'home':
                     proxies = {"http": proxList[proxidx]}
                 else:
                     proxies = {}
-                logging.error("    prox server = " + proxList[proxidx] + ", cnt = " + str(proxidx))
-                r = twstock.t86.get(code, date, 'json', proxies)
-                logging.error("    t86 get")
+                logging.info("    prox server = " + proxList[proxidx] + ", cnt = " + str(proxidx))
+                r = twstock.t86.get(code, date, 'json', proxies, logging)
                 if 'data' in r:
                     data = r['data']
                     for h in data:
@@ -86,21 +94,22 @@ try:
                         collT86.update_one(query, value, upsert=True)
                     cnt = 10
                     proxidx = (proxidx + 1) % len(proxList)
+                    logging.info("    t86 get")
                 elif 'rtcode' in r and r['rtcode'] == -1:
                     cnt = 10
                     #logging.error("date: " + date)
-                    logging.error("    " + r['rtmessage'])
+                    logging.error("   " + r['rtmessage'])
                 else:
                     #logging.error("date: " + date)
                     #logging.error("groupCode: " + code)
-                    logging.error("    error: " + str(r))
+                    logging.error("   " + str(r))
                     if model:
                         exit()
                     else:
                         time.sleep(1)
                     cnt = cnt + 1
                     proxidx = (proxidx + 1) % len(proxList)
-            logging.error("sleep 5")
+            logging.info("sleep 5")
             time.sleep(5)
 except BaseException as e:
-    logging.error("    error: " + str(e))
+    logging.error("   " + str(e))

@@ -4,12 +4,13 @@ import time
 import requests
 import twstock
 import sys
+import logging
 #http://www.twse.com.tw/fund/T86?response=json&date=20190528&selectType=01&_=1559145215220
 #https://godoc.org/github.com/toomore/gogrs/twse go的方式取股票
 STOCKINFO_URL = 'http://www.twse.com.tw/fund/T86'
 global date_v
 date_v = datetime.datetime.now().strftime("%Y%m%d")
-
+log = logging
 def _format_stock_info(data) -> dict:
     result = {
         'code': ''
@@ -41,7 +42,9 @@ def dataChk(res):
     if 'stat' in res and res['stat'] == 'OK':
         datalist = res['data']
         for d in datalist:
-            if len(d) != 18:
+            log.debug('       len = ' + str(len(d)))
+            if len(d) != 19:
+                log.error('       len = ' + str(len(d)))
                 return False
     return True
 
@@ -58,43 +61,61 @@ def get_raw(group, date, resType, proxies) -> dict:
         while i < 10:
             req = requests
             #req.keep_alive = False
+            """
             if 'http' in proxies:
-                req.get(STOCKINFO_URL, proxies=proxies)
+                log.debug('       proxy get session begin')
+                req.get(STOCKINFO_URL, proxies=proxies, timeout=(5, 20))
+                log.debug('       proxy get session end')
             else:
-                req.get(STOCKINFO_URL)
+                log.debug('       get session begin')
+                req.get(STOCKINFO_URL, timeout=(5, 20))
+                log.debug('       get session end')
+            time.sleep(1)
+            """
             t=int(time.time()) * 1000
             p = {'response': resType, 'date': date, 'selectType':group, '_':t}
             if 'http' in proxies:
-                res = req.get(STOCKINFO_URL, proxies=proxies, params=p)
+                log.debug('       proxy get data begin')
+                res = req.get(STOCKINFO_URL, proxies=proxies, params=p, timeout=(5, 20))
+                log.debug('       proxy get data end')
             else:
-                res = req.get(STOCKINFO_URL, params=p)
-            print(str(res.json))
+                log.debug('       get data begin')
+                res = req.get(STOCKINFO_URL, params=p, timeout=(5, 20))
+                log.debug('       get data end')
+            
+            if 'status_code' in res and res.status_code != 200:
+                res = {'rtmessage': str(res.status_code), 'rtcode': 1}
+                break
+            
             if sys.version_info < (3, 5):
                 try:
                     res = res.json()
+                    log.debug('       res.json')
                 except ValueError:
                     res = {'rtmessage': 'json decode error:' + str(res), 'rtcode': 1}
                     break
             else:
                 try:
                     res = res.json()
+                    log.debug('       res.json')
                 except json.decoder.JSONDecodeError:
                     res = {'rtmessage': 'json decode error:' + str(res), 'rtcode': 1}
                     break
             
-            if 'status_code' in res and res.status_code != 200:
-                res = {'rtmessage': str(res.status_code), 'rtcode': 1}
+            if dataChk(res):
+                log.debug('       dataChk true')
                 break
             
-            if dataChk(res):
-                break
+            time.sleep(5)
             i = i + 1
         
         return res
     except requests.ConnectionError as e:
         return {'rtmessage': 'ConnectionError: ' + str(e), 'rtcode': 1}
 
-def get(group, date, resType, proxies, retry=3):
+def get(group, date, resType, proxies, log_, retry=3):
+    log = log_
+
     if date == '':
         date = date_v
 
