@@ -49,7 +49,7 @@ logging.info("接收群組List: " + ', '.join(group))
 #eDate = '20190630'
 datelist = pd.bdate_range(bDate, eDate).strftime("%Y%m%d")
 
-proxList = ['', 'home'
+proxList = [' ', 'home'
   , '167.99.159.6:8080'
   , '157.230.112.218:8080'
   , '167.71.103.168:3128'
@@ -78,6 +78,7 @@ proxList = ['', 'home'
   , '192.163.215.33:443'
 ]
 proxidx = 1
+errorProxy = {}
 
 logging.info("============" + bDate + ", " + eDate + ", groupCode = " + groupCode + "============")
 try:
@@ -87,7 +88,7 @@ try:
             logging.info("    groupCode = " + code)
             cnt = 0
             while cnt < 10:
-                if proxList[proxidx] != '' and proxList[proxidx] != 'home':
+                if proxList[proxidx] != ' ' and proxList[proxidx] != 'home':
                     proxies = {"http": proxList[proxidx]}
                 else:
                     proxies = {}
@@ -110,12 +111,24 @@ try:
                     #logging.error("date: " + date)
                     #logging.error("groupCode: " + code)
                     logging.error("   " + str(r))
-                    if model:
-                        exit()
+                    if proxList[proxidx] in errorProxy:
+                        errorProxy[proxList[proxidx]] = errorProxy[proxList[proxidx]] + 1
                     else:
-                        time.sleep(1)
+                        errorProxy[proxList[proxidx]] = 1
+                        
+                    time.sleep(1)
                     cnt = cnt + 1
                     proxidx = (proxidx + 1) % len(proxList)
             time.sleep(5)
+"""       
+排序
+[(k,di[k]) for k in sorted(di.keys())]
+[ v for v in sorted(di.values())]
+sorted(d.items(), lambda x, y: cmp(x[1], y[1])), 或反序： 
+sorted(d.items(), lambda x, y: cmp(x[1], y[1]), reverse=True) 
+"""
+    for p in [ v for v in sorted(errorProxy.items(), key=lambda d: d[1])]:
+        logging.info(p)
+
 except BaseException as e:
     logging.error("   " + str(e))
