@@ -123,13 +123,10 @@ try:
 
     for p in [ v for v in sorted(errorProxy.items(), key=lambda d: d[1])]:
         logging.info(p)
-
-"""       
-排序
-[(k,di[k]) for k in sorted(di.keys())]
-[ v for v in sorted(di.values())]
-sorted(d.items(), lambda x, y: cmp(x[1], y[1])), 或反序： 
-sorted(d.items(), lambda x, y: cmp(x[1], y[1]), reverse=True) 
-"""
+    #排序
+    #[(k,di[k]) for k in sorted(di.keys())]
+    #[ v for v in sorted(di.values())]
+    #sorted(d.items(), lambda x, y: cmp(x[1], y[1])), 或反序： 
+    #sorted(d.items(), lambda x, y: cmp(x[1], y[1]), reverse=True) 
 except BaseException as e:
     logging.error("   " + str(e))
