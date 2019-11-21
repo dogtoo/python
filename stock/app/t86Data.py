@@ -91,7 +91,7 @@ try:
                     proxies = {"http": proxList[proxidx]}
                 else:
                     proxies = {}
-                logging.info("    prox server = " + proxList[proxidx] + ", cnt = " + str(proxidx))
+                logging.debug("    prox server = " + proxList[proxidx] + ", cnt = " + str(proxidx))
                 r = twstock.t86.get(code, date, 'json', proxies, logging)
                 if 'data' in r:
                     data = r['data']
@@ -101,7 +101,7 @@ try:
                         collT86.update_one(query, value, upsert=True)
                     cnt = 10
                     proxidx = (proxidx + 1) % len(proxList)
-                    logging.info("    t86 get")
+                    logging.info("    t86 get sleep 5")
                 elif 'rtcode' in r and r['rtcode'] == -1:
                     cnt = 10
                     #logging.error("date: " + date)
@@ -116,7 +116,6 @@ try:
                         time.sleep(1)
                     cnt = cnt + 1
                     proxidx = (proxidx + 1) % len(proxList)
-            logging.info("sleep 5")
             time.sleep(5)
 except BaseException as e:
     logging.error("   " + str(e))
