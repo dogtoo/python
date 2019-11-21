@@ -111,11 +111,11 @@ try:
                         query = {"code":h['code'],"date":h['date']}
                         value = { "$set": h }
                         collT86.update_one(query, value, upsert=True)
-                    cnt = 10
+                    cnt = 20
                     proxidx = (proxidx + 1) % len(proxList)
                     logging.info("    t86 get sleep 5")
                 elif 'rtcode' in r and r['rtcode'] == -1:
-                    cnt = 10
+                    cnt = 20
                     #logging.error("date: " + date)
                     logging.error("   " + r['rtmessage'])
                     if r['rtmessage'] == 'Empty Query.':
