@@ -154,6 +154,8 @@ try:
                     time.sleep(1)
                     cnt = cnt + 1
                     proxidx = (proxidx + 1) % len(proxList)
+            else:
+                logging.error("    groupCode = " + code + " had not get data")
                     
             #if first massage is Empty Query then break this date
             if emptyData:
