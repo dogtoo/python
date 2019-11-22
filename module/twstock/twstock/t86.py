@@ -76,11 +76,11 @@ def get_raw(group, date, resType, proxies) -> dict:
             p = {'response': resType, 'date': date, 'selectType':group, '_':t}
             if 'http' in proxies:
                 log.debug('       proxy get data begin')
-                res = req.get(STOCKINFO_URL, proxies=proxies, params=p, timeout=(5, 20))
+                res = req.get(STOCKINFO_URL, proxies=proxies, params=p, timeout=(5, 60))
                 log.debug('       proxy get data end')
             else:
                 log.debug('       get data begin')
-                res = req.get(STOCKINFO_URL, params=p, timeout=(5, 20))
+                res = req.get(STOCKINFO_URL, params=p, timeout=(5, 60))
                 log.debug('       get data end')
             
             if 'status_code' in res and res.status_code != 200:
