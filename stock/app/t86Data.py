@@ -78,6 +78,7 @@ proxList = [' ', 'home'
   , '192.163.215.33:443'
 ]
 proxidx = 1
+runProxy = {}
 errorProxy = {}
 
 logging.info("============" + bDate + ", " + eDate + ", groupCode = " + groupCode + "============")
@@ -87,9 +88,15 @@ try:
         for code in group:
             logging.info("    groupCode = " + code)
             cnt = 0
-            while cnt < 10:
+            while cnt < 20:
                 if proxList[proxidx] != ' ' and proxList[proxidx] != 'home':
                     proxies = {"http": proxList[proxidx]}
+                    
+                    if proxList[proxidx] in runProxy:
+                        runProxy[proxList[proxidx]] = runProxy[proxList[proxidx]] + 1
+                    else:
+                        runProxy[proxList[proxidx]] = 1
+                        errorProxy[proxList[proxidx]] = 0
                 else:
                     proxies = {}
                 logging.debug("    prox server = " + proxList[proxidx] + ", cnt = " + str(proxidx))
@@ -111,14 +118,13 @@ try:
                     #logging.error("date: " + date)
                     #logging.error("groupCode: " + code)
                     logging.error("   " + str(r))
-                    if proxList[proxidx] in errorProxy:
-                        errorProxy[proxList[proxidx]] = errorProxy[proxList[proxidx]] + 1
-                    else:
-                        errorProxy[proxList[proxidx]] = 1
+                    errorProxy[proxList[proxidx]] = errorProxy[proxList[proxidx]] + 1
                         
                     time.sleep(1)
                     cnt = cnt + 1
                     proxidx = (proxidx + 1) % len(proxList)
+            else:
+                logging.error("    groupCode = " + code + " had not get data")
             time.sleep(5)
 
     for p in [ v for v in sorted(errorProxy.items(), key=lambda d: d[1])]:
