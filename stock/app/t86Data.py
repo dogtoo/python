@@ -135,11 +135,11 @@ try:
                         query = {"code":h['code'],"date":h['date']}
                         value = { "$set": h }
                         collT86.update_one(query, value, upsert=True)
-                    cnt = 20
+                    cnt = 21
                     proxidx = (proxidx + 1) % len(proxList)
                     logging.info("    t86 get sleep 5")
                 elif 'rtcode' in r and r['rtcode'] == -1:
-                    cnt = 20
+                    cnt = 21
                     #logging.error("date: " + date)
                     logging.error("   " + r['rtmessage'])
                     if r['rtmessage'] == 'Empty Query.':
@@ -155,17 +155,18 @@ try:
                     cnt = cnt + 1
                     proxidx = (proxidx + 1) % len(proxList)
             else:
-                logging.error("    groupCode = " + code + " had not get data")
+                if cnt == 20:
+                    logging.error("    groupCode = " + code + " had not get data")
                     
             #if first massage is Empty Query then break this date
             if emptyData:
                 emptyData = False
+                logging.error("   break the date = " + date)
                 break
 
             time.sleep(5)
-
     for p in [ v for v in sorted(errorProxy.items(), key=lambda d: d[1])]:
-        logging.info(p)
+        logging.info(str(p) + ", run = " + str(runProxy[p[0]]))
     #排序
     #[(k,di[k]) for k in sorted(di.keys())]
     #[ v for v in sorted(di.values())]
