@@ -49,7 +49,7 @@ logging.info("接收群組List: " + ', '.join(group))
 #eDate = '20190630'
 datelist = pd.bdate_range(bDate, eDate).strftime("%Y%m%d")
 
-proxList = [' ', 'home'
+proxList = ['home', 'home'
   #, '167.99.159.6:8080'
   #, '157.230.112.218:8080'
   #, '167.71.103.168:3128'
@@ -154,27 +154,29 @@ logging.info("============" + bDate + ", " + eDate + ", groupCode = " + groupCod
 try:
     for date in datelist:
         logging.info("date = " + date)
-        for code in group:
-            logging.info("    groupCode = " + code)
+        for gcode in group:
+            logging.info("    groupCode = " + gcode)
             cnt = 0
 
             while cnt < 20:
                 if proxList[proxidx] != ' ' and proxList[proxidx] != 'home':
                     proxies = {"http": proxList[proxidx]}
-                    
-                    if proxList[proxidx] in runProxy:
-                        runProxy[proxList[proxidx]] = runProxy[proxList[proxidx]] + 1
-                    else:
-                        runProxy[proxList[proxidx]] = 1
-                        errorProxy[proxList[proxidx]] = 0
                 else:
                     proxies = {}
+                    
+                if proxList[proxidx] in runProxy:
+                    runProxy[proxList[proxidx]] = runProxy[proxList[proxidx]] + 1
+                else:
+                    runProxy[proxList[proxidx]] = 1
+                    errorProxy[proxList[proxidx]] = 0
                 logging.debug("    prox server = " + proxList[proxidx] + ", cnt = " + str(proxidx))
-                r = twstock.t86.get(code, date, 'json', proxies, logging)
+                r = twstock.t86.get(gcode, date, 'json', proxies, logging)
                 if 'data' in r:
                     data = r['data']
                     for h in data:
                         query = {"code":h['code'],"date":h['date']}
+                        #groupCode需要在查詢中用到
+                        h['groupCode'] = gcode
                         value = { "$set": h }
                         collT86.update_one(query, value, upsert=True)
                     cnt = 21
@@ -192,7 +194,7 @@ try:
                     #logging.error("groupCode: " + code)
                     logging.error("   " + str(r))
                     errorProxy[proxList[proxidx]] = errorProxy[proxList[proxidx]] + 1
-                        
+                    
                     time.sleep(1)
                     cnt = cnt + 1
                     proxidx = (proxidx + 1) % len(proxList)
