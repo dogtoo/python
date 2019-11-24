@@ -27,14 +27,14 @@ def _format_stock_info(data) -> dict:
     
     result['code'] = data[0]
     result['date'] = ''
-    result['FII_I'] = data[2] + data[5]
-    result['FII_O'] = data[3] + data[6]
-    result['SIT_I'] = data[8]
-    result['SIT_O'] = data[9]
-    result['DProp_I'] = data[12]
-    result['DProp_O'] = data[13]
-    result['DHedge_I'] = data[15]
-    result['DHedge_O'] = data[16]
+    result['FII_I'] = int(data[2].replace(',','')) + int(data[5].replace(',',''))
+    result['FII_O'] = int(data[3].replace(',','')) + int(data[6].replace(',',''))
+    result['SIT_I'] = int(data[8].replace(',',''))
+    result['SIT_O'] = int(data[9].replace(',',''))
+    result['DProp_I'] = int(data[12].replace(',',''))
+    result['DProp_O'] = int(data[13].replace(',',''))
+    result['DHedge_I'] = int(data[15].replace(',',''))
+    result['DHedge_O'] = int(data[16].replace(',',''))
     
     return result
 
