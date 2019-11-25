@@ -1,0 +1,1 @@
+https://www.twse.com.tw/exchangeReport/MI_MARGN?response=json&date=20191122&selectType=01&_=1574676057389
