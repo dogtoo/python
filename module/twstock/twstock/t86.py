@@ -63,13 +63,13 @@ def dataChk(res):
         datalist = res['data']
         for d in datalist:
             #log.debug('       len = ' + str(len(d)))
-            if int(res['date']) > 20171215 and len(d) != 19:
+            if int(res['date']) <= 20141128 and len(d) != 12:
                 log.error('       len = ' + str(len(d)))
                 return False
-            elif int(res['date']) <= 20171215 and len(d) != 16:
+            elif int(res['date']) > 20141128 and int(res['date']) <= 20171215 and len(d) != 16:
                 log.error('       len = ' + str(len(d)))
                 return False            
-            elif int(res['date']) <= 20141128 and len(d) != 12:
+            elif int(res['date']) > 20171215 and len(d) != 19:
                 log.error('       len = ' + str(len(d)))
                 return False
     return True
