@@ -27,7 +27,7 @@ def _format_stock_info(data) -> dict:
     
     result['code'] = data[0]
     result['date'] = ''
-    if int(data['date']) <= 20171215:
+    if len(data) == 16:
         result['FII_I'] = int(data[2].replace(',',''))
         result['FII_O'] = int(data[3].replace(',',''))
         result['SIT_I'] = int(data[5].replace(',',''))
