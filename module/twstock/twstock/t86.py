@@ -6,8 +6,9 @@ import twstock
 import sys
 import logging
 #http://www.twse.com.tw/fund/T86?response=json&date=20190528&selectType=01&_=1559145215220
+#https://www.twse.com.tw/fund/TWT47U?response=json&date=20030101&selectType=01&_=1574739645853 月報 101/5/2前改用月報 date 放每月1日
 #https://godoc.org/github.com/toomore/gogrs/twse go的方式取股票
-STOCKINFO_URL = 'http://www.twse.com.tw/fund/T86'
+
 global date_v
 date_v = datetime.datetime.now().strftime("%Y%m%d")
 log = logging
@@ -61,7 +62,7 @@ def dataChk(res):
     if 'stat' in res and res['stat'] == 'OK':
         datalist = res['data']
         for d in datalist:
-            log.debug('       len = ' + str(len(d)))
+            #log.debug('       len = ' + str(len(d)))
             if int(res['date']) > 20171215 and len(d) != 19:
                 log.error('       len = ' + str(len(d)))
                 return False
@@ -75,6 +76,11 @@ def dataChk(res):
 
 def get_raw(group, date, resType, proxies) -> dict:
     try:
+        if int(date) < 20120501:
+            STOCKINFO_URL = 'https://www.twse.com.tw/fund/TWT47U'
+        else:
+            STOCKINFO_URL = 'http://www.twse.com.tw/fund/T86'
+    
         """
         proxies = {
             "http": "http://105.235.203.114:8080",
@@ -99,13 +105,14 @@ def get_raw(group, date, resType, proxies) -> dict:
             """
             t=int(time.time()) * 1000
             p = {'response': resType, 'date': date, 'selectType':group, '_':t}
+                
             if 'http' in proxies:
                 log.debug('       proxy get data begin')
-                res = req.get(STOCKINFO_URL, proxies=proxies, params=p, timeout=(5, 60))
+                res = req.get(STOCKINFO_URL, proxies=proxies, params=p, timeout=(5, 80))
                 log.debug('       proxy get data end')
             else:
                 log.debug('       get data begin')
-                res = req.get(STOCKINFO_URL, params=p, timeout=(5, 60))
+                res = req.get(STOCKINFO_URL, params=p, timeout=(5, 80))
                 log.debug('       get data end')
             
             if 'status_code' in res and res.status_code != 200:

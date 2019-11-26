@@ -89,12 +89,12 @@ twoEndtime = int(time.mktime(time.strptime(today + ' 06:50:00', '%Y%m%d %H:%M:%S
 def chkRun(runcnt):
     sysTime = int( '{:%d%H%M}'.format(datetime.now()) )
     # 9:00 起
-    strTime = int( '{:%d}'.format(datetime.now()) + '0059' )
+    strTime = int( '{:%d}'.format(datetime.now()) + '0859' )
     # 13:40 結束
-    endTime = int( '{:%d}'.format(datetime.now()) + '0540' )
+    endTime = int( '{:%d}'.format(datetime.now()) + '1340' )
     # 15:00 零股結算
-    secBTime = int( '{:%d}'.format(datetime.now()) + '0659' )
-    secETime = int( '{:%d}'.format(datetime.now()) + '0710' )
+    secBTime = int( '{:%d}'.format(datetime.now()) + '1459' )
+    secETime = int( '{:%d}'.format(datetime.now()) + '1510' )
     logging.debug("sysTime = " + str(sysTime) + ", strTime = " + str(strTime) + ", endTime = " + str(endTime) + ", secBTime = " + str(secBTime) + ", secETime = " + str(secETime))
     if runcnt == 0 and debug:
         return True
