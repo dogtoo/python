@@ -7,11 +7,11 @@ import pandas as pd
 import logging
 from datetime import datetime
 
-logging.basicConfig(level=logging.INFO,
+logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s : %(message)s',
                     datefmt='%Y-%m-%dT %H:%M:%S',
-                    #filename='../../log/t86_{:%Y-%m-%d}.log'.format(datetime.now()))
-                    filename='/python/log/t86_{:%Y-%m-%d}.log'.format(datetime.now()))
+                    filename='../../log/t86_{:%Y-%m-%d}.log'.format(datetime.now()))
+                    #filename='/python/log/t86_{:%Y-%m-%d}.log'.format(datetime.now()))
 
 bDate = sys.argv[1]
 eDate = sys.argv[2]
@@ -23,8 +23,8 @@ if len(sys.argv) >= 4:
 
 if model:
     print("model = true")
-client = pymongo.MongoClient("mongodb://172.18.0.2:27017")
-#client = pymongo.MongoClient("mongodb://192.168.1.5:27017")
+#client = pymongo.MongoClient("mongodb://172.18.0.2:27017")
+client = pymongo.MongoClient("mongodb://192.168.1.5:27017")
 db = client["twStock"]
 db.authenticate("twstock", "twstock123")
 collRT = db["TWSE"]
@@ -192,7 +192,7 @@ try:
                     logging.debug(h['code'])
                     gcode = collRT.find_one({'code':h['code']})
                     logging.debug(str(gcode))
-                    if not gcode and 'groupCode' in gcode:
+                    if gcode is not None and 'groupCode' in gcode:
                         h['groupCode'] = gcode['groupCode']
                     else:
                         h['groupCode'] = '00'
