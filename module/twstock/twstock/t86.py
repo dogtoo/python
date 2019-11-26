@@ -27,7 +27,16 @@ def _format_stock_info(data) -> dict:
     
     result['code'] = data[0]
     result['date'] = ''
-    if len(data) == 16:
+    if len(data) == 12:
+        result['FII_I'] = int(data[2].replace(',',''))
+        result['FII_O'] = int(data[3].replace(',',''))
+        result['SIT_I'] = int(data[5].replace(',',''))
+        result['SIT_O'] = int(data[6].replace(',',''))
+        result['DProp_I'] = int(data[9].replace(',',''))
+        result['DProp_O'] = int(data[10].replace(',',''))
+        result['DHedge_I'] = 0
+        result['DHedge_O'] = 0
+    elif len(data) == 16:
         result['FII_I'] = int(data[2].replace(',',''))
         result['FII_O'] = int(data[3].replace(',',''))
         result['SIT_I'] = int(data[5].replace(',',''))
@@ -36,7 +45,7 @@ def _format_stock_info(data) -> dict:
         result['DProp_O'] = int(data[10].replace(',',''))
         result['DHedge_I'] = int(data[12].replace(',',''))
         result['DHedge_O'] = int(data[13].replace(',',''))
-    else:
+    elif len(data) == 19:
         result['FII_I'] = int(data[2].replace(',','')) + int(data[5].replace(',',''))
         result['FII_O'] = int(data[3].replace(',','')) + int(data[6].replace(',',''))
         result['SIT_I'] = int(data[8].replace(',',''))
@@ -59,6 +68,9 @@ def dataChk(res):
             elif int(res['date']) <= 20171215 and len(d) != 16:
                 log.error('       len = ' + str(len(d)))
                 return False            
+            elif int(res['date']) <= 20141128 and len(d) != 12:
+                log.error('       len = ' + str(len(d)))
+                return False
     return True
 
 def get_raw(group, date, resType, proxies) -> dict:
