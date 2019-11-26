@@ -226,7 +226,6 @@ try:
         if emptyData:
             emptyData = False
             logging.error("   break the date = " + date)
-            break
 
         time.sleep(1)
         
