@@ -27,14 +27,24 @@ def _format_stock_info(data) -> dict:
     
     result['code'] = data[0]
     result['date'] = ''
-    result['FII_I'] = int(data[2].replace(',','')) + int(data[5].replace(',',''))
-    result['FII_O'] = int(data[3].replace(',','')) + int(data[6].replace(',',''))
-    result['SIT_I'] = int(data[8].replace(',',''))
-    result['SIT_O'] = int(data[9].replace(',',''))
-    result['DProp_I'] = int(data[12].replace(',',''))
-    result['DProp_O'] = int(data[13].replace(',',''))
-    result['DHedge_I'] = int(data[15].replace(',',''))
-    result['DHedge_O'] = int(data[16].replace(',',''))
+    if int(data['date']) <= 20171215:
+        result['FII_I'] = int(data[2].replace(',',''))
+        result['FII_O'] = int(data[3].replace(',',''))
+        result['SIT_I'] = int(data[5].replace(',',''))
+        result['SIT_O'] = int(data[6].replace(',',''))
+        result['DProp_I'] = int(data[9].replace(',',''))
+        result['DProp_O'] = int(data[10].replace(',',''))
+        result['DHedge_I'] = int(data[12].replace(',',''))
+        result['DHedge_O'] = int(data[13].replace(',',''))
+    else:
+        result['FII_I'] = int(data[2].replace(',','')) + int(data[5].replace(',',''))
+        result['FII_O'] = int(data[3].replace(',','')) + int(data[6].replace(',',''))
+        result['SIT_I'] = int(data[8].replace(',',''))
+        result['SIT_O'] = int(data[9].replace(',',''))
+        result['DProp_I'] = int(data[12].replace(',',''))
+        result['DProp_O'] = int(data[13].replace(',',''))
+        result['DHedge_I'] = int(data[15].replace(',',''))
+        result['DHedge_O'] = int(data[16].replace(',',''))
     
     return result
 
@@ -43,9 +53,12 @@ def dataChk(res):
         datalist = res['data']
         for d in datalist:
             log.debug('       len = ' + str(len(d)))
-            if len(d) != 19:
+            if int(res['date']) > 20171215 and len(d) != 19:
                 log.error('       len = ' + str(len(d)))
                 return False
+            elif int(res['date']) <= 20171215 and len(d) != 16:
+                log.error('       len = ' + str(len(d)))
+                return False            
     return True
 
 def get_raw(group, date, resType, proxies) -> dict:
