@@ -87,6 +87,8 @@ RUN set -ex; \
 		\) -exec rm -rf '{}' +; \
 	rm -f get-pip.py
 
+RUN cp /usr/share/zoneinfo/Asia/Taipei /etc/localtime
+
 # flit
 RUN pip install flit
 
