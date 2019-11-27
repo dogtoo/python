@@ -38,10 +38,11 @@ tar -czvf `date +20%y'%m' -d 'last month'`_realtime.tar.gz `date +20%y'%m' -d 'l
 mv `date +20%y'%m' -d 'last month'`_realtime.tar.gz ~/RAID5/stockbak/realtime &&
 rm -f `date +20%y'%m' -d 'last month'`*_realtime* >> /home/dogtoo/python/log/tar.log
 
-#星期1-6 每日下午8點 收T86
-0 20 * * 1-6 docker run --rm -d --network mongoNetwork -v ~/python:/python pystock:latest python3 /python/stock/app/t86DataAll.py `date +20\%y\%m\%d` `date +20\%y\%m\%d` >> /home/dogtoo/python/log/stock2.log
+#星期1-6 每日下午8點 收T86 stockDay
+0 22 * * 1-6 docker run --rm -d --network mongoNetwork -v ~/python:/python pystock:latest python3 /python/stock/app/t86DataAll.py `date +20\%y\%m\%d` `date +20\%y\%m\%d` t86 >> /home/dogtoo/python/log/stock2.log
+0 22 * * 1-6 docker run --rm -d --network mongoNetwork -v ~/python:/python pystock:latest python3 /python/stock/app/t86DataAll.py `date +20\%y\%m\%d` `date +20\%y\%m\%d` stockDay >> /home/dogtoo/python/log/stock3.log
 #星期1-6 每日下午10點 bak T86資料
-0 22 * * 1-6 docker run --rm -d --network mongoNetwork  -v ~/python:/python python3:latest python3 /python/stock/app/realTimeBak.py bak t86 `date +20\%y\%m\%d` `date +20\%y\%m\%d` 0 >> /home/dogtoo/python/log/bak.log
+30 22 * * 1-6 docker run --rm -d --network mongoNetwork  -v ~/python:/python python3:latest python3 /python/stock/app/realTimeBak.py bak t86 `date +20\%y\%m\%d` `date +20\%y\%m\%d` 0 >> /home/dogtoo/python/log/bak.log
 
 #每月1日 zip t86 bak資料
 0 3 1 * *  cd ~/python/stock/bak &&

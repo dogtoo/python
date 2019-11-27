@@ -15,10 +15,11 @@ logging.basicConfig(level=logging.INFO,
 
 bDate = sys.argv[1]
 eDate = sys.argv[2]
+type = sys.argv[3]
 
 model = False
-if len(sys.argv) >= 4:
-    if len(sys.argv[3]) == 1:
+if len(sys.argv) >= 5:
+    if len(sys.argv[4]) == 1:
         model = True
 
 if model:
@@ -29,10 +30,17 @@ db = client["twStock"]
 db.authenticate("twstock", "twstock123")
 collRT = db["TWSE"]
 collname = ""
+
 if model:
-    collname = "t86_bak"
+    if type == 't86':
+        collname = "t86_bak"
+    else:
+        collname = "stockDay_bak"
 else:
-    collname = "t86"
+    if type == 't86':
+        collname = "t86"
+    else:
+        collname = "stockDay"
 collT86 = db[collname]
 
 datelist = pd.date_range(bDate, eDate).strftime("%Y%m%d")
@@ -187,7 +195,11 @@ try:
                 errorProxy[proxList[proxidx]] = 0
             logging.debug("    prox server = " + proxList[proxidx] + ", cnt = " + str(proxidx))
             
-            r = twstock.t86.get('ALL', date, 'json', proxies, logging)
+            if type == 't86':
+                r = twstock.t86.get('ALL', date, 'json', proxies, logging)
+            else:
+                r = twstock.t86.STOCK_DAY('ALLBUT0999', date, 'json', proxies, logging)
+            
             if 'data' in r:
                 data = r['data']
                 for h in data:
