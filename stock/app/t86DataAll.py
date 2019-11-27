@@ -35,7 +35,7 @@ else:
     collname = "t86"
 collT86 = db[collname]
 
-datelist = pd.bdate_range(bDate, eDate).strftime("%Y%m%d")
+datelist = pd.date_range(bDate, eDate).strftime("%Y%m%d")
 
 proxList = ['home', 'home'
  , '59.149.159.230:8888'
@@ -168,7 +168,10 @@ emptyData = False
 logging.info("============" + bDate + ", " + eDate + "============")
 try:
     for date in datelist:
+        if int(date) < 20120501 and date[-2:] != '01':
+            continue
         logging.info("date = " + date)
+
         cnt = 0
         while cnt < 20:
             #取得代理伺服器
@@ -223,7 +226,6 @@ try:
         if emptyData:
             emptyData = False
             logging.error("   break the date = " + date)
-            break
 
         time.sleep(1)
         
