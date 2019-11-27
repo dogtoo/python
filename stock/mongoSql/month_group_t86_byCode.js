@@ -1,18 +1,19 @@
+var t86CodeByDate =
 db.getCollection('t86').aggregate([
     {
         $match:{
             $and:[
-                {date:{'$gte':'20190101', '$lte':'20191131'}}
+                {date:{'$gte':'20190601', '$lte':'20191131'}}
                //,{groupCode:{'$eq':'03'}}
                //,{groupCode:{'$ne':'00'}}
-                ,{code:{$eq:'9910'}}
+                ,{code:{$eq:'2323'}}
             ]
         }
     },
     {
         $group:{
             _id: {
-                date:{$substr:['$date', 0, 6]}
+                date:{$substr:['$date', 0, 8]}
               //, groupCode:'$groupCode'
                 , code:'$code'
             }
@@ -30,21 +31,40 @@ db.getCollection('t86').aggregate([
         $sort:{
             '_id':1
         }
-    },
-    {
-        $project: {
-            date: '$_id.date'
-           ,code: '$_id.code'
-           ,'å¤–è³‡è²·é€²':{$divide:['$FII_I', 10000]}
-           ,'å¤–è³‡è³£å‡º':{$divide:['$FII_O', 10000]}
-           ,'å¤–è³‡å¢æ¸›':{$subtract:['$FII_I', '$FII_O']}
-           ,'æŠ•ä¿¡è²·é€²':{$divide:['$SIT_I', 10000]}
-           ,'æŠ•ä¿¡è³£å‡º':{$divide:['$SIT_O', 10000]}
-           ,'æŠ•ä¿¡å¢æ¸›':{$subtract:['$SIT_I', '$SIT_O']}
-           ,'è‡ªç‡Ÿå•†è²·é€²':{$divide:['$DProp_I', 10000]}
-           ,'è‡ªç‡Ÿå•†è³£å‡º':{$divide:['$DProp_O', 10000]}
-           ,'è‡ªç‡Ÿå•†è²·é€²é¿':{$divide:['$DHedge_I', 10000]}
-           ,'è‡ªç‡Ÿå•†è³£å‡ºé¿':{$divide:['$DHedge_O', 10000]}
-        }
+    },
+    {
+        $lookup:{
+            from: 'TWSE',
+            localField:'_id.code',
+            foreignField:'code',
+            as:'codeinfo'
+        }
+    },
+    {
+        $unwind:'$codeinfo'
+    },
+    {
+        $project: {
+            _id: 0
+           ,date: '$_id.date'
+           ,code: '$_id.code'
+           ,name: '$codeinfo.name'
+           ,'¥~¸ê¶R¶i':{$divide:['$FII_I', 10000]}
+           ,'¥~¸ê½æ¥X':{$divide:['$FII_O', 10000]}
+           ,'¥~¸ê¼W´î':{$divide:[{$subtract:['$FII_I', '$FII_O']}, 10000]}
+           ,'§ë«H¶R¶i':{$divide:['$SIT_I', 10000]}
+           ,'§ë«H½æ¥X':{$divide:['$SIT_O', 10000]}
+           ,'§ë«H¼W´î':{$divide:[{$subtract:['$SIT_I', '$SIT_O']}, 10000]}
+           ,'¦ÛÀç°Ó¶R¶i':{$divide:['$DProp_I',10000]}
+           ,'¦ÛÀç°Ó½æ¥X':{$divide:['$DProp_O', 10000]}
+           ,'¦ÛÀç°Ó¶R¶iÁ×':{$divide:['$DHedge_I', 10000]}
+           ,'¦ÛÀç°Ó½æ¥XÁ×':{$divide:['$DHedge_O', 10000]}
+        }
     }
-])
+])
+var acc = 0
+t86CodeByDate.forEach(function(item, index, array) {
+    acc = acc + item.¥~¸ê¼W´î
+    print(item.date+','+ item.¥~¸ê¶R¶i+','+item.¥~¸ê½æ¥X+','+item.¥~¸ê¼W´î+','+acc)
+    //print(item)
+});

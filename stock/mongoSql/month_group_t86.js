@@ -34,21 +34,21 @@ db.getCollection('t86').aggregate([
         $project: {
             date: '$_id.date'
            ,groupCode: '$_id.groupCode'
-           ,'å¤–è³‡è²·é€²':{$divide:['$FII_I', 10000]}
-           ,'å¤–è³‡è³£å‡º':{$divide:['$FII_O', 10000]}
-           ,'å¤–è³‡å¢æ¸›':{$subtract:['$FII_I', '$FII_O']}
-           ,'æŠ•ä¿¡è²·é€²':{$divide:['$SIT_I', 10000]}
-           ,'æŠ•ä¿¡è³£å‡º':{$divide:['$SIT_O', 10000]}
-           ,'æŠ•ä¿¡å¢æ¸›':{$subtract:['$SIT_I', '$SIT_O']}
-           ,'è‡ªç‡Ÿå•†è²·é€²':{$divide:['$DProp_I', 10000]}
-           ,'è‡ªç‡Ÿå•†è³£å‡º':{$divide:['$DProp_O', 10000]}
-           ,'è‡ªç‡Ÿå•†è²·é€²é¿':{$divide:['$DHedge_I', 10000]}
-           ,'è‡ªç‡Ÿå•†è³£å‡ºé¿':{$divide:['$DHedge_O', 10000]}
+           ,'¥~¸ê¶R¶i':{$divide:['$FII_I', 10000]}
+           ,'¥~¸ê½æ¥X':{$divide:['$FII_O', 10000]}
+           ,'¥~¸ê¼W´î':{$subtract:['$FII_I', '$FII_O']}
+           ,'§ë«H¶R¶i':{$divide:['$SIT_I', 10000]}
+           ,'§ë«H½æ¥X':{$divide:['$SIT_O', 10000]}
+           ,'§ë«H¼W´î':{$subtract:['$SIT_I', '$SIT_O']}
+           ,'¦ÛÀç°Ó¶R¶i':{$divide:['$DProp_I', 10000]}
+           ,'¦ÛÀç°Ó½æ¥X':{$divide:['$DProp_O', 10000]}
+           ,'¦ÛÀç°Ó¶R¶iÁ×':{$divide:['$DHedge_I', 10000]}
+           ,'¦ÛÀç°Ó½æ¥XÁ×':{$divide:['$DHedge_O', 10000]}
         }
     },
     {
         $sort:{
-            'å¤–è³‡å¢æ¸›':-1
+            '¥~¸ê¼W´î':-1
         }
     }
 ])
