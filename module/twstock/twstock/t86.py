@@ -97,12 +97,13 @@ def _format_stock_day_info(data) -> dict:
         if data[11].replace(' ','') != '--':
             result['Last_Best_Bid_Price'] = float(data[11].replace(',',''))
         
-        result['Last_Best_Bid_Volume'] = int(data[12].replace(',',''))
         if data[13].replace(' ','') != '--':
             result['Last_Best_Ask_Price'] = float(data[13].replace(',',''))
         
-        result['Last_Best_Ask_Volume'] = int(data[14].replace(',',''))
         result['Price_Earning_Ratio'] = float(data[15].replace(',',''))
+        
+        result['Last_Best_Bid_Volume'] = int(data[12].replace(',',''))
+        result['Last_Best_Ask_Volume'] = int(data[14].replace(',',''))
     except BaseException as e:
         logging.info("停牌可能 = " + str(data))
     return result
