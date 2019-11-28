@@ -80,30 +80,31 @@ def _format_stock_day_info(data) -> dict:
 
     result['code'] = data[0]
     result['date'] = ''
-
-    result['Trade_Volume'] = int(data[2].replace(',',''))
-    result['Transaction'] = int(data[3].replace(',',''))
-    result['Trade_Value'] = int(data[4].replace(',',''))
-    if data[5].replace(' ','') != '--':
-        result['Opening_Price'] = float(data[5].replace(',',''))
-        result['Highest_Price'] = float(data[6].replace(',',''))
-        result['Lowest_Price'] = float(data[7].replace(',',''))
-        result['Closing_Price'] = float(data[8].replace(',',''))
-        if result['Closing_Price'] >= result['Opening_Price']:
-            result['Change'] = float(data[10].replace(',',''))
-        else:
-            result['Change'] = -float(data[10].replace(',',''))
-    
-    if data[11].replace(' ','') != '--':
-        result['Last_Best_Bid_Price'] = float(data[11].replace(',',''))
-    
-    result['Last_Best_Bid_Volume'] = int(data[12].replace(',',''))
-    if data[13].replace(' ','') != '--':
-        result['Last_Best_Ask_Price'] = float(data[13].replace(',',''))
-    
-    result['Last_Best_Ask_Volume'] = int(data[14].replace(',',''))
-    result['Price_Earning_Ratio'] = float(data[15].replace(',',''))
+    try:
+        result['Trade_Volume'] = int(data[2].replace(',',''))
+        result['Transaction'] = int(data[3].replace(',',''))
+        result['Trade_Value'] = int(data[4].replace(',',''))
+        if data[5].replace(' ','') != '--':
+            result['Opening_Price'] = float(data[5].replace(',',''))
+            result['Highest_Price'] = float(data[6].replace(',',''))
+            result['Lowest_Price'] = float(data[7].replace(',',''))
+            result['Closing_Price'] = float(data[8].replace(',',''))
+            if result['Closing_Price'] >= result['Opening_Price']:
+                result['Change'] = float(data[10].replace(',',''))
+            else:
+                result['Change'] = -float(data[10].replace(',',''))
         
+        if data[11].replace(' ','') != '--':
+            result['Last_Best_Bid_Price'] = float(data[11].replace(',',''))
+        
+        result['Last_Best_Bid_Volume'] = int(data[12].replace(',',''))
+        if data[13].replace(' ','') != '--':
+            result['Last_Best_Ask_Price'] = float(data[13].replace(',',''))
+        
+        result['Last_Best_Ask_Volume'] = int(data[14].replace(',',''))
+        result['Price_Earning_Ratio'] = float(data[15].replace(',',''))
+    except BaseException as e:
+        logging.info("停牌可能 = " + data)
     return result
 
 def dataChk(res):
