@@ -176,7 +176,7 @@ emptyData = False
 logging.info("============" + bDate + ", " + eDate + "============")
 try:
     for date in datelist:
-        if int(date) < 20120501 and date[-2:] != '01':
+        if type == 't86' and int(date) < 20120501 and date[-2:] != '01':
             continue
         logging.info("date = " + date)
 
