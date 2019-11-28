@@ -104,7 +104,7 @@ def _format_stock_day_info(data) -> dict:
         result['Last_Best_Ask_Volume'] = int(data[14].replace(',',''))
         result['Price_Earning_Ratio'] = float(data[15].replace(',',''))
     except BaseException as e:
-        logging.info("停牌可能 = " + data)
+        logging.info("停牌可能 = " + str(data))
     return result
 
 def dataChk(res):
