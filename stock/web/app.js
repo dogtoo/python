@@ -1,6 +1,6 @@
 const Koa = require('koa');
 const logger = require('koa-logger');
-const Router = require('koa-router');
+//const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 const views = require('koa-views');
 const compose = require('koa-compose');
@@ -8,12 +8,12 @@ const compose = require('koa-compose');
 const fs = require('fs');
 const path = require('path');
 */
-const router = Router();
+const router = require('./routes/index');
 const app = new Koa();
 app.use(logger())
 app.use(bodyParser());
-app.use(views(__dirname, {
-        extension: 'html'
+app.use(views(__dirname + '/views', {
+        extension: 'ejs'
     })
 );
 
@@ -41,6 +41,7 @@ async function log_(ctx, next) {
 async function test_(ctx, next) {
     const start_time = Date.now();
     console.log(`test_ start`);
+    console.log(ctx.request.query);
     await next();
     const ms = Date.now() - start_time;
     console.log(`test_ end ${ctx.method} ${ctx.url} - ${ms}ms`);
@@ -54,29 +55,9 @@ Middleware End
 const middlewares = compose([log_, test_]);
 app.use(middlewares)
 
-router.get('/login', async(ctx) => {
-    console.log(`get login`);
-    ctx.body = `
-        <form method="POST" action="/login">
-            <label>UserName</label>
-            <input name="user" /><br/>
-            <button type="submit">submit</button>
-        </form>
-    `;
-});
+app.use(router.routes(), router.allowedMethods());
 
-router.post('/login', async(ctx) => {
-    console.log(`post login`);
-    let user = ctx.request.body.user;
-    ctx.body = `<p>Welocome,${user}!</p>`;
-});
-
-// Router -> /
-router.get('/', async(ctx) => {
-    console.log(`get /`);
-    await ctx.render('index')
-});
-
+app.listen(3000);
 /* 3. read html file test
 router.get('/', async(ctx) => {
     ctx.body = render('index.html');
@@ -105,8 +86,3 @@ router.get('/ready', async(ctx) => {
     console.log(`${ctx.method} ${ctx.url} - ${ms}ms`);
 });
 */
-
-//不知為什這個要放在router設定的後面
-app.use(router.routes());
-
-app.listen(3000);
