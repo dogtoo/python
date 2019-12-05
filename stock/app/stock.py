@@ -5,6 +5,7 @@ import pymongo
 import time
 import sys
 import logging
+import requests
 from datetime import timedelta, date, datetime
 
 debug = False 
@@ -17,7 +18,9 @@ if len(runGroupStr) == 0:
     debug = True
     runGroupStr = "24" 
 
-logging.basicConfig(level=logging.WARNING,
+SESSION_URL = 'http://163.29.17.179/stock/index.jsp'
+
+logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s : %(message)s',
                     datefmt='%Y-%m-%dT %H:%M:%S',
                     #filename='../../log/' + stockName + '_' + '{:%Y-%m-%d}'.format(datetime.now()) + '_' + '{}.log'.format(runGroupStr.replace("|","_")) )
@@ -109,38 +112,58 @@ def chkRun(runcnt):
 
 #print("***" + time.ctime() + "*** (", len(stockCodeL), ")", flush=True)
 #logging.error("***" + '{:%H:%M:%S}'.format(datetime.now()) + "*** " + runGroupStr + " (" + str(len(stockCodeL)) + ")")
-logging.error(" gropuCode = " + runGroupStr + "(cnt = " + str(len(stockCodeL)) + ")")
+logging.info(" gropuCode = " + runGroupStr + "(cnt = " + str(len(stockCodeL)) + ")")
 run = True
 run = chkRun(0)
 #while (localtime >= strtime and localtime <= endtime) or debug == True or (localtime > endtime and localtime <= twoEndtime):
+req = requests.Session()
+req.get(SESSION_URL)
 while run:
     sleep = 5 #間隔5秒
     b = time.time()
-    stock = twstock.realtime.get(stockCodeL)
+    stock = twstock.realtime.get(stockCodeL, req, logging)
     #print(runGroupStr,stock["success"])
     if stock["success"]:
-        logging.error("    success")
+        logging.info("    success")
         #轉換格式
+        logcnt = 0;
         for code, v in stock.items():
+            logcnt = logcnt + 1;
             if isinstance(v, dict) and v['success']:
-                del v['info']
-                rlTime = v['realtime']
-                del v['realtime']
-                v.update(rlTime)
-                v.update({'group':group[v['code']][0:2]})
-                #存入db
-                #collRT.insert_one(v)
-                #新的訊息有可能沒有交易，新增一筆的方式是要張數有增加
-                query = {"code":v['code'],"date":v['date'],"accumulate_trade_volume":{"$gte":v['accumulate_trade_volume']}}
-                value = { "$set": v }
-                if "final_trade_volume" not in v:
-                    collRT.update_one(query, value, upsert=True)
-                else:
-                    query = {"code":v['code'],"date":v['date'],"final_trade_volume":v['final_trade_volume']}
-                    value = {"$set":v}
-                    collRT.update_one(query, value, upsert=True)
+                try:
+                    del v['info']
+                    rlTime = v['realtime']
+                    del v['realtime']
+                    v.update(rlTime)
+                    v.update({'group':group[v['code']][0:2]})
+                    #存入db
+                    #collRT.insert_one(v)
+                    #新的訊息有可能沒有交易，新增一筆的方式是要張數有增加
+                    query = {"code":v['code'],"date":v['date'],"accumulate_trade_volume":{"$gte":v['accumulate_trade_volume']}}
+                    value = { "$set": v}
+                    if logcnt == 1:
+                        logging.debug("        db inst beg")
+                        
+                    if "final_trade_volume" not in v:
+                        if logcnt == 1:
+                            logging.debug("        " + str({"accumulate_trade_volume":v['accumulate_trade_volume']
+                                                          , "trade_volume":v['trade_volume']} )
+                                         )
+                        collRT.update_one(query, value, upsert=True)
+                    else:
+                        query = {"code":v['code'],"date":v['date'],"final_trade_volume":v['final_trade_volume']}
+                        if logcnt == 1:
+                            logging.debug("        " + str({"final_trade_volume":v['final_trade_volume']
+                                                          , "trade_volume":v['trade_volume']}))
+                        value = {"$set":v}
+                        collRT.update_one(query, value, upsert=True)
+                        
+                    if logcnt == 1:
+                        logging.debug("        db inst end")
+                except BaseException as e:
+                    logging.error("    BaseException :" + str(e))
     else:
-        logging.error("    error")
+        logging.error("    error" + stock['rtmessage'])
     """
     #查詢股票群組
     for stockGroupCode,codeL in group.items():
@@ -173,7 +196,7 @@ while run:
         time.sleep(sleep)
     #print("===" + time.ctime() + "===", e-b, flush=True)
 else:
-    logging.error("time out")
+    logging.info("time out")
 #print(time.ctime());
 """
 python3 stock.py TWSE 01,02,20

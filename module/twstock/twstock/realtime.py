@@ -6,7 +6,7 @@ import time
 import requests
 import twstock
 import sys
-
+import logging
 
 #SESSION_URL = 'http://mis.twse.com.tw/stock/index.jsp'
 #STOCKINFO_URL = 'http://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch={stock_id}&_={time}'
@@ -15,7 +15,7 @@ STOCKINFO_URL = 'http://163.29.17.179/stock/api/getStockInfo.jsp?ex_ch={stock_id
 
 # Mock data
 mock = False
-
+req = requests
 #https://sites.google.com/site/kentyeh2000/zheng-jiao-suo-ji-shi-zi-xun-jie-xi
 def _format_stock_info(data) -> dict:
     result = {
@@ -98,12 +98,12 @@ def _join_stock_id(stocks) -> str:
 
 def get_raw(stocks) -> dict:
     try:
-        req = requests.Session()
-        req.get(SESSION_URL)
+        #req = requests.Session()
+        #req.get(SESSION_URL)
         r = req.get(
             STOCKINFO_URL.format(
                 stock_id=_join_stock_id(stocks),
-                time=int(time.time()) * 1000))
+                time=int(time.time()) * 1000), timeout=(1, 2))
         if sys.version_info < (3, 5):
             try:
                 return r.json()
@@ -115,10 +115,13 @@ def get_raw(stocks) -> dict:
             except json.decoder.JSONDecodeError:
                 return {'rtmessage': 'json decode error', 'rtcode': '5000'}
     except requests.ConnectionError:
-        return {'rtmessage': 'ConnectionError', 'rtcode': '5000'}
+        return {'rtmessage': 'ConnectionError:'  + str(e), 'rtcode': '5000'}
+    except requests.exceptions.RequestException as e:
+        return {'rtmessage': 'RequestException: ' + str(e), 'rtcode': '5000'}
 
-def get(stocks, retry=3):
+def get(stocks, request, logging, retry=3):
     # Prepare data
+    req = request
     data = get_raw(stocks) if not mock else twstock.mock.get(stocks)
 
     # Set success
@@ -128,7 +131,7 @@ def get(stocks, retry=3):
     if data['rtcode'] == '5000':
         # XXX: Stupit retry, you will dead here
         if retry:
-            return get(stocks, retry - 1)
+            return get(stocks, logging, retry - 1)
         return data
 
     # No msgArray, dead
