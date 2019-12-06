@@ -125,7 +125,7 @@ while getSession:
     except BaseException as e:
         logging.error("get Session Exception :" + str(e))
         time.sleep(10)
-        if !chkRun(0):
+        if not chkRun(0):
             sys.exit(0)
 
 while run:
