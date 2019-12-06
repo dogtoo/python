@@ -133,7 +133,7 @@ def get(stocks, request, logging, retry=3):
     if data['rtcode'] == '5000':
         # XXX: Stupit retry, you will dead here
         if retry:
-            logging.info('retry' + ' because:' + str(data['rtmessage']))
+            logging.info('retry because:' + str(data))
             return get(stocks, logging, retry - 1)
         return data
 

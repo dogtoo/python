@@ -120,7 +120,7 @@ getSession = True
 while getSession:
     try:
         req = requests.Session()
-        req.get(SESSION_URL)
+        req.get(SESSION_URL, timeout=(1, 2))
         getSession = False
     except BaseException as e:
         logging.error("get Session Exception :" + str(e))
