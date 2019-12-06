@@ -34,6 +34,7 @@ stop = len(stockList)
 while stop > 0:
     for i in range(len(stockList)):
         #fp[i].write(p[i].stdout.readline())
+        p[i].poll()
         logging.info(str(i) + " code(" + str(p[i].pid) + ")=" + str(p[i].returncode))
         #p[i].poll()
         if p[i].returncode == 0:

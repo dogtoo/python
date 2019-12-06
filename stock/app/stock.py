@@ -6,6 +6,8 @@ import time
 import sys
 import logging
 import requests
+import random
+random.seed('dogtoo')
 from datetime import timedelta, date, datetime
 
 debug = False 
@@ -51,6 +53,74 @@ endtime = int(time.mktime(time.strptime(today + ' 05:32:00', '%Y%m%d %H:%M:%S'))
 twoEndtime = int(time.mktime(time.strptime(today + ' 06:50:00', '%Y%m%d %H:%M:%S'))) # 14:30 
 """
 #print("localtime:", localtime, ", Str time:", strtime, ", End time:", endtime, flush=True)
+
+proxList = ['59.149.159.230:8888'
+ , '23.101.2.247:81'
+ , '188.166.119.186:80'
+ , '178.62.232.215:8080'
+ , '192.81.223.236:3128'
+ , '62.33.207.197:3128'
+ , '62.33.207.202:80'
+ , '58.233.211.104:443'
+ , '58.233.211.104:80'
+ , '109.86.229.189:8080'
+ , '51.158.178.67:3128'
+ , '51.158.68.26:8811'
+ , '51.158.106.54:8811'
+ , '58.233.211.104:80'
+ , '58.233.211.104:443'
+ , '23.237.173.102:3128'
+ , '167.172.140.184:3128'
+ , '167.172.225.187:3128'
+ , '167.172.225.187:8080'
+ , '51.158.68.133:8811'
+ , '51.158.98.121:8811'
+ , '163.172.147.94:8811'
+ , '136.243.47.220:3128'
+ , '23.101.2.247:81'
+ , '159.138.1.185:80'
+ , '194.167.44.91:80'
+ , '51.158.120.84:8811'
+ , '51.158.98.121:8811'
+ , '163.172.152.52:8811'
+ , '163.172.136.226:8811'
+ , '51.158.111.229:8811'
+ , '51.158.68.68:8811'
+ , '163.172.147.94:8811'
+ , '51.158.99.51:8811'
+ , '51.158.119.88:8811'
+ , '34.90.113.143:3128'
+ , '141.125.82.106:80'
+ , '138.201.72.117:80'
+ , '185.125.204.68:3128'
+ , '103.226.213.156:8888'
+ , '176.123.61.238:3128'
+ , '62.33.207.201:3128'
+ , '150.109.162.73:3128'
+ , '67.63.33.7:80'
+ , '167.71.132.188:8080'
+ , '157.245.207.190:8080'
+ , '178.62.232.215:8080'
+ , '192.81.223.236:3128'
+ , '80.234.38.44:3128'
+ , '109.174.19.134:8385'
+ , '51.68.189.52:3128'
+ , '47.74.44.84:8080'
+ , '47.52.32.109:80'
+ , '35.235.75.244:3128'
+ , '47.52.225.33:80'
+ , '157.245.196.253:8080'
+ , '159.65.87.167:8080'
+ , '149.28.141.62:8118'
+ , '167.88.117.209:8080'
+ , '47.52.131.183:80'
+ , '206.189.200.179:8080'
+ , '159.65.109.226:8080'
+ , '167.71.138.113:8080'
+ , '165.22.241.186:8080'
+ , '209.97.128.45:8080'
+ , '165.22.254.99:3128'
+ ]
 
 group = {}
 stockCodeL = []
@@ -117,10 +187,17 @@ run = True
 run = chkRun(0)
 #while (localtime >= strtime and localtime <= endtime) or debug == True or (localtime > endtime and localtime <= twoEndtime):
 getSession = True
+proxidx = 0
+proxies = {}
+
 while getSession:
     try:
+        if runGroupStr != '01|02':
+            proxies = {"http": random.sample(proxList, k=1)[0]}
+        else:
+            proxies = {}
         req = requests.Session()
-        req.get(SESSION_URL, timeout=(1, 2))
+        req.get(SESSION_URL, proxies=proxies, timeout=(1, 2))
         getSession = False
     except BaseException as e:
         logging.error("get Session Exception :" + str(e))
@@ -131,7 +208,7 @@ while getSession:
 while run:
     sleep = 5 #間隔5秒
     b = time.time()
-    stock = twstock.realtime.get(stockCodeL, req, logging)
+    stock = twstock.realtime.get(stockCodeL, req, proxies, logging)
     #print(runGroupStr,stock["success"])
     if stock["success"]:
         logging.info("    success")
@@ -174,6 +251,7 @@ while run:
                     logging.error("    BaseException :" + str(e))
     else:
         logging.error("    error" + stock['rtmessage'])
+        proxies = {"http": random.sample(proxList, k=1)[0]}
     """
     #查詢股票群組
     for stockGroupCode,codeL in group.items():

@@ -16,6 +16,7 @@ STOCKINFO_URL = 'http://163.29.17.179/stock/api/getStockInfo.jsp?ex_ch={stock_id
 # Mock data
 mock = False
 req = requests
+prox = {}
 #https://sites.google.com/site/kentyeh2000/zheng-jiao-suo-ji-shi-zi-xun-jie-xi
 def _format_stock_info(data) -> dict:
     result = {
@@ -103,7 +104,7 @@ def get_raw(stocks) -> dict:
         r = req.get(
             STOCKINFO_URL.format(
                 stock_id=_join_stock_id(stocks),
-                time=int(time.time()) * 1000), timeout=(2, 2))
+                time=int(time.time()) * 1000), proxies=prox, timeout=(2, 2))
         if sys.version_info < (3, 5):
             try:
                 return r.json()
@@ -121,8 +122,9 @@ def get_raw(stocks) -> dict:
     except BaseException as e:
         return {'rtmessage': 'BaseException: ' + str(e), 'rtcode': '5000'}
 
-def get(stocks, request, logging, retry=3):
+def get(stocks, request, proxies, logging, retry=3):
     # Prepare data
+    prox = proxies
     req = request
     data = get_raw(stocks) if not mock else twstock.mock.get(stocks)
 
@@ -134,7 +136,7 @@ def get(stocks, request, logging, retry=3):
         # XXX: Stupit retry, you will dead here
         if retry:
             logging.info('retry:' + str(retry) + ' because:' + str(data['rtmessage']))
-            return get(stocks, request, logging, retry - 1)
+            return get(stocks, request, proxies, logging, retry - 1)
         return data
 
     # No msgArray, dead
