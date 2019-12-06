@@ -132,8 +132,8 @@ def get(stocks, request, logging, retry=3):
     # JSONdecode error, could be too fast, retry
     if data['rtcode'] == '5000':
         # XXX: Stupit retry, you will dead here
+        logging.info('retry ')
         if retry:
-            logging.info('retry because:' + str(data))
             return get(stocks, logging, retry - 1)
         return data
 
