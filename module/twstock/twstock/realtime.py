@@ -118,6 +118,8 @@ def get_raw(stocks) -> dict:
         return {'rtmessage': 'ConnectionError:'  + str(e), 'rtcode': '5000'}
     except requests.exceptions.RequestException as e:
         return {'rtmessage': 'RequestException: ' + str(e), 'rtcode': '5000'}
+    except BaseException as e:
+        return {'rtmessage': 'BaseException: ' + str(e), 'rtcode': '5000'}
 
 def get(stocks, request, logging, retry=3):
     # Prepare data
@@ -131,6 +133,7 @@ def get(stocks, request, logging, retry=3):
     if data['rtcode'] == '5000':
         # XXX: Stupit retry, you will dead here
         if retry:
+            logging.info('retry:' + retry + ' because:' + data['rtmessage'])
             return get(stocks, logging, retry - 1)
         return data
 
