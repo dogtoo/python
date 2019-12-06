@@ -114,7 +114,7 @@ def get_raw(stocks) -> dict:
                 return r.json()
             except json.decoder.JSONDecodeError:
                 return {'rtmessage': 'json decode error', 'rtcode': '5000'}
-    except requests.ConnectionError:
+    except requests.ConnectionError as e:
         return {'rtmessage': 'ConnectionError:'  + str(e), 'rtcode': '5000'}
     except requests.exceptions.RequestException as e:
         return {'rtmessage': 'RequestException: ' + str(e), 'rtcode': '5000'}
