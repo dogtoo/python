@@ -3,7 +3,7 @@ db.getCollection('t86').aggregate([
     {
         $match:{
             $and:[
-                {date:{'$gte':'20190601', '$lte':'20191131'}}
+                {date:{'$gte':'20190601', '$lte':'20191231'}}
                //,{groupCode:{'$eq':'03'}}
                //,{groupCode:{'$ne':'00'}}
                 ,{code:{$eq:'2328'}}
@@ -49,17 +49,17 @@ db.getCollection('t86').aggregate([
            ,date: '$_id.date'
            ,code: '$_id.code'
            ,name: '$codeinfo.name'
-           ,'外資買進':{$divide:['$FII_I', 10000]}
-           ,'外資賣出':{$divide:['$FII_O', 10000]}
-           ,'外資增減':{$divide:[{$subtract:['$FII_I', '$FII_O']}, 10000]}
-           ,'投信買進':{$divide:['$SIT_I', 10000]}
-           ,'投信賣出':{$divide:['$SIT_O', 10000]}
-           ,'投信增減':{$divide:[{$subtract:['$SIT_I', '$SIT_O']}, 10000]}
-           ,'自營商買進':{$divide:['$DProp_I',10000]}
-           ,'自營商賣出':{$divide:['$DProp_O', 10000]}
-           ,'自營商買進避':{$divide:['$DHedge_I', 10000]}
-           ,'自營商賣出避':{$divide:['$DHedge_O', 10000]}
-           ,'累計金額':{$convert:{
+           ,'外資買進':{$divide:['$FII_I', 1000]}
+           ,'外資賣出':{$divide:['$FII_O', 1000]}
+           ,'外資增減':{$divide:[{$subtract:['$FII_I', '$FII_O']}, 1000]}
+           ,'投信買進':{$divide:['$SIT_I', 1000]}
+           ,'投信賣出':{$divide:['$SIT_O', 1000]}
+           ,'投信增減':{$divide:[{$subtract:['$SIT_I', '$SIT_O']}, 1000]}
+           ,'自營商買進':{$divide:['$DProp_I',1000]}
+           ,'自營商賣出':{$divide:['$DProp_O', 1000]}
+           ,'自營商買進避':{$divide:['$DHedge_I', 1000]}
+           ,'自營商賣出避':{$divide:['$DHedge_O', 1000]}
+           ,'累計股數':{$convert:{
                         input:'0'
                        ,to: 'int'}}
         }
@@ -105,7 +105,7 @@ db.getCollection('t86').aggregate([
            ,'自營商賣出':1
            ,'自營商買進避':1
            ,'自營商賣出避':1
-           ,'累計金額':1
+           ,'累計股數':1
            ,'Closing_Price':'$stockDay.Closing_Price'
         }
     }
@@ -114,7 +114,7 @@ var acc = 0
 t86CodeByDate.forEach(function(item, index, array) {
     acc = acc + item.外資增減;
     //print(item.date+','+ item.外資買進+','+item.外資賣出+','+item.外資增減+','+acc)
-    item.累計金額 = acc;
+    item.累計股數 = acc;
     print(item)
 });
 
