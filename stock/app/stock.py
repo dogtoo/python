@@ -116,8 +116,18 @@ logging.info(" gropuCode = " + runGroupStr + "(cnt = " + str(len(stockCodeL)) + 
 run = True
 run = chkRun(0)
 #while (localtime >= strtime and localtime <= endtime) or debug == True or (localtime > endtime and localtime <= twoEndtime):
-req = requests.Session()
-req.get(SESSION_URL)
+getSession = True
+while getSession:
+    try:
+        req = requests.Session()
+        req.get(SESSION_URL)
+        getSession = False
+    except BaseException as e:
+        logging.error("get Session Exception :" + str(e))
+        time.sleep(10)
+        if !chkRun(0):
+            sys.exit(0)
+
 while run:
     sleep = 5 #間隔5秒
     b = time.time()
