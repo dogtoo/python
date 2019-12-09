@@ -192,7 +192,7 @@ proxies = {}
 
 while getSession:
     try:
-        if runGroupStr != '01|02':
+        if runGroupStr != '01':
             proxies = {"http": random.sample(proxList, k=1)[0]}
         else:
             proxies = {}
