@@ -197,7 +197,7 @@ while getSession:
         else:
             proxies = {}
         req = requests.Session()
-        req.get(SESSION_URL, proxies=proxies, timeout=(1, 2))
+        req.get(SESSION_URL, proxies=proxies, timeout=(5, 5))
         getSession = False
     except BaseException as e:
         logging.error("get Session Exception :" + str(e))
