@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO,
                     filename='../../log/realTime_{:%Y-%m-%d}.log'.format(datetime.now()))
                     #filename='/python/log/realTime_{:%Y-%m-%d}.log'.format(datetime.now()))
 
-stockList = ["01","02","20","03","21","12","04","18","14","28","05","22","06","08","09","10","11","15","25","24","31","27","26","29","39","23","16","17"]
+stockList = ["01","02","03","04","05","06","08","09","10","11","12","14","15","16","17","18","20","21","22","23","24","25","26","27","28","29","30","31"]
 #stockList = ["01"]
 cmd = 'python ./stock.py TWSE "{}"'
 cwd = os.getcwd()  # Get the current working directory (cwd)
