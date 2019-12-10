@@ -107,6 +107,7 @@ RUN cd /python/twstock \
 # pip uninstall twstock
 CMD ["python3"]
 
-CMD ["cd", "python"]
+WORKDIR /python/stock/app
+#CMD ["sh", "-c", "python3 /python/stock/app/realTimeRun.py"]
 
-CMD ["sh", "-c", "python3 /python/stock/app/realTimeRun.py"]
+CMD ["sh", "-c", "python3 realTimeRun.py"]
