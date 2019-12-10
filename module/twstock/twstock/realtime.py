@@ -10,8 +10,8 @@ import logging
 
 #SESSION_URL = 'http://mis.twse.com.tw/stock/index.jsp'
 #STOCKINFO_URL = 'http://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch={stock_id}&_={time}'
-SESSION_URL = 'http://163.29.17.179/stock/index.jsp'
-STOCKINFO_URL = 'http://163.29.17.179/stock/api/getStockInfo.jsp?ex_ch={stock_id}&_={time}'
+SESSION_URL = 'https://mis.twse.com.tw/stock/index.jsp'
+STOCKINFO_URL = 'https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch={stock_id}&_={time}'
 
 # Mock data
 mock = False

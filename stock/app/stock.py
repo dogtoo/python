@@ -9,6 +9,8 @@ import requests
 import random
 random.seed('dogtoo')
 from datetime import timedelta, date, datetime
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.ssl_ import create_urllib3_context
 
 debug = False 
 stockName = sys.argv[1]
@@ -20,8 +22,7 @@ if len(runGroupStr) == 0:
     debug = True
     runGroupStr = "24" 
 
-SESSION_URL = 'http://163.29.17.179/stock/index.jsp'
-
+SESSION_URL = 'https://mis.twse.com.tw'
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s : %(message)s',
                     datefmt='%Y-%m-%dT %H:%M:%S',
@@ -190,6 +191,13 @@ getSession = True
 proxidx = 0
 proxies = {}
 
+class SSLContextAdapter(HTTPAdapter):
+    def init_poolmanager(self, *args, **kwargs):
+        context = create_urllib3_context()
+        kwargs['ssl_context'] = context
+        context.load_default_certs() # this loads the OS defaults on Windows
+        return super(SSLContextAdapter, self).init_poolmanager(*args, **kwargs)
+
 while getSession:
     try:
         if runGroupStr != '01':
@@ -197,7 +205,9 @@ while getSession:
         else:
             proxies = {}
         req = requests.Session()
-        req.get(SESSION_URL, proxies=proxies, timeout=(5, 5))
+        adapter = SSLContextAdapter()
+        req.mount(SESSION_URL, adapter)
+        req.get(SESSION_URL, proxies=proxies, timeout=(5, 5), verify=True)
         getSession = False
     except BaseException as e:
         logging.error("get Session Exception :" + str(e))
