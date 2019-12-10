@@ -49,7 +49,64 @@ var timer = {
 };
 
 function kLine(options) {
-    this.options = options;
+    this.options = {
+		backgroundColor:'#fff',
+        riseColor: 'red',
+        fallColor: 'green',
+        normalColor: 'black',
+        //主图区域的边距
+        chartMargin:{left:45.5,top:20.5,right:20.5},
+        region: { x: 45.5, y: 20.5, width: initialWidth - 45.5 - 20.5, height: 250 },
+        barWidth: 5, spaceWidth: 2, horizontalLineCount: 7, verticalLineCount: 7, lineStyle: 'solid', borderColor: 'gray', splitLineColor: '#eeeeee', lineWidth: 1,
+        MAs: [
+            { color: 'rgb(255,70,251)', daysCount: 5 },
+            { color: 'rgb(227,150,34)', daysCount: 10 },
+            { color: 'rgb(53,71,107)', daysCount: 20 }/*,
+            { color: 'rgb(0,0,0)', daysCount: 60 }*/
+            ],
+        yAxis: {
+            font: '11px Arial', // region: { },
+            color: 'black',
+            align: 'right',
+            fontHeight: 8,
+            textBaseline: 'top'
+        },
+        xAxis: {
+            font: '11px Arial', // region: { },
+            color: 'black',
+            align: 'right',
+            fontHeight: 8,
+            textBaseline: 'top',
+            scalerCount: 9
+        },
+        volume: {
+            region: { x: 45.5, y: 290.5, height: 80, width: initialWidth - 45.5 - 20.5 },
+            horizontalLineCount: 1,
+            yAxis: {
+                font: '11px Arial', // region: { },
+                color: 'black',
+                align: 'right',
+                fontHeight: 8,
+                textBaseline: 'top'
+            }
+        },
+        priceLine: {
+            region:{ x: 45.5, y: 380.5, height: 60, width: initialWidth - 45.5 - 20.5 },
+            verticalLineCount: 7,
+            horizontalLineCount: 1, lineStyle: 'solid', borderColor: 'gray', splitLineColor: '#eeeeee',fillColor:'lightgray',alpha:.5,
+            yAxis: {
+                font: '11px Arial', // region: { },
+                color: 'black',
+                align: 'right',
+                fontHeight: 8,
+                textBaseline: 'top'
+            }
+        },
+        controller:{
+            bar: { width: 20, height: 35, borderColor: 'black', fillColor: 'lightgray' },
+            minBarDistance: 20
+        }
+	};
     this.dataRanges = null;
 }
 
@@ -143,24 +200,86 @@ kLine.prototype = {
             return tipHtml;
         }
 
-        /*
-        //添加鼠标事件
-        addCrossLinesAndTipEvents(this.canvas, {
-        getCrossPoint: function (ev) { return { x: getX(ev.offsetX), y: ev.offsetY }; },
-        triggerEventRanges: { x: region.x, y: region.y + 1, width: region.width, height: volumeRegion.y + volumeRegion.height - region.y },
-        tipOptions: {
-        getTipHtml: function (ev) { return getTipHtml(ev.offsetX); },
-        size:{width:120,height:150},
-        position:{x:false,y:region.y+(region.height-150)/3}, //position中的值是相对于canvas的左上角的
-        opacity:80,
-        cssClass:'',
-        offsetToPoint:30,
-        },
-        crossLineOptions: {
-        color: 'black'
+        function getEventOffsetPosition(ev){
+            var offset = isTouchDevice()
+                ? setTouchEventOffsetPosition(ev, getPageCoord(me.canvas))
+                : getOffset(ev);
+            return offset;
         }
-        });
+
+        var controllerEvents = {
+            onStart:function(ev){
+                ev = ev || event;
+                var offset = getEventOffsetPosition(ev);
+                me.controllerStartOffset = offset;
+                me.controllerStartRange = me.dataRanges;
+            },
+            onEnd:function(ev){
+                me.controllerStartOffset = null;
+                me.controllerStartRange = null;
+            },
+            onMove:function(ev){
+                if(!me.controllerStartOffset) return;
+                ev = ev || event;
+                var offset = getEventOffsetPosition(ev);
+                var moveX = offset.offsetX - me.controllerStartOffset.offsetX;
+                var currentRange = me.controllerStartRange;/*0-100*/
+                var regionWidth = region.width;
+                var moveValue =0- (moveX/regionWidth)*(currentRange.to-currentRange.start);
+                var start = currentRange.start+moveValue;
+                var to = currentRange.to + moveValue;
+                if(start<0) {
+                    start = 0;
+                    to = start + (currentRange.to-currentRange.start);
+                }
+                else{
+                    if(to > 100){
+                        to = 100;
+                        start = to-(currentRange.to-currentRange.start);
+                    }
+                }
+                var changeToValue = {left:start,right:to};
+                if(!me.painting) drawKL({ start: changeToValue.left, to: changeToValue.right });
+            }
+        };
+
+        /*
+        当touchstart时的位置在K线柱附近时表示要显示柱的描述信息框；否则则要控制K线的范围
         */
+        var fingerSize = {width:30,height:20};
+        function shouldDoControllerEvent(ev,evtType){
+            if(evtType == undefined) return true;
+            if(typeof me.shouldController == 'undefined') me.shouldController = true;
+            if(evtType == 'touchstart'){
+                var offset = getEventOffsetPosition(ev);
+                var showTip=false;
+
+                var x = offset.offsetX;
+                x -= region.x;
+                var index = Math.ceil(x / (me.klOptions.spaceWidth + me.klOptions.barWidth)) - 1;
+
+                var indexRange = Math.ceil(fingerSize.width / (me.klOptions.spaceWidth + me.klOptions.barWidth))+1;
+
+                var indexStart = Math.max(0,index - indexRange/2);
+                var indexTo = Math.min(me.filteredData.length-1,index+indexRange/2);
+                var yMin=999999;
+                var yMax=-1;
+                for(index = indexStart;index<=indexTo;index++){
+                    var dataAtIndex = me.filteredData[index];
+                    var yTop = region.y+ (me.high - dataAtIndex.high) * region.height / (me.high - me.low) - fingerSize.height;
+                    var yBottom = region.y+(me.high - dataAtIndex.low) * region.height / (me.high - me.low) + fingerSize.height;
+                    yMin = Math.min(yTop,yMin);
+                    yMax = Math.max(yBottom,yMax);
+                }
+                showTip = offset.offsetY >= yMin && offset.offsetY <= yMax;
+                setDebugMsg('yMin='+yMin + ',yMax=' + yMax + ',offsetY='+offset.offsetY+',showTip=' + showTip);
+                me.shouldController = !showTip;
+
+            }
+            //setDebugMsg('shouldController=' + me.shouldController);
+            return me.shouldController;
+        }
+
         if(!me.crossLineAndTipMgrInstance){
             me.crossLineAndTipMgrInstance = new crossLinesAndTipMgr(me.canvas, {
                 getCrossPoint: function (ev) { return { x: getX(ev.offsetX), y: ev.offsetY }; },
@@ -175,7 +294,9 @@ kLine.prototype = {
                 },
                 crossLineOptions: {
                     color: 'black'
-                }
+                },
+                shouldDoControllerEvent:shouldDoControllerEvent,
+                controllerEvents:controllerEvents
             });
             me.crossLineAndTipMgrInstance.addCrossLinesAndTipEvents();
         }
@@ -193,7 +314,9 @@ kLine.prototype = {
                     },
                     crossLineOptions: {
                         color: 'black'
-                    }
+                    },
+                    shouldDoControllerEvent:shouldDoControllerEvent,
+                    controllerEvents:controllerEvents
                 });
         }
 
@@ -274,7 +397,13 @@ kLine.prototype = {
                 me.requestController = true;
                 me.implement.onOrentationChanged.call(me);
             });
+
         }
+
+        addEvent(window, 'resize', function (ev) {
+            me.requestController = true;
+            me.implement.onOrentationChanged.call(me);
+        });
 
         me.painting = false;
     },
@@ -399,6 +528,7 @@ kLine.prototype = {
         };
         //画蜡烛
         filteredData.each(drawCandle);
+        this.filteredData = filteredData;
         //timer.stop();
         //timer.start('paintItems:纵轴');
         var yAxisOptions = options.yAxis;
@@ -423,11 +553,12 @@ kLine.prototype = {
             options.xAxis.scalerCount = filteredData.length;
             stepLength = 1;
         }
-        xScalers.push(convertDate(filteredData[0].quoteTime, false));
+        xScalers.push(convertDate(filteredData[0].quoteTime, false).substr(2));
         for (var i = 1; i < options.xAxis.scalerCount; i++) {
             var index = Math.ceil(i * stepLength);
             if (index >= filteredData.length) index = filteredData.length - 1;
             var quoteTime = convertDate(filteredData[index].quoteTime, false);
+            quoteTime = quoteTime.substr(2);
             xScalers.push(quoteTime);
         }
         var xPainter = new Painter(this.canvas.id, xAxisImp, xScalers);
@@ -438,7 +569,7 @@ kLine.prototype = {
         //画量
         this.implement.paintVolume.call(this, filteredData);
         //timer.stop();
-        //画价格线                
+        //画价格线
         //this.implement.paintPriceLine.call(this);
     },
     paintPriceLine: function () {
@@ -537,9 +668,10 @@ kLine.prototype = {
             var MA = val.values;
             ctx.strokeStyle = val.color;
             ctx.beginPath();
+            var currentX = 0;
             MA.each(function (val, arr, i) {
                 var x = i * (options.spaceWidth + options.barWidth) + (options.spaceWidth + options.barWidth) * .5;
-                
+
                 if (!val) return;
                 var y = funcGetY(val);
                 if (y && i==0) {
@@ -649,7 +781,7 @@ kLine.prototype = {
         
 var painter;// = new Painter('canvasKL', kl, data);
 var initialWidth = Math.min(screen.width,1024)-40;
-function drawKL(ranges) {            
+function drawKL(ranges) {
     var kOptions = {
         backgroundColor:'#fff',
         riseColor: 'red',
@@ -707,10 +839,10 @@ function drawKL(ranges) {
             bar: { width: 20, height: 35, borderColor: 'black', fillColor: 'lightgray' },
             minBarDistance: 20
         }
-       
+
     };
-   
-    if(!painter){            
+
+    if(!painter){
         var canvas = $id('canvasKL');
         if(canvas.width != initialWidth) canvas.width = initialWidth;
         var kl = new kLine(kOptions);
