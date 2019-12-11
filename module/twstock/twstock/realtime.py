@@ -104,7 +104,7 @@ def get_raw(stocks) -> dict:
         r = req.get(
             STOCKINFO_URL.format(
                 stock_id=_join_stock_id(stocks),
-                time=int(time.time()) * 1000), proxies=prox, timeout=(5, 10))
+                time=int(time.time()) * 1000), proxies=prox)
         if sys.version_info < (3, 5):
             try:
                 return r.json()
