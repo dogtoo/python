@@ -45,7 +45,7 @@ while stop > 0:
             p[i].kill
             p[i] = subprocess.Popen(cmd.format(stockList[i]), shell=True)
             
-    time.sleep(10)
+    time.sleep(60)
     logging.info(stop)
     """
     if stop == 0:
