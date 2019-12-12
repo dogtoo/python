@@ -1,0 +1,39 @@
+function xAxis(options){
+  this.options = options;
+  this.data = [];
+}
+xAxis.prototype = {
+    initialize: function (painter) {
+        painter.options = this.options;
+        this.data = (typeof painter.data.xAxis === 'undefined') ? painter.data : painter.data.xAxis;
+    },
+    start: function () {
+        var ctx = this.ctx;
+        ctx.save();
+        ctx.fillStyle = this.options.color;
+        ctx.font = this.options.font;
+        if (this.options.textBaseline) ctx.textBaseline = this.options.textBaseline;
+        ctx.translate(this.options.region.x, this.options.region.y);
+    },
+    getDataLength : function() {
+        return this.paintImplement.data.length;
+    },
+    getY: function () {
+        return 0;
+    },
+    getX: function (i) {
+        if (i == 0) return 0;
+        var w = this.ctx.measureText(this.paintImplement.data[i]).width;
+        if (i == this.paintImplement.data.length - 1) return this.options.region.width - w;
+        return (this.options.region.width * i / (this.paintImplement.data.length - 1)) - w / 2;
+    },
+    paintItem: function (i, x, y) {
+        this.ctx.fillText(this.paintImplement.data[i], x, y);
+    },
+    end: function () {
+        this.ctx.restore();
+    },
+    toString: function() {
+        return 'xAxis';
+    }
+};
