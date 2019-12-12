@@ -1,11 +1,44 @@
 <!DOCTYPE html>
+
 <html lang="zh-Hant-TW">
 <head>
-    <title></title>
-    <meta charset="UTF-8">
+    <meta http-equiv="content-type" content="text/html;charset=UTF8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <script src="absPainter.js" type="text/javascript" charset="UTF8"></script>
+    <script src="axis-x.js" type="text/javascript" charset="UTF8"></script>
+    <script src="axis-y.js" type="text/javascript" charset="UTF8"></script>
 </head>
 <body>
-    <h1><%=msg%></h1>
+    <h1 id="h1"><%=msg%></h1>
+    <canvas id="kline" width="800" height="460" style="z-index: 2; border: 1px solid #69c"></canvas>
 </body>
+<script type="text/javascript">
+    var yaxis = new yAxis({
+        region: { x: 0, y: 2, width: 100, height: 460 },
+        font: '11px Arial',
+        color: 'black',
+        align: 'right',
+        fontHeight: 8,
+        textBaseline: 'top'
+    });
+
+    var xaxis = new xAxis({
+        region: { x: 0, y: 10, width: 800, height: 460 },
+        font: '11px Arial',
+        color: 'black',
+        align: 'right',
+        fontHeight: 8,
+        textBaseline: 'top',
+        scalerCount: 9
+    });
+
+    var paintStream = [yaxis, xaxis];
+    var data = {
+        'yAxis' : ['11-10-1', '11-10-2', '11-10-3', '11-10-4', '11-10-5', '11-10-6']
+      , 'xAxis' : [13.93, 13.54, 13.15, 12.77, 12.38, 11.99]
+    };
+    var painter = new Painter('kline',paintStream,data);
+    painter.build();
+</script>
 </html>
