@@ -211,12 +211,12 @@ while getSession:
         getSession = False
     except BaseException as e:
         logging.error("get Session Exception :" + str(e))
-        time.sleep(10)
+        #time.sleep(10)
         if not chkRun(0):
             sys.exit(0)
 
 while run:
-    sleep = 5 #間隔5秒
+    sleep = 3 #間隔5秒
     b = time.time()
     stock = twstock.realtime.get(stockCodeL, req, proxies, logging)
     #print(runGroupStr,stock["success"])
