@@ -29,8 +29,8 @@ logging.basicConfig(level=logging.INFO,
                     filename='../../log/' + stockName + '_' + '{:%Y-%m-%d}'.format(datetime.now()) + '_' + '{}.log'.format(runGroupStr.replace("|","_")) )
                     #filename='/python/log/' + stockName + '_' + '{:%Y-%m-%d}'.format(datetime.now()) + '_' + '{}.log'.format(runGroupStr.replace("|","_")) )
     
-#client = pymongo.MongoClient("mongodb://172.18.0.2:27017")
-client = pymongo.MongoClient("mongodb://192.168.1.5:27017")
+client = pymongo.MongoClient("mongodb://172.18.0.2:27017")
+#client = pymongo.MongoClient("mongodb://192.168.1.5:27017")
 db = client["twStock"]
 db.authenticate("twstock", "twstock123")
 
