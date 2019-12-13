@@ -16,6 +16,10 @@ app.use(views(__dirname + '/views', {
         extension: 'ejs'
     })
 );
+app.use(views(__dirname + '/views/js', {
+        extension: 'js'
+    })
+);
 
 /**
 Middleware組合 Star

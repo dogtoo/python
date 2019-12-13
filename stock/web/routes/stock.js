@@ -9,16 +9,20 @@ router.get('/kline', async(ctx) => {
     })
 });
 
-router.get('/absPainter.js', async(ctx) => {
+router.get('/js/absPainter.js', async(ctx) => {
     await ctx.render('js/absPainter')
 });
 
-router.get('/axis-x.js', async(ctx) => {
+router.get('/js/axis-x.js', async(ctx) => {
     await ctx.render('js/axis-x')
 });
 
-router.get('/axis-y.js', async(ctx) => {
+router.get('/js/axis-y.js', async(ctx) => {
     await ctx.render('js/axis-y')
+});
+
+router.get('/js/k-data.js', async(ctx) => {
+    await ctx.render('js/k-data')
 });
 
 module.exports = router;

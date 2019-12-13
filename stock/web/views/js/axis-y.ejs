@@ -6,7 +6,6 @@ function yAxis(scalerOptions) {
 yAxis.prototype = {
     initialize: function (painter) {
         painter.scalerOptions = this.scalerOptions;
-        this.data = (typeof painter.data.yAxis === 'undefined') ? painter.data : painter.data.yAxis;
     },
     start: function () {
         var ctx = this.ctx;
@@ -15,6 +14,10 @@ yAxis.prototype = {
         ctx.font = this.scalerOptions.font;
         ctx.translate(this.scalerOptions.region.x, this.scalerOptions.region.y);
         if (this.scalerOptions.textBaseline) ctx.textBaseline = this.scalerOptions.textBaseline;
+    },
+    preData: function() {
+        if (typeof this.data.low === 'undefined' && typeof this.data.high === 'undefined') return false;
+        //calcAxisValues(this.data.low, this.data.high, )
     },
     end: function () { this.ctx.restore(); },
     getDataLength : function() {
@@ -35,8 +38,11 @@ yAxis.prototype = {
             this.ctx.fillStyle = this.scalerOptions.color(this.paintImplement.data[i]);
         this.ctx.fillText(this.paintImplement.data[i], x, y);
     },
-    toString: function() {
-        return 'xAxis';
+    getName: function() {
+        return 'yAxis';
+    },
+    getWidth: function() {
+
     }
 };
 
