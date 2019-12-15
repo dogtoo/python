@@ -1,48 +1,59 @@
-function yAxis(scalerOptions) {
-  this.scalerOptions = scalerOptions;
-  this.data = [];
+function yAxis(options) {
+  this.options = options;
+  if (typeof this.options.low === 'undefined') this.options.low = 0;
+  if (typeof this.options.high === 'undefined') this.options.high = 10;
+  if (typeof this.options.horizontalLineCount === 'undefined') this.options.horizontalLineCount = 10;
 }
 
 yAxis.prototype = {
     initialize: function (painter) {
-        painter.scalerOptions = this.scalerOptions;
+        painter.options = this.options;
     },
     start: function () {
         var ctx = this.ctx;
         ctx.save();
-        if (typeof this.scalerOptions.color == 'string') ctx.fillStyle = this.scalerOptions.color;
-        ctx.font = this.scalerOptions.font;
-        ctx.translate(this.scalerOptions.region.x, this.scalerOptions.region.y);
-        if (this.scalerOptions.textBaseline) ctx.textBaseline = this.scalerOptions.textBaseline;
-    },
-    preData: function() {
-        if (typeof this.data.low === 'undefined' && typeof this.data.high === 'undefined') return false;
-        //calcAxisValues(this.data.low, this.data.high, )
+        if (typeof this.options.color == 'string') ctx.fillStyle = this.options.color;
+        ctx.font = this.options.font;
+        ctx.translate(this.paintRegion[paintName + '.x'], this.paintRegion[paintName + '.y']);
+        if (this.options.textBaseline) ctx.textBaseline = this.options.textBaseline;
     },
     end: function () { this.ctx.restore(); },
     getDataLength : function() {
-        return this.paintImplement.data.length;
+        return (typeof this.data[this.implName] != 'undefined') ? this.data[this.implName].length : 0;
     },
     getX: function (i) {
-        if (this.scalerOptions.align == 'left') return 0;
-        var w = this.ctx.measureText(this.paintImplement.data[i]).width;
-        return this.scalerOptions.region.width - w;
+        if (this.options.align == 'left') return 0;
+        var w = this.ctx.measureText(this.data[this.implName][i]).width;
+        return this.paintRegion[this.paintName + '.width'] - w;
     },
     getY: function (i) {
         if (i == 0) return 0;
-        if (i == this.paintImplement.data.length-1) return this.scalerOptions.region.height - this.scalerOptions.fontHeight;
-        return (this.scalerOptions.region.height * i / (this.paintImplement.data.length - 1) - this.scalerOptions.fontHeight / 2);
+        if (i == this.data[this.implName].length-1) return this.paintRegion[this.paintName + '.height'] - this.options.fontHeight;
+        return (this.paintRegion[this.paintName + '.height'] * i / (this.data[this.implName].length - 1) - this.options.fontHeight / 2);
     },
     paintItem: function (i, x, y) {
-        if (typeof this.scalerOptions.color == 'function')
-            this.ctx.fillStyle = this.scalerOptions.color(this.paintImplement.data[i]);
-        this.ctx.fillText(this.paintImplement.data[i], x, y);
+        if (typeof this.options.color == 'function')
+            this.ctx.fillStyle = this.options.color(this.data[this.implName][i]);
+        this.ctx.fillText(this.data[this.implName][i], x, y);
     },
     getName: function() {
         return 'yAxis';
     },
-    getWidth: function() {
-
+    getWidth: function(format) {
+        return this.ctx.measureText(format).width;
+    },
+    preData: function(data) {
+        if (Object.prototype.toString.call(data) != '[object Array]') return;
+        if (data.length <= 0) return;
+        var h = determineFontHeight(this.paintImplement.options.font);
+        // h * x * 5 = height;
+        this.paintImplement.options.horizontalLineCount = Math.round(this.paintRegion[this.paintName + '.height'] / h / 3);
+        this.paintImplement.options.horizontalLineCount = (this.paintImplement.options.horizontalLineCount <= 1) ? 2 : this.paintImplement.options.horizontalLineCount;
+        this.paintImplement.options.low = data[0];
+        this.paintImplement.options.high = data[data.length-1];
+        this.data[this.implName] = calcAxisValues(this.paintImplement.options.high
+                            , this.paintImplement.options.low
+                            , this.paintImplement.options.horizontalLineCount)
     }
 };
 

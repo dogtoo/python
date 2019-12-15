@@ -9,6 +9,10 @@ router.get('/kline', async(ctx) => {
     })
 });
 
+router.get('/js/util.js', async(ctx) => {
+    await ctx.render('js/util')
+});
+
 router.get('/js/absPainter.js', async(ctx) => {
     await ctx.render('js/absPainter')
 });
