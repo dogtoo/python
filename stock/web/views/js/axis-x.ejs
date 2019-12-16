@@ -1,11 +1,10 @@
 function xAxis(options){
   this.options = options;
-  this.data = [];
+  if (typeof this.options.verticalLineCount === 'undefined') this.options.verticalLineCount = 10;
 }
 xAxis.prototype = {
     initialize: function (painter) {
         painter.options = this.options;
-        this.data = (typeof painter.data.xAxis === 'undefined') ? painter.data : painter.data.xAxis;
     },
     start: function () {
         var ctx = this.ctx;
@@ -13,27 +12,74 @@ xAxis.prototype = {
         ctx.fillStyle = this.options.color;
         ctx.font = this.options.font;
         if (this.options.textBaseline) ctx.textBaseline = this.options.textBaseline;
-        ctx.translate(this.options.region.x, this.options.region.y);
+        ctx.translate(this.paintRegion[paintName + '.x'], this.paintRegion[paintName + '.y']);
     },
     getDataLength : function() {
-        return this.paintImplement.data.length;
+        return (typeof this.data[this.implName] != 'undefined') ? this.data[this.implName].length : 0;
     },
     getY: function () {
         return 0;
     },
     getX: function (i) {
         if (i == 0) return 0;
-        var w = this.ctx.measureText(this.paintImplement.data[i]).width;
-        if (i == this.paintImplement.data.length - 1) return this.options.region.width - w;
-        return (this.options.region.width * i / (this.paintImplement.data.length - 1)) - w / 2;
+        var w = this.ctx.measureText(this.data[this.implName][i]).width;
+        if (i == this.data[this.implName].length - 1) return this.paintRegion[this.paintName + '.width'] - w;
+        return (this.paintRegion[this.paintName + '.width'] * i / (this.data[this.implName].length - 1)) - w / 2;
     },
     paintItem: function (i, x, y) {
-        this.ctx.fillText(this.paintImplement.data[i], x, y);
+        this.ctx.fillText(this.data[this.implName][i], x, y);
     },
     end: function () {
         this.ctx.restore();
+    },
+    getHeight: function(format) {
+        this.options.fontHeight = determineFontHeight(this.options.font);
+        return this.options.fontHeight + 2;
+    },
+    preData: function(data) {
+        if (Object.prototype.toString.call(data) != '[object Array]') return;
+        if (data.length <= 0) return;
+        this.ctx.font = this.options.font;
+        this.options.fontWidth= this.ctx.measureText(data[0]).width;
+        //verticalLineCount
+        // w * x * 2 = width;
+        this.options.verticalLineCount = Math.round(this.paintRegion[this.paintName + '.width'] / this.options.fontWidth / 2);
+        var xScalers = [];
+        var stepLength = data.length / (this.options.verticalLineCount - 1);
+        if (stepLength < 1) {
+            this.options.verticalLineCount = data.length;
+            stepLength = 1;
+        }
+        xScalers.push(convertDate(data[0], false).substr(2));
+        for (var i = 1; i < this.options.verticalLineCount; i++) {
+            var index = Math.ceil(i * stepLength);
+            if (index >= data.length) index = data.length - 1;
+            var quoteTime = convertDate(data[index], false);
+            quoteTime = quoteTime.substr(2);
+            xScalers.push(quoteTime);
+        }
+        this.data[this.implName] = xScalers;
     },
     toString: function() {
         return 'xAxis';
     }
 };
+
+function convertDate(val, withWeek) {
+    var year = Math.ceil(val / 10000) - 1;
+    var day = val % 100;
+    var month = (Math.ceil(val / 100) - 1) % 100;
+    var d = new Date();
+    d.setYear(year);
+    d.setMonth(month - 1);
+    d.setDate(day);
+    if (month < 10) month = '0' + month;
+    if (day < 10) day = '0' + day;
+    if (withWeek) {
+        var weekNames = ['日', '一', '二', '三', '四', '五', '六'];
+        return year + '-' + month + '-' + day + '(星期' + weekNames[d.getDay()] + ')';
+    }
+    else {
+        return year + '-' + month + '-' + day;
+    }
+}

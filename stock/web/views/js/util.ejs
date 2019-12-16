@@ -170,7 +170,8 @@ function determineFontHeight(fontStyle) {
     var dummy = document.createElement("div");
     var dummyText = document.createTextNode("M");
     dummy.appendChild(dummyText);
-    dummy.setAttribute("style", fontStyle);
+    var style = "font-family: " + fontStyle.split(" ")[1] + "; font-size: " + fontStyle.split(" ")[0] + ";";
+    dummy.setAttribute("style", style);
     body.appendChild(dummy);
     var result = dummy.offsetHeight;
     body.removeChild(dummy);

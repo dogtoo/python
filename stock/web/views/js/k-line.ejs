@@ -1,0 +1,56 @@
+function kLine(options) {
+  this.options = options;
+}
+
+kLine.prototype = {
+    initialize: function (painter) {
+        painter.options = this.options;
+
+        this.y0 = painter.data[painter.options.yAxis][painter.data[painter.options.yAxis].length-1];
+        this.y1 = painter.data[painter.options.yAxis][0];
+        this.yScale = painter.data[painter.options.yAxis].length / painter.paintRegion[painter.paintName + '.height'];
+
+        this.x0 = painter.data[painter.options.xAxis][0];
+        this.x1 = painter.data[painter.options.xAxis][painter.data[painter.options.xAxis].length-1];
+        this.xScale = painter.data[painter.options.xAxis].length / painter.paintRegion[painter.paintName + '.width'];
+    },
+    start: function () {
+        var ctx = this.ctx;
+        ctx.save();
+        ctx.translate(this.paintRegion[paintName + '.x'], this.paintRegion[paintName + '.y']);
+    },
+    end: function () { this.ctx.restore(); },
+    getDataLength : function() {
+        return (typeof this.data[this.implName] != 'undefined') ? this.data[this.implName].length : 0;
+    },
+    getX: function (i) {
+        var high = this.data[this.implName][i][3]
+        var low = this.data[this.implName][i][4]
+    },
+    getY: function (i) {
+        var date_ = this.data[this.implName][i][0]
+    },
+    paintItem: function (i, x, y) {
+        ctx.beginPath();
+        ctx.moveTo(lineX, topY);
+        ctx.lineTo(lineX, bottomY);
+        ctx.stroke();
+    },
+    getName: function() {
+        return 'kLine';
+    },
+    preData: function(data) {
+        if (Object.prototype.toString.call(data) != '[object Array]') return;
+        if (data.length <= 0) return;
+        var chk = 0;
+        for (var d in data) {
+            //0:day 1:open 2:close 3:high 4:low
+            if (data[d].length != 4) {
+                chk = 1;
+                break;
+            }
+        }
+        if (chk) return;
+    }
+};
+

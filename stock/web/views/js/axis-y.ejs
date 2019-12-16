@@ -40,20 +40,24 @@ yAxis.prototype = {
         return 'yAxis';
     },
     getWidth: function(format) {
+        this.ctx.font = this.options.font;
         return this.ctx.measureText(format).width;
+    },
+    getHeight: function(format) {
+        return 0;
     },
     preData: function(data) {
         if (Object.prototype.toString.call(data) != '[object Array]') return;
         if (data.length <= 0) return;
-        var h = determineFontHeight(this.paintImplement.options.font);
+        this.options.fontHeight = determineFontHeight(this.options.font);
         // h * x * 5 = height;
-        this.paintImplement.options.horizontalLineCount = Math.round(this.paintRegion[this.paintName + '.height'] / h / 3);
-        this.paintImplement.options.horizontalLineCount = (this.paintImplement.options.horizontalLineCount <= 1) ? 2 : this.paintImplement.options.horizontalLineCount;
-        this.paintImplement.options.low = data[0];
-        this.paintImplement.options.high = data[data.length-1];
-        this.data[this.implName] = calcAxisValues(this.paintImplement.options.high
-                            , this.paintImplement.options.low
-                            , this.paintImplement.options.horizontalLineCount)
+        this.options.horizontalLineCount = Math.round(this.paintRegion[this.paintName + '.height'] / this.options.fontHeight / 3);
+        this.options.horizontalLineCount = (this.options.horizontalLineCount <= 1) ? 2 : this.options.horizontalLineCount;
+        this.options.low = data[0];
+        this.options.high = data[data.length-1];
+        this.data[this.implName] = calcAxisValues(this.options.high
+                            , this.options.low
+                            , this.options.horizontalLineCount)
     }
 };
 

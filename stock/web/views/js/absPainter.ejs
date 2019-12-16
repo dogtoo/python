@@ -3,9 +3,7 @@ function Painter(canvasId, paintStream) {
     if (!this.canvas.getContext) return;
     this.ctx = this.canvas.getContext('2d');
     this.data = {};
-    this.paintImplement = Object.prototype;
-    this.paintName = 'absPainter';
-    this.implName = 'absPainter';
+
     this.width = this.canvas.width;
     this.height = this.canvas.height;
     this.paintRegion = {}
@@ -15,7 +13,12 @@ function Painter(canvasId, paintStream) {
        ,'left': 0
        ,'right': 0
     }
-
+    this.implements = {}; //paintStream in
+    //temp
+    this.paintImplement = Object.prototype;
+    this.options = {};
+    this.paintName = 'absPainter';
+    this.implName = 'absPainter';
 }
 Painter.prototype = {
     init: function() {
@@ -32,20 +35,23 @@ Painter.prototype = {
                 implement = item[paintName][p];
                 painter.implName = p;
                 painter.setPainterImplement(implement, paintName);
+                if (typeof painter.paintImplement.initialize == 'function')
+                    painter.paintImplement.initialize(painter);
                 painter.prePaintRegion(paintName, 'x');
                 painter.prePaintRegion(paintName, 'y');
                 painter.prePaintRegion(paintName, 'width');
                 painter.prePaintRegion(paintName, 'height');
-                if (typeof painter.paintImplement.initialize == 'function') 
-                    painter.paintImplement.initialize(painter);
-                if (typeof painter.paintImplement.preData === 'function' && typeof painter.data[p] != 'undefined') 
+                if (typeof painter.paintImplement.preData === 'function' && typeof painter.data[p] != 'undefined')
                     painter.paintImplement.preData.call(painter, painter.data[p]);
+
+                painter.implements[painter.implName] = painter.paintImplement;
             }
         });
 
         for (var implt in paintStream) {
             console.log(paintStream[implt]);
         }
+        painter.ctx.clearRect(0, 0, painter.width, painter.height);
     },
     build: function() {
         var painter = this;
@@ -56,6 +62,8 @@ Painter.prototype = {
                 implement = item[paintName][p];
                 painter.implName = p;
                 painter.setPainterImplement(implement, paintName);
+                if (typeof painter.paintImplement.initialize == 'function')
+                    painter.paintImplement.initialize(painter);
                 painter.paint();
             }
         });
@@ -64,7 +72,7 @@ Painter.prototype = {
         var pctx = this.paintImplement;
         var data = this.data[this.implName];
         var ctx = this.ctx;
-        
+
         if (pctx.start) pctx.start.call(this);
 
         if (typeof pctx.paintItems == 'function') {
@@ -179,7 +187,7 @@ function prePaintRegionObj(key_, type_, v_, padding_ = true) {
             }
         }
     } else if (type_ === 'string') {
-        if (Object.prototype.toString.call(v_.match(/^(\d+)\%$/)) === '[object Array]' 
+        if (Object.prototype.toString.call(v_.match(/^(\d+)\%$/)) === '[object Array]'
             && typeof v_.match(/^(\d+)\%$/)[1] === 'string') {
             var percentage = parseInt(v_.match(/^(\d+)\%$/)[1]);
             if (percentage > 100) percentage = 100;
@@ -191,7 +199,7 @@ function prePaintRegionObj(key_, type_, v_, padding_ = true) {
                 return (painter.width - ((padding_) ? painter.padding.left - painter.padding.right : 0)) * (percentage / 100);
             if (key_.match(/height/))
                 return (painter.height - ((padding_) ? painter.padding.top - painter.padding.bottom : 0)) * (percentage / 100);
-        } else if (Object.prototype.toString.call(v_.match(/^f\:(.+)/)) === '[object Array]' 
+        } else if (Object.prototype.toString.call(v_.match(/^f\:(.+)/)) === '[object Array]'
             && typeof v_.match(/^f\:(.+)/)[1] === 'string') {
             var format_ = v_.match(/^f\:(.+)/)[1];
             if (key_.match(/x/))
@@ -201,7 +209,7 @@ function prePaintRegionObj(key_, type_, v_, padding_ = true) {
             if (key_.match(/width/))
                 return painter.paintImplement.getWidth.call(painter, format_);
             if (key_.match(/height/))
-                return painter.paintImplement.getHeight.call(format_);
+                return painter.paintImplement.getHeight.call(painter, format_);
         } else if (painter.paintRegion.hasOwnProperty(v_)) {
             return painter.paintRegion[v_];
         } else if (key_.match(/padding\.(.+)/) && painter.padding.hasOwnProperty(key_.match(/padding\.(.+)/)[1])) {
@@ -214,14 +222,18 @@ function prePaintRegionObj(key_, type_, v_, padding_ = true) {
             //v_ = {'$and':['price.x', 'price.width']}
             if (Object.prototype.toString.call(object_v_) === '[object Array]') {
                 for (var object_i_ in object_v_) {
-                    var key__ = object_v_[object_i_];
-                    var type__ = (typeof painter.paintRegion[key__] != 'undefined') ? typeof painter.paintRegion[key__] : typeof key__;
-                    var v__ = (typeof painter.paintRegion[key__] != 'undefined') ? painter.paintRegion[key__] : key__;
-                    key__ = (object_v_[object_i_].match(/x|y|width|height|padding/)) ? object_v_[object_i_] : key_;
-                    if (tot == 0)
-                        tot = prePaintRegionObj(key__, type__, v__, false)
-                    else
-                        tot = math(mathType, tot, prePaintRegionObj(key__, type__, v__, false));
+                    if (typeof object_v_[object_i_] === 'string' || typeof object_v_[object_i_] === 'object') {
+                        var key__ = object_v_[object_i_];
+                        var type__ = (typeof painter.paintRegion[key__] != 'undefined') ? typeof painter.paintRegion[key__] : typeof key__;
+                        var v__ = (typeof painter.paintRegion[key__] != 'undefined') ? painter.paintRegion[key__] : key__;
+                        key__ = (object_v_[object_i_].match(/x|y|width|height|padding/)) ? object_v_[object_i_] : key_;
+                        if (tot == 0)
+                            tot = prePaintRegionObj(key__, type__, v__, false)
+                        else
+                            tot = math(mathType, tot, prePaintRegionObj(key__, type__, v__, false));
+                    } else if (typeof object_v_[object_i_] === 'number'){
+                        tot += object_v_[object_i_];
+                    }
                 }
             }
         }

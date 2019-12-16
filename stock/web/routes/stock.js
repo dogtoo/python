@@ -25,6 +25,10 @@ router.get('/js/axis-y.js', async(ctx) => {
     await ctx.render('js/axis-y')
 });
 
+router.get('/js/k-line.js', async(ctx) => {
+    await ctx.render('js/k-line')
+});
+
 router.get('/js/k-data.js', async(ctx) => {
     await ctx.render('js/k-data')
 });
