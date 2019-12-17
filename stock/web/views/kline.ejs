@@ -14,7 +14,7 @@
 </head>
 <body>
     <h1 id="h1"><%=msg%></h1>
-    <canvas id="kline" width="800" height="460" style="z-index: 2; border: 1px solid #69c"></canvas>
+    <canvas id="kline" width="900" height="500" style="z-index: 2; border: 1px solid #69c"></canvas>
 </body>
 <script type="text/javascript">
 
@@ -28,7 +28,6 @@
         //this.data = getKLData();
     }
 
-
     var paintStream = [
         {
             'price':{
@@ -38,13 +37,15 @@
                     color: 'black',
                     align: 'right',
                     textBaseline: 'top',
+                    dataType: 'money'
                 })
             }
         },
         {
             'main':{
                 region: {
-                    x: {'$and':['price.x', 'price.width']}, y: 0, width: {'$sub':['100%','price.width','padding.right','padding.left']}, height: '50%',
+                    x: {'$and':['price.x', 'price.width']}, y: {'$sub':['price.y', (determineFontHeight('11px Arial')/2)]}
+                    , width: {'$sub':['100%','price.width','padding.right','padding.left']}, height: {'$sub':['50%', (determineFontHeight('11px Arial')/2)]},
                     //horizontalLineCount: 7, verticalLineCount: 7,
                     //backgroundColor:'#fff',
                     riseColor: 'red',
@@ -67,16 +68,18 @@
         },
         {
             'date':{
-                region: { x: 'main.x', y: {'$and':['main.height', 10]}, width: 'main.width', height: 'f:00-00-00' },
+                region: { x: 'main.x', y: {'$and':['main.height', determineFontHeight('11px Arial')]}, width: 'main.width', height: 'f:00-00-00' },
                 'dateX':new xAxis({
                     font: '11px Arial',
                     color: 'black',
                     align: 'right',
                     textBaseline: 'top',
+                    dataType: 'string'
                 })
             }
         }
     ];
+
     var painter = new painterKline('kline',paintStream, getKLData());
     painterKline.prototype.preData = function() {
         this.data.priceY = [];
@@ -85,9 +88,8 @@
         var dateXL = [];
         var priceY = {};
         var dateX = {};
-        for (var i = 0; i < this.data.kline.length; i++) {
+        for (var i = 0; i < 90; i++) {
             var rawData = data[i];
-            //20111215,11.68,11.65,11.76,11.40,11.41,43356655,502325991
             priceY[Number(rawData[3])] = 1;
             priceY[Number(rawData[4])] = 1;
             dateX[rawData[0]] = 1;
@@ -112,35 +114,157 @@
         });
         this.data.dateX = dateXL;
     }
+
+    painterKline.prototype.start = function () {
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = 'gray';
+        this.ctx.save();
+        this.ctx.translate(this.paintRegion['main.x']
+                       , this.paintRegion['main.y']);
+
+        this.ctx.rect(0, 0
+                       , this.paintRegion['main.width']
+                       , this.paintRegion['main.height']);
+        this.ctx.stroke();
+        var spaceHeight = (this.paintRegion['main.height'] - (this.implements.priceY.options.fontHeight/2)) / (this.implements.priceY.options.horizontalLineCount - 1);
+        for (var i = 1; i <= (this.implements.priceY.options.horizontalLineCount-2); i++) {
+            var y = spaceHeight * i;
+            this.drawHLine('#eeeeee', 0, y, this.paintRegion['main.width'], 1, 'solid');
+        }
+
+        var spaceWidth = this.paintRegion['main.width'] / (this.implements.dateX.options.verticalLineCount - 1);
+        for (var i = 1; i <= this.implements.dateX.options.verticalLineCount; i++) {
+            var w = spaceWidth * i;
+            if (w * 10 % 10 == 0) w += .5;
+            this.drawVLine('#eeeeee', w, 0,this.paintRegion['main.height'], 1, 'solid');
+        }
+
+        this.ctx.restore();
+    }
+    painter.padding.top = 10;
+    painter.padding.left = 10;
+    painter.padding.right = 20;
+    painter.init();
+    painter.build();
+    /*
+    var paintStream = [
+        {
+            'date':{
+                region: { x: 0, y: 0, width: 'f:00-00-00', height: '50%' },
+                'dateY':new yAxis({
+                    font: '11px Arial',
+                    color: 'black',
+                    align: 'right',
+                    textBaseline: 'top',
+                    dataType: 'string'
+                })
+            }
+        },
+        {
+            'main':{
+                region: {
+                    x: {'$and':['date.x', 'date.width']}, y: {'$sub':['date.y', (determineFontHeight('11px Arial')/2)]}
+                    , width: {'$sub':['100%','date.width','padding.right','padding.left']}, height: {'$sub':['50%', (determineFontHeight('11px Arial')/2)]},
+                    //horizontalLineCount: 7, verticalLineCount: 7,
+                    //backgroundColor:'#fff',
+                    riseColor: 'red',
+                    fallColor: 'green',
+                    normalColor: 'black',
+                    chartMargin:{left:45.5,top:20.5,right:20.5},
+                    barWidth: 5, spaceWidth: 2, lineStyle: 'solid', borderColor: 'gray', splitLineColor: '#eeeeee', lineWidth: 1
+                },
+                'kline':new kLine({
+                    lineWidth: 1,
+                    lineStyle: 'solid',
+                    borderColor: 'gray',
+                    yAxis: 'dateY',
+                    xAxis: 'priceX'
+                }),
+                'dayline':{
+
+                }
+            }
+        },
+        {
+            'price':{
+                region: { x: 'main.x', y: {'$and':['main.height', determineFontHeight('11px Arial')]}, width: 'main.width', height: 'f:00.00' },
+                'priceX':new xAxis({
+                    font: '11px Arial',
+                    color: 'black',
+                    align: 'right',
+                    textBaseline: 'top',
+                    dataType: 'money'
+                })
+            }
+        }
+    ];
+
+    var painter = new painterKline('kline',paintStream, getKLData());
+    painterKline.prototype.preData = function() {
+        var kline = [];
+        var priceXL = [];
+        var dateYL = [];
+        var priceX = {};
+        var dateY = {};
+        for (var i = 0; i < 90; i++) {
+            var rawData = data[i];
+            //20111215,11.68,11.65,11.76,11.40,11.41,43356655,502325991
+            priceX[Number(rawData[3])] = 1;
+            priceX[Number(rawData[4])] = 1;
+            dateY[rawData[0]] = 1;
+            kline.push([rawData[0], rawData[2], rawData[5], rawData[3], rawData[4] ]);
+        }
+        this.data.kline = kline.reverse();
+
+        for (var pk in priceX)
+            priceXL.push(pk);
+
+        priceXL.sort(function(a, b) {
+            return a - b;
+        });
+        this.data.priceX = priceXL;
+        //Object.keys(priceY).reduce((a, c) => (a[c] = priceY[c], a), {});
+
+        for (var dk in dateY)
+            dateYL.push(dk);
+
+        dateYL.sort(function(a, b) {
+            return a - b;
+        });
+        this.data.dateY = dateYL.reverse();
+    }
     painter.padding.top = 10;
     painter.padding.left = 10;
     painter.padding.right = 20;
     painter.init();
 
-    painter.ctx.beginPath();
-    painter.ctx.strokeStyle = 'gray';
-    painter.ctx.save();
-    painter.ctx.translate(painter.paintRegion['main.x']
-                   , painter.paintRegion['main.y'] - (painter.implements.priceY.options.fontHeight / 2));
+    painterKline.prototype.start = function () {
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = 'gray';
+        this.ctx.save();
+        this.ctx.translate(this.paintRegion['main.x']
+                       , this.paintRegion['main.y']);
 
-    painter.ctx.rect(0, 0
-                   , painter.paintRegion['main.width']
-                   , painter.paintRegion['main.height'] - (painter.implements.priceY.options.fontHeight/2));
-    painter.ctx.stroke();
-    var spaceHeight = (painter.paintRegion['main.height'] - (painter.implements.priceY.options.fontHeight/2)) / (painter.implements.priceY.options.horizontalLineCount - 1);
-    for (var i = 1; i <= (painter.implements.priceY.options.horizontalLineCount-2); i++) {
-        var y = spaceHeight * i;
-        painter.drawHLine('#eeeeee', 0, y, painter.paintRegion['main.width'], 1, 'solid');
-    }
+        this.ctx.rect(0, 0
+                       , this.paintRegion['main.width']
+                       , this.paintRegion['main.height']);
+        this.ctx.stroke();
+        var spaceHeight = (this.paintRegion['main.height'] - (this.implements.dateY.options.fontHeight/2)) / (this.implements.dateY.options.horizontalLineCount - 1);
+        for (var i = 1; i <= (this.implements.dateY.options.horizontalLineCount-2); i++) {
+            var y = spaceHeight * i;
+            this.drawHLine('#eeeeee', 0, y, this.paintRegion['main.width'], 1, 'solid');
+        }
 
-    var spaceWidth = painter.paintRegion['main.width'] / (painter.implements.dateX.options.verticalLineCount - 1);
-    for (var i = 1; i <= painter.implements.dateX.options.verticalLineCount; i++) {
-        var w = spaceWidth * i;
-        if (w * 10 % 10 == 0) w += .5;
-        painter.drawVLine('#eeeeee', w, 0,painter.paintRegion['main.height'], 1, 'solid');
-    }
+        var spaceWidth = this.paintRegion['main.width'] / (this.implements.priceX.options.verticalLineCount - 1);
+        for (var i = 1; i <= this.implements.priceX.options.verticalLineCount; i++) {
+            var w = spaceWidth * i;
+            if (w * 10 % 10 == 0) w += .5;
+            this.drawVLine('#eeeeee', w, 0,this.paintRegion['main.height'], 1, 'solid');
+        }
 
-    painter.ctx.restore();
+        this.ctx.restore();
+    }*/
+
     painter.build();
 </script>
 </html>

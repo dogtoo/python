@@ -1,6 +1,10 @@
 function xAxis(options){
   this.options = options;
-  if (typeof this.options.verticalLineCount === 'undefined') this.options.verticalLineCount = 10;
+  if (typeof this.options.first === 'undefined') this.options.first = 0;
+  if (typeof this.options.last === 'undefined') this.options.last = 0;
+  if (typeof this.options.verticalLineCount === 'undefined') this.options.verticalLineCount = 0;
+  if (typeof this.options.dataType === 'undefined') this.options.dataType = 'number';
+  if (typeof this.options.font === 'undefined') this.options.font = '12px Arial';
 }
 xAxis.prototype = {
     initialize: function (painter) {
@@ -33,32 +37,43 @@ xAxis.prototype = {
         this.ctx.restore();
     },
     getHeight: function(format) {
-        this.options.fontHeight = determineFontHeight(this.options.font);
+        if (typeof format === 'undefined') format = 'TEST';
+        this.options.fontHeight = determineFontHeight(this.options.font, format);
         return this.options.fontHeight + 2;
     },
     preData: function(data) {
         if (Object.prototype.toString.call(data) != '[object Array]') return;
         if (data.length <= 0) return;
+
         this.ctx.font = this.options.font;
-        this.options.fontWidth= this.ctx.measureText(data[0]).width;
-        //verticalLineCount
-        // w * x * 2 = width;
+        //this.options.fontWidth= this.ctx.measureText(data[0]).width;
+        this.options.fontWidth= determineFontWidth(this.options.font, data[0]);
+
         this.options.verticalLineCount = Math.round(this.paintRegion[this.paintName + '.width'] / this.options.fontWidth / 2);
-        var xScalers = [];
-        var stepLength = data.length / (this.options.verticalLineCount - 1);
-        if (stepLength < 1) {
-            this.options.verticalLineCount = data.length;
-            stepLength = 1;
+        this.options.verticalLineCount = (this.options.verticalLineCount <= 1) ? 2 : this.options.verticalLineCount;
+        if (this.options.dataType.match(/string/)) {
+            var xScalers = [];
+            var stepLength = data.length / (this.options.verticalLineCount - 1);
+            if (stepLength < 1) {
+                this.options.verticalLineCount = data.length;
+                stepLength = 1;
+            }
+            xScalers.push(convertDate(data[0], false).substr(2));
+            for (var i = 1; i < this.options.verticalLineCount; i++) {
+                var index = Math.ceil(i * stepLength);
+                if (index >= data.length) index = data.length - 1;
+                var quoteTime = convertDate(data[index], false);
+                quoteTime = quoteTime.substr(2);
+                xScalers.push(quoteTime);
+            }
+            this.data[this.implName] = xScalers;
+        } else if (this.options.dataType.match(/number|money/)) {
+            this.options.first = data[0];
+            this.options.last = data[data.length-1];
+            this.data[this.implName] = calcAxisValues(this.options.last
+                                , this.options.first
+                                , this.options.verticalLineCount)
         }
-        xScalers.push(convertDate(data[0], false).substr(2));
-        for (var i = 1; i < this.options.verticalLineCount; i++) {
-            var index = Math.ceil(i * stepLength);
-            if (index >= data.length) index = data.length - 1;
-            var quoteTime = convertDate(data[index], false);
-            quoteTime = quoteTime.substr(2);
-            xScalers.push(quoteTime);
-        }
-        this.data[this.implName] = xScalers;
     },
     toString: function() {
         return 'xAxis';
@@ -82,4 +97,15 @@ function convertDate(val, withWeek) {
     else {
         return year + '-' + month + '-' + day;
     }
+}
+
+function calcAxisValues(high, low, count,formatFunc) {
+    var diff = high - low;
+    var space = diff / (count-1);
+    var result = [];
+    if (typeof formatFunc == 'undefined') formatFunc = toMoney;
+    for (var i = 0; i < count; i++) {
+        result.push(toMoney(high - i * space));
+    }
+    return result;
 }

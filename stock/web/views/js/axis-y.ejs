@@ -1,8 +1,9 @@
 function yAxis(options) {
   this.options = options;
   if (typeof this.options.low === 'undefined') this.options.low = 0;
-  if (typeof this.options.high === 'undefined') this.options.high = 10;
-  if (typeof this.options.horizontalLineCount === 'undefined') this.options.horizontalLineCount = 10;
+  if (typeof this.options.high === 'undefined') this.options.high = 0;
+  if (typeof this.options.horizontalLineCount === 'undefined') this.options.horizontalLineCount = 0;
+  if (typeof this.options.dataType === 'undefined') this.options.dataType = 'number';
 }
 
 yAxis.prototype = {
@@ -40,8 +41,7 @@ yAxis.prototype = {
         return 'yAxis';
     },
     getWidth: function(format) {
-        this.ctx.font = this.options.font;
-        return this.ctx.measureText(format).width;
+        return determineFontWidth(this.options.font, format);
     },
     getHeight: function(format) {
         return 0;
@@ -49,15 +49,33 @@ yAxis.prototype = {
     preData: function(data) {
         if (Object.prototype.toString.call(data) != '[object Array]') return;
         if (data.length <= 0) return;
-        this.options.fontHeight = determineFontHeight(this.options.font);
-        // h * x * 5 = height;
-        this.options.horizontalLineCount = Math.round(this.paintRegion[this.paintName + '.height'] / this.options.fontHeight / 3);
+        this.options.fontHeight = determineFontHeight(this.options.font, data[0]);
+
+        this.options.horizontalLineCount = Math.round(this.paintRegion[this.paintName + '.height'] / this.options.fontHeight / 2);
         this.options.horizontalLineCount = (this.options.horizontalLineCount <= 1) ? 2 : this.options.horizontalLineCount;
-        this.options.low = data[0];
-        this.options.high = data[data.length-1];
-        this.data[this.implName] = calcAxisValues(this.options.high
-                            , this.options.low
-                            , this.options.horizontalLineCount)
+        if (this.options.dataType.match(/string/)) {
+            var yScalers = [];
+            var stepLength = data.length / (this.options.horizontalLineCount - 1);
+            if (stepLength < 1) {
+                this.options.horizontalLineCount = data.length;
+                stepLength = 1;
+            }
+            yScalers.push(convertDate(data[0], false).substr(2));
+            for (var i = 1; i < this.options.horizontalLineCount; i++) {
+                var index = Math.ceil(i * stepLength);
+                if (index >= data.length) index = data.length - 1;
+                var quoteTime = convertDate(data[index], false);
+                quoteTime = quoteTime.substr(2);
+                yScalers.push(quoteTime);
+            }
+            this.data[this.implName] = yScalers;
+        } else if (this.options.dataType.match(/number|money/)) {
+            this.options.low = data[0];
+            this.options.high = data[data.length-1];
+            this.data[this.implName] = calcAxisValues(this.options.high
+                                , this.options.low
+                                , this.options.horizontalLineCount)
+        }
     }
 };
 

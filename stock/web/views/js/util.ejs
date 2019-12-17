@@ -165,10 +165,10 @@
     };
 })();
 
-function determineFontHeight(fontStyle) {
+function determineFontHeight(fontStyle, format = "M") {
     var body = document.getElementsByTagName("body")[0];
     var dummy = document.createElement("div");
-    var dummyText = document.createTextNode("M");
+    var dummyText = document.createTextNode(format);
     dummy.appendChild(dummyText);
     var style = "font-family: " + fontStyle.split(" ")[1] + "; font-size: " + fontStyle.split(" ")[0] + ";";
     dummy.setAttribute("style", style);
@@ -176,4 +176,12 @@ function determineFontHeight(fontStyle) {
     var result = dummy.offsetHeight;
     body.removeChild(dummy);
     return result;
+};
+
+function determineFontWidth(fontStyle, format = "M") {
+    var body = document.getElementsByTagName("body")[0];
+    var canvas = document.createElement("canvas");
+    var ctx = canvas.getContext('2d');
+    ctx.font = fontStyle;
+    return ctx.measureText(format).width;
 };

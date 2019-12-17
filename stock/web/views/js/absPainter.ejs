@@ -55,6 +55,7 @@ Painter.prototype = {
     },
     build: function() {
         var painter = this;
+        if (painter.start) painter.start.call(painter);
         paintStream.forEach(function(item, index, array){
             paintName = Object.keys(item)[0];
             for (var p in item[paintName]) {
@@ -232,7 +233,7 @@ function prePaintRegionObj(key_, type_, v_, padding_ = true) {
                         else
                             tot = math(mathType, tot, prePaintRegionObj(key__, type__, v__, false));
                     } else if (typeof object_v_[object_i_] === 'number'){
-                        tot += object_v_[object_i_];
+                        tot = math(mathType, tot, object_v_[object_i_]);;
                     }
                 }
             }
