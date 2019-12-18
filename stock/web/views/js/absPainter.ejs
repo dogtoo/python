@@ -47,10 +47,11 @@ Painter.prototype = {
                 painter.implements[painter.implName] = painter.paintImplement;
             }
         });
-
+/*
         for (var implt in paintStream) {
             console.log(paintStream[implt]);
         }
+*/
         painter.ctx.clearRect(0, 0, painter.width, painter.height);
     },
     build: function() {
@@ -172,12 +173,12 @@ Painter.prototype = {
     }
 }
 
-function prePaintRegionObj(key_, type_, v_, padding_ = true) {
+function prePaintRegionObj(key_, type_, v_) {
     if (type_ === 'number') {
         if (key_.match(/x/))
-            return v_ + ((padding_) ? painter.padding.left : 0);
+            return v_;
         if (key_.match(/y/))
-            return v_ + ((padding_) ? painter.padding.top : 0);
+            return v_;
         if (key_.match(/width/))
             return v_;
         if (key_.match(/height/))
@@ -197,9 +198,9 @@ function prePaintRegionObj(key_, type_, v_, padding_ = true) {
             if (key_.match(/y/))
                 return painter.height * (percentage / 100);
             if (key_.match(/width/))
-                return (painter.width - ((padding_) ? painter.padding.left - painter.padding.right : 0)) * (percentage / 100);
+                return painter.width * (percentage / 100);
             if (key_.match(/height/))
-                return (painter.height - ((padding_) ? painter.padding.top - painter.padding.bottom : 0)) * (percentage / 100);
+                return painter.height * (percentage / 100);
         } else if (Object.prototype.toString.call(v_.match(/^f\:(.+)/)) === '[object Array]'
             && typeof v_.match(/^f\:(.+)/)[1] === 'string') {
             var format_ = v_.match(/^f\:(.+)/)[1];
@@ -213,6 +214,8 @@ function prePaintRegionObj(key_, type_, v_, padding_ = true) {
                 return painter.paintImplement.getHeight.call(painter, format_);
         } else if (painter.paintRegion.hasOwnProperty(v_)) {
             return painter.paintRegion[v_];
+        } else if (v_.match(/padding\.(.+)/) && painter.padding.hasOwnProperty(v_.match(/padding\.(.+)/)[1])) {
+            return painter.padding[v_.match(/padding\.(.+)/)[1]];
         } else if (key_.match(/padding\.(.+)/) && painter.padding.hasOwnProperty(key_.match(/padding\.(.+)/)[1])) {
             return painter.padding[key_.match(/padding\.(.+)/)[1]];
         }

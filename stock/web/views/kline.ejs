@@ -10,6 +10,7 @@
     <script src="js/axis-x.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/axis-y.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/k-line.js" type="text/javascript" charset="UTF8"></script>
+    <script src="js/line.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/k-data.js" type="text/javascript" charset="UTF8"></script>
 </head>
 <body>
@@ -27,11 +28,21 @@
     painterKline.prototype.preData = function() {
         //this.data = getKLData();
     }
+    var fline = new line({
+                yAxis: 'priceY',
+                xAxis: 'dateX',
+                strokeStyle: 'cyan',
+                disX: 5
+            });
+    //fline.__proto__ = Object.create(line.__proto__);
+    fline.__proto__.preData =  function(data) {
+        fline.options.disX = painter.implements.kline.options.lineWidth/2;
+    }
 
     var paintStream = [
         {
             'price':{
-                region: { x: 0, y: 0, width: 'f:00.00', height: '50%' },
+                region: { x: 'padding.left', y: 'padding.top', width: 'f:00.00', height: '50%' },
                 'priceY':new yAxis({
                     font: '11px Arial',
                     color: 'black',
@@ -44,8 +55,8 @@
         {
             'main':{
                 region: {
-                    x: {'$and':['price.x', 'price.width']}, y: {'$sub':['price.y', (determineFontHeight('11px Arial')/2)]}
-                    , width: {'$sub':['100%','price.width','padding.right','padding.left']}, height: {'$sub':['50%', (determineFontHeight('11px Arial')/2)]},
+                    x: {'$and':['price.x', 'price.width', 3]}, y: {'$and':['price.y', (determineFontHeight('11px Arial')/2)]}
+                    , width: {'$sub':['100%','price.width','padding.right','padding.left']}, height: {'$sub':['50%', determineFontHeight('11px Arial')]},
                     //horizontalLineCount: 7, verticalLineCount: 7,
                     //backgroundColor:'#fff',
                     riseColor: 'red',
@@ -57,18 +68,25 @@
                 'kline':new kLine({
                     lineWidth: 1,
                     lineStyle: 'solid',
-                    borderColor: 'gray',
                     yAxis: 'priceY',
                     xAxis: 'dateX'
                 }),
-                'dayline':{
-
-                }
+                'fline': fline,
+                'tline':new line({
+                    yAxis: 'priceY',
+                    xAxis: 'dateX',
+                    strokeStyle: 'limegreen'
+                }),
+                'sline':new line({
+                    yAxis: 'priceY',
+                    xAxis: 'dateX',
+                    strokeStyle: 'magenta'
+                })
             }
         },
         {
             'date':{
-                region: { x: 'main.x', y: {'$and':['main.height', determineFontHeight('11px Arial')]}, width: 'main.width', height: 'f:00-00-00' },
+                region: { x: 'main.x', y: {'$and':['main.height', 'main.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: 'f:00-00-00' },
                 'dateX':new xAxis({
                     font: '11px Arial',
                     color: 'black',
@@ -82,20 +100,23 @@
 
     var painter = new painterKline('kline',paintStream, getKLData());
     painterKline.prototype.preData = function() {
-        this.data.priceY = [];
+        //this.data.priceY = [];
         var kline = [];
+        var fline = [];
         var priceYL = [];
         var dateXL = [];
         var priceY = {};
         var dateX = {};
-        for (var i = 0; i < 90; i++) {
+        for (var i = 0; i < 10; i++) {
             var rawData = data[i];
             priceY[Number(rawData[3])] = 1;
             priceY[Number(rawData[4])] = 1;
             dateX[rawData[0]] = 1;
             kline.push([rawData[0], rawData[2], rawData[5], rawData[3], rawData[4] ]);
+            fline.push([rawData[0], rawData[5]]);
         }
         this.data.kline = kline;
+        this.data.fline = fline;
 
         for (var pk in priceY)
             priceYL.push(pk);
@@ -141,11 +162,12 @@
 
         this.ctx.restore();
     }
+
     painter.padding.top = 10;
     painter.padding.left = 10;
     painter.padding.right = 20;
     painter.init();
-    painter.build();
+
     /*
     var paintStream = [
         {
@@ -265,6 +287,8 @@
         this.ctx.restore();
     }*/
 
+    painter.build();
+    painter.init();
     painter.build();
 </script>
 </html>
