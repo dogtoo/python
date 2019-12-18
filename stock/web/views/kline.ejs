@@ -15,7 +15,7 @@
 </head>
 <body>
     <h1 id="h1"><%=msg%></h1>
-    <canvas id="kline" width="900" height="500" style="z-index: 2; border: 1px solid #69c"></canvas>
+    <canvas id="kline" width="1002" height="500" style="z-index: 2; border: 1px solid #69c"></canvas>
 </body>
 <script type="text/javascript">
 
@@ -32,17 +32,40 @@
                 yAxis: 'priceY',
                 xAxis: 'dateX',
                 strokeStyle: 'cyan',
+                lineWidth: 0.5,
                 disX: 5
             });
     //fline.__proto__ = Object.create(line.__proto__);
     fline.__proto__.preData =  function(data) {
         fline.options.disX = painter.implements.kline.options.lineWidth/2;
     }
+    
+    var tline = new line({
+                yAxis: 'priceY',
+                xAxis: 'dateX',
+                strokeStyle: 'limegreen',
+                lineWidth: 1,
+                disX: 5
+            });
+    tline.__proto__.preData =  function(data) {
+        tline.options.disX = painter.implements.kline.options.lineWidth/2;
+    }
+    
+    var sline = new line({
+                yAxis: 'priceY',
+                xAxis: 'dateX',
+                strokeStyle: 'magenta',
+                lineWidth: 1,
+                disX: 5
+            });
+    sline.__proto__.preData =  function(data) {
+        sline.options.disX = painter.implements.kline.options.lineWidth/2;
+    }
 
     var paintStream = [
         {
             'price':{
-                region: { x: 'padding.left', y: 'padding.top', width: 'f:00.00', height: '50%' },
+                region: { x: 'padding.left', y: 'padding.top', width: 'f:00.00', height: '55%' },
                 'priceY':new yAxis({
                     font: '11px Arial',
                     color: 'black',
@@ -56,7 +79,7 @@
             'main':{
                 region: {
                     x: {'$and':['price.x', 'price.width', 3]}, y: {'$and':['price.y', (determineFontHeight('11px Arial')/2)]}
-                    , width: {'$sub':['100%','price.width','padding.right','padding.left']}, height: {'$sub':['50%', determineFontHeight('11px Arial')]},
+                    , width: {'$sub':['100%','price.width','padding.right','padding.left']}, height: {'$sub':['55%', determineFontHeight('11px Arial')]},
                     //horizontalLineCount: 7, verticalLineCount: 7,
                     //backgroundColor:'#fff',
                     riseColor: 'red',
@@ -72,16 +95,8 @@
                     xAxis: 'dateX'
                 }),
                 'fline': fline,
-                'tline':new line({
-                    yAxis: 'priceY',
-                    xAxis: 'dateX',
-                    strokeStyle: 'limegreen'
-                }),
-                'sline':new line({
-                    yAxis: 'priceY',
-                    xAxis: 'dateX',
-                    strokeStyle: 'magenta'
-                })
+                'tline': tline,
+                'sline': sline
             }
         },
         {
@@ -98,25 +113,46 @@
         }
     ];
 
+    function MACount(maType, date, data) {
+        maType = maType - 1;
+        var MA = 0;
+        if (date >= maType) {
+            for (var ma = date-maType; ma <= date; ma++)
+                MA = MA + data[ma][5];
+            return (MA / (maType+1));
+        } else {
+            return null;
+        }
+    }
+
     var painter = new painterKline('kline',paintStream, getKLData());
     painterKline.prototype.preData = function() {
         //this.data.priceY = [];
         var kline = [];
+        
         var fline = [];
+        var tline = [];
+        var sline = [];
+        
         var priceYL = [];
         var dateXL = [];
         var priceY = {};
         var dateX = {};
-        for (var i = 0; i < 10; i++) {
+        for (var i = 0; i < 104; i++) {
             var rawData = data[i];
             priceY[Number(rawData[3])] = 1;
             priceY[Number(rawData[4])] = 1;
             dateX[rawData[0]] = 1;
             kline.push([rawData[0], rawData[2], rawData[5], rawData[3], rawData[4] ]);
-            fline.push([rawData[0], rawData[5]]);
+            
+            fline.push([rawData[0], MACount(5, i, data)]);
+            tline.push([rawData[0], MACount(10, i, data)]);
+            sline.push([rawData[0], MACount(20, i, data)]);
         }
         this.data.kline = kline;
         this.data.fline = fline;
+        this.data.tline = tline;
+        this.data.sline = sline;
 
         for (var pk in priceY)
             priceYL.push(pk);

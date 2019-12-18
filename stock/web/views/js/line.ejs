@@ -7,6 +7,7 @@ function line(options) {
   this.options.prevY = null;
   if (typeof this.options.disX === 'undefined') this.options.disX = 0;
   if (typeof this.options.disY === 'undefined') this.options.disY = 0;
+  if (typeof this.options.lineWidth === 'undefined') this.options.lineWidth = 10;
 }
 
 line.prototype = {
@@ -38,6 +39,7 @@ line.prototype = {
         }
         this.ctx.beginPath();
         this.ctx.strokeStyle = this.options.strokeStyle;
+        this.ctx.lineWidth = this.options.lineWidth;
     },
     end: function () {
         this.options.prevX = null;
@@ -48,9 +50,11 @@ line.prototype = {
         return (typeof this.data[this.implName] != 'undefined') ? this.data[this.implName].length : 0;
     },
     getX: function (i) {
+        if (this.data[this.implName][i][0] === null) return null;
         return (i * painter.options.xScale) + this.options.disX;
     },
     getY: function (i) {
+        if (this.data[this.implName][i][1] === null) return null;
         return (painter.data[painter.implName][i][1]- painter.options.y0) * painter.options.yScale + this.options.disY;
     },
     paintItem: function (i, x, y) {
@@ -62,7 +66,7 @@ line.prototype = {
             this.ctx.lineTo(painter.paintRegion[painter.paintName + '.width'], painter.paintRegion[painter.paintName + '.height']);
             this.ctx.stroke();
         }*/
-
+        if (x === null && y === null ) return;
         y = painter.paintRegion[painter.paintName + '.height'] - y;
 
         if (this.options.prevX === null && this.options.prevY === null) {
