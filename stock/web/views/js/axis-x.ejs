@@ -1,10 +1,11 @@
 function xAxis(options){
-  this.options = options;
-  if (typeof this.options.first === 'undefined') this.options.first = 0;
-  if (typeof this.options.last === 'undefined') this.options.last = 0;
-  if (typeof this.options.verticalLineCount === 'undefined') this.options.verticalLineCount = 0;
-  if (typeof this.options.dataType === 'undefined') this.options.dataType = 'number';
-  if (typeof this.options.font === 'undefined') this.options.font = '12px Arial';
+    this.options = options;
+    if (typeof this.options.first === 'undefined') this.options.first = 0;
+    if (typeof this.options.last === 'undefined') this.options.last = 0;
+    if (typeof this.options.verticalLineCount === 'undefined') this.options.verticalLineCount = 0;
+    if (typeof this.options.dataType === 'undefined') this.options.dataType = 'number';
+    if (typeof this.options.font === 'undefined') this.options.font = '12px Arial';
+    this.options.xScale = 0;
 }
 xAxis.prototype = {
     initialize: function (painter) {
@@ -73,6 +74,16 @@ xAxis.prototype = {
             this.data[this.implName] = calcAxisValues(this.options.last
                                 , this.options.first
                                 , this.options.verticalLineCount)
+        }
+        console.log('axisX:'+this.options.xScale);
+    },
+    getXScale: function(data) {
+        if (this.options.dataType.match(/string/)) {
+            if (painter.paintRegion.hasOwnProperty(painter.paintName + '.width'))
+                this.options.xScale = painter.paintRegion[painter.paintName + '.width'] / data.length;
+        } else if (this.options.dataType.match(/number|money/)) {
+            if (painter.paintRegion.hasOwnProperty(painter.paintName + '.width'))
+                this.options.xScale = painter.paintRegion[painter.paintName + '.width'] / Math.abs(this.options.last - this.options.first);
         }
     },
     toString: function() {

@@ -4,6 +4,7 @@ function yAxis(options) {
   if (typeof this.options.high === 'undefined') this.options.high = 0;
   if (typeof this.options.horizontalLineCount === 'undefined') this.options.horizontalLineCount = 0;
   if (typeof this.options.dataType === 'undefined') this.options.dataType = 'number';
+  this.options.yScale = 0;
 }
 
 yAxis.prototype = {
@@ -75,6 +76,18 @@ yAxis.prototype = {
             this.data[this.implName] = calcAxisValues(this.options.high
                                 , this.options.low
                                 , this.options.horizontalLineCount)
+        }
+
+        console.log('axisY:'+this.options.yScale);
+
+    },
+    getYScale: function(data) {
+        if (this.options.dataType.match(/string/)) {
+            if (painter.paintRegion.hasOwnProperty(painter.paintName + '.height'))
+                this.options.yScale = painter.paintRegion[painter.paintName + '.height'] / data.length;
+        } else if (this.options.dataType.match(/number|money/)) {
+            if (painter.paintRegion.hasOwnProperty(painter.paintName + '.height'))
+                this.options.yScale = painter.paintRegion[painter.paintName + '.height'] / Math.abs(this.options.high - this.options.low);
         }
     }
 };
