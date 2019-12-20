@@ -43,7 +43,7 @@ line.prototype = {
         if (this.options.xAxis.options.dataType === 'string') {
             return (i * this.options.xAxis.options.xScale) + this.options.disX;
         } else {
-            return (painter.data[painter.implName][i][1]- this.options.xAxis.options.first) * this.options.xAxis.options.xScale + this.options.disX;
+            return painter.paintRegion[painter.paintName + '.width'] - (painter.data[painter.implName][i][1]- this.options.xAxis.options.first) * this.options.xAxis.options.xScale + this.options.disX;
         }
 
     },
@@ -52,7 +52,7 @@ line.prototype = {
         if (this.options.yAxis.options.dataType === 'string') {
             return (i * this.options.yAxis.options.yScale) + this.options.disY;
         } else {
-            return (painter.data[painter.implName][i][1]- this.options.yAxis.options.low) * this.options.yAxis.options.yScale + this.options.disY;
+            return painter.paintRegion[painter.paintName + '.height'] - (painter.data[painter.implName][i][1]- this.options.yAxis.options.low) * this.options.yAxis.options.yScale + this.options.disY;
         }
     },
     paintItem: function (i, x, y) {
@@ -65,7 +65,8 @@ line.prototype = {
             this.ctx.stroke();
         }*/
         if (x === null && y === null ) return;
-        y = painter.paintRegion[painter.paintName + '.height'] - y;
+        //y =  - y;
+        //x =  - x;
 
         if (this.options.prevX === null && this.options.prevY === null) {
             this.options.prevX  = x;

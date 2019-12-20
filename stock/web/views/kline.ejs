@@ -15,7 +15,7 @@
 </head>
 <body>
     <h1 id="h1"><%=msg%></h1>
-    <canvas id="kline" width="500" height="1002" style="z-index: 2; border: 1px solid #69c"></canvas>
+    <canvas id="kline" width="1002" height="500" style="z-index: 2; border: 1px solid #69c"></canvas>
 </body>
 <script type="text/javascript">
 
@@ -40,7 +40,7 @@
             return [null, null];
         }
     }
-/*
+
 {
     var fline = new line({
                 yAxis: 'priceY',
@@ -201,8 +201,9 @@
         this.ctx.restore();
     }
 }
-*/
 
+
+/*
 {
     var fline = new line({
                 yAxis: 'dateY',
@@ -221,7 +222,7 @@
                 xAxis: 'priceX',
                 strokeStyle: 'limegreen',
                 lineWidth: 1,
-                disX: 5
+                disY: 5
             });
     tline.__proto__.preData =  function(data) {
         tline.options.disY = painter.implements.kline.options.lineWidth/2;
@@ -364,7 +365,7 @@
         this.ctx.restore();
     }
 }
-
+*/
     painter.padding.top = 10;
     painter.padding.left = 10;
     painter.padding.right = 20;
