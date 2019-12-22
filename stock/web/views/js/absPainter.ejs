@@ -230,7 +230,7 @@ function prePaintRegionObj(key_, type_, v_) {
                         var key__ = object_v_[object_i_];
                         var type__ = (typeof painter.paintRegion[key__] != 'undefined') ? typeof painter.paintRegion[key__] : typeof key__;
                         var v__ = (typeof painter.paintRegion[key__] != 'undefined') ? painter.paintRegion[key__] : key__;
-                        key__ = (object_v_[object_i_].match(/x|y|width|height|padding/)) ? object_v_[object_i_] : key_;
+                        key__ = (typeof object_v_[object_i_] === 'string' && object_v_[object_i_].match(/x|y|width|height|padding/)) ? object_v_[object_i_] : key_;
                         if (tot == 0)
                             tot = prePaintRegionObj(key__, type__, v__, false)
                         else

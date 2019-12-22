@@ -33,7 +33,7 @@
         maType = maType - 1;
         var MA = 0;
         if (date >= maType) {
-            for (var ma = date-maType; ma <= date; ma++)
+            for (var ma = date-maType-1; ma <= date-1; ma++)
                 MA = MA + data[ma][5];
             return [data[ma][0], (MA / (maType+1))];
         } else {
@@ -93,7 +93,7 @@
             'main':{
                 region: {
                     x: {'$and':['price.x', 'price.width', 3]}, y: {'$and':['price.y', (determineFontHeight('11px Arial')/2)]}
-                    , width: {'$sub':['100%','price.width','padding.right','padding.left']}, height: {'$sub':['55%', determineFontHeight('11px Arial')]},
+                    , width: {'$sub':['100%','price.width','padding.right','padding.left']}, height: '55%',
                     //horizontalLineCount: 7, verticalLineCount: 7,
                     //backgroundColor:'#fff',
                     riseColor: 'red',
@@ -122,6 +122,18 @@
                     align: 'right',
                     textBaseline: 'top',
                     dataType: 'string'
+                })
+            }
+        },
+        {
+            'volume':{
+                region: { x: 'price.x', y: {'$and':['price.height', {'$mul':['date.height',2]}]}, width: 'f:0000', height: '10%' },
+                'volumeY':new yAxis({
+                    font: '11px Arial',
+                    color: 'black',
+                    align: 'right',
+                    textBaseline: 'top',
+                    dataType: 'number'
                 })
             }
         }
@@ -172,6 +184,8 @@
             return a - b;
         });
         this.data.dateX = dateXL;
+        
+        this.data.volumeY = ["0", "1000","2000"];
     }
 
     painterKline.prototype.start = function () {
@@ -185,19 +199,32 @@
                        , this.paintRegion['main.width']
                        , this.paintRegion['main.height']);
         this.ctx.stroke();
-        var spaceHeight = (this.paintRegion['main.height'] - (this.implements.priceY.options.fontHeight/2)) / (this.implements.priceY.options.horizontalLineCount - 1);
+        var spaceHeight = 0;
+        //console.log('height:'+this.paintRegion['price.height']+',length:'+(this.implements.priceY.options.horizontalLineCount - 1)+',fontHeight:'+this.implements.priceY.options.fontHeight / 2);
+        /*
         for (var i = 1; i <= (this.implements.priceY.options.horizontalLineCount-2); i++) {
-            var y = spaceHeight * i;
+            spaceHeight = this.paintRegion['price.height'] * i / (this.implements.priceY.options.horizontalLineCount - 1) - (this.implements.priceY.options.fontHeight/2);
+            var y = spaceHeight;
             this.drawHLine('#eeeeee', 0, y, this.paintRegion['main.width'], 1, 'solid');
+        }*/
+        
+        for (var i in this.implements.priceY.options.y) {
+            this.drawHLine('#eeeeee', 0, this.implements.priceY.options.y[i], this.paintRegion['main.width'], 1, 'solid');
         }
-
-        var spaceWidth = this.paintRegion['main.width'] / (this.implements.dateX.options.verticalLineCount - 1);
-        for (var i = 1; i <= this.implements.dateX.options.verticalLineCount; i++) {
-            var w = spaceWidth * i;
-            if (w * 10 % 10 == 0) w += .5;
+        /*
+        console.log('lineWidth:'+this.implements.kline.options.lineWidth);
+        console.log('width:'+this.paintRegion['main.width']+',Count:'+this.implements.dateX.options.verticalLineCount);
+        var spaceWidth;
+        for (var i = 1; i <= this.implements.dateX.options.verticalLineCount-2; i++) {
+            spaceWidth = (this.paintRegion['main.width'] * i) / (this.implements.dateX.options.verticalLineCount - 1) - this.implements.kline.options.lineWidth / 2;
+            var w = spaceWidth ;
+            //if (w * 10 % 10 == 0) w += .5;
             this.drawVLine('#eeeeee', w, 0,this.paintRegion['main.height'], 1, 'solid');
-        }
-
+        }*/
+        
+            for (var i in this.implements.dateX.options.x) {
+                this.drawVLine('#eeeeee', this.implements.dateX.options.x[i], 0,this.paintRegion['main.height'], 1, 'solid');
+            }
         this.ctx.restore();
     }
 }
@@ -374,6 +401,6 @@
 
 
     painter.build();
-
+painter.build();
 </script>
 </html>

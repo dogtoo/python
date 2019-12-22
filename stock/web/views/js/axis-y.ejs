@@ -4,6 +4,7 @@ function yAxis(options) {
   if (typeof this.options.high === 'undefined') this.options.high = 0;
   if (typeof this.options.horizontalLineCount === 'undefined') this.options.horizontalLineCount = 0;
   if (typeof this.options.dataType === 'undefined') this.options.dataType = 'number';
+  this.options.y = [];
   this.options.yScale = 0;
 }
 
@@ -29,13 +30,21 @@ yAxis.prototype = {
         return this.paintRegion[this.paintName + '.width'] - w;
     },
     getY: function (i) {
-        if (i == 0) return 0;
+        //if (i == 0) return 0;
         if (i == this.data[this.implName].length-1) return this.paintRegion[this.paintName + '.height'] - this.options.fontHeight;
-        return (this.paintRegion[this.paintName + '.height'] * i / (this.data[this.implName].length - 1) - this.options.fontHeight / 2);
+        //console.log('height:'+this.paintRegion[this.paintName + '.height']+',length:'+(this.data[this.implName].length - 1)+',fontHeight:'+this.options.fontHeight / 2);
+        this.paintImplement.getYScale(this.data[this.implName]);
+        return this.options.yScale;
+        //return (this.paintRegion[this.paintName + '.height'] * i / (this.data[this.implName].length - 1) - this.options.fontHeight / 2);
     },
     paintItem: function (i, x, y) {
         if (typeof this.options.color == 'function')
             this.ctx.fillStyle = this.options.color(this.data[this.implName][i]);
+        y = this.paintRegion[this.paintName + '.height'] - y * (this.data[this.implName][i] - this.options.low);
+        if (typeof this.options.y[i] === 'undefined')
+            this.options.y.push(y);
+        else
+            this.options.y[i][y];
         this.ctx.fillText(this.data[this.implName][i], x, y);
     },
     getName: function() {
@@ -75,11 +84,8 @@ yAxis.prototype = {
             this.options.high = data[data.length-1];
             this.data[this.implName] = calcAxisValues(this.options.high
                                 , this.options.low
-                                , this.options.horizontalLineCount)
+                                , this.options.horizontalLineCount, this.options.dataType)
         }
-
-        console.log('axisY:'+this.options.yScale);
-
     },
     getYScale: function(data) {
         if (this.options.dataType.match(/string/)) {
@@ -96,9 +102,12 @@ function calcAxisValues(high, low, count,formatFunc) {
     var diff = high - low;
     var space = diff / (count-1);
     var result = [];
-    if (typeof formatFunc == 'undefined') formatFunc = toMoney;
+    //if (typeof formatFunc == 'undefined') formatFunc = toMoney;
     for (var i = 0; i < count; i++) {
-        result.push(toMoney(high - i * space));
+        if (formatFunc == 'money')
+            result.push(toMoney(high - i * space));
+        if (formatFunc == 'number')
+            result.push(bigNumberToText(high - i * space));
     }
     return result;
 }
