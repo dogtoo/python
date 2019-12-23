@@ -32,16 +32,26 @@ xAxis.prototype = {
         //if (i == this.data[this.implName].length - 1) return this.paintRegion[this.paintName + '.width'] - w;
         //console.log('width:'+this.paintRegion[this.paintName + '.width']+'count:'+(this.data[this.implName].length - 1));
         //return (this.paintRegion[this.paintName + '.width'] * i / (this.data[this.implName].length - 1)) - w / 2;
-        this.paintImplement.getXScale(this.data[this.implName]);
-        return this.options.xScale;
+        //this.paintImplement.getXScale(this.data[this.implName]);
+        //return this.options.xScale;
+        var v_c = Math.round((this.options.x.length)/this.options.verticalLineCount);
+        //for (var i = 0 ; i < this.implements.dateX.options.x.length ; i+= v_c) {
+        var x = (i * v_c);
+        var diff = this.options.x.length - x;
+        if (diff < v_c || x >= this.options.x.length) x = this.options.x.length - 1;
+        console.log(this.options.x[x]);
+        console.log(this.paintRegion[this.paintName + '.width'] - this.options.fontWidth);
+        return (this.options.x[x] + this.options.fontWidth <= this.paintRegion[this.paintName + '.width']) ? this.options.x[x] : this.paintRegion[this.paintName + '.width'] - this.options.fontWidth;
+        //}
     },
     paintItem: function (i, x, y) {
-        x = x * i;
+        /*x = x * i;
         if (typeof this.options.x[i] === 'undefined')
             this.options.x.push(x);
         else
             this.options.x[i][x];
-        
+        */
+        console.log(this.data[this.implName][i]);
         this.ctx.fillText(this.data[this.implName][i], x, y);
     },
     end: function () {
@@ -60,32 +70,30 @@ xAxis.prototype = {
         //this.options.fontWidth= this.ctx.measureText(data[0]).width;
         this.options.fontWidth= determineFontWidth(this.options.font, data[0]);
 
-        this.options.verticalLineCount = Math.round((this.paintRegion[this.paintName + '.width'] - this.options.fontWidth) / this.options.fontWidth / 4 );
+        this.options.verticalLineCount = Math.round((this.paintRegion[this.paintName + '.width'] - this.options.fontWidth) / this.options.fontWidth /2 );
         this.options.verticalLineCount = (this.options.verticalLineCount <= 1) ? 2 : this.options.verticalLineCount;
         if (this.options.dataType.match(/string/)) {
             var xScalers = [];
-            
-            while((data.length-2) % (this.options.verticalLineCount + 1) != 0) {
-                this.options.verticalLineCount--;
-            }                
-            var stepLength = Math.round((data.length-2) / (this.options.verticalLineCount + 1));
+
+            var stepLength = Math.round(data.length / this.options.verticalLineCount);
             if (stepLength < 1) {
                 this.options.verticalLineCount = data.length;
                 stepLength = 1;
             }
             xScalers.push(convertDate(data[0], false).substr(2));
             var index = 1;
-            for (var i = 1; i <= this.options.verticalLineCount; i++) {
+            for (var i = 1; i < this.options.verticalLineCount; i++) {
                 /*
                 var index = Math.ceil(i * stepLength) - 1;*/
-                
-                index = index + stepLength - 1 - ((i == 1) ? 1 : 0);
+
+                index = index + stepLength - ((i == 1)?1:0);
                 if (index >= data.length) index = data.length - 1;
+                if (index >= data.length - index) index = data.length - 1;
                 var quoteTime = convertDate(data[index], false);
                 quoteTime = quoteTime.substr(2);
                 xScalers.push(quoteTime);
             }
-            //xScalers.push(convertDate(data[data.length - 1], false).substr(2));
+            xScalers.push(convertDate(data[data.length - 1], false).substr(2));
             this.data[this.implName] = xScalers;
         } else if (this.options.dataType.match(/number|money/)) {
             this.options.first = data[0];
@@ -94,7 +102,7 @@ xAxis.prototype = {
                                 , this.options.first
                                 , this.options.verticalLineCount)
         }
-        
+
     },
     getXScale: function(data) {
         if (this.options.dataType.match(/string/)) {

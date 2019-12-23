@@ -51,7 +51,7 @@
             });
     //fline.__proto__ = Object.create(line.__proto__);
     fline.__proto__.preData =  function(data) {
-        fline.options.disX = painter.implements.kline.options.lineWidth/2;
+        fline.options.disX = painter.implements.kline.options.lineWidth;
     }
 
     var tline = new line({
@@ -62,7 +62,7 @@
                 disX: 5
             });
     tline.__proto__.preData =  function(data) {
-        tline.options.disX = painter.implements.kline.options.lineWidth/2;
+        tline.options.disX = painter.implements.kline.options.lineWidth;
     }
 
     var sline = new line({
@@ -73,7 +73,7 @@
                 disX: 5
             });
     sline.__proto__.preData =  function(data) {
-        sline.options.disX = painter.implements.kline.options.lineWidth/2;
+        sline.options.disX = painter.implements.kline.options.lineWidth;
     }
 
     var paintStream = [
@@ -184,7 +184,7 @@
             return a - b;
         });
         this.data.dateX = dateXL;
-        
+
         this.data.volumeY = ["0", "1000","2000"];
     }
 
@@ -207,7 +207,7 @@
             var y = spaceHeight;
             this.drawHLine('#eeeeee', 0, y, this.paintRegion['main.width'], 1, 'solid');
         }*/
-        
+
         for (var i in this.implements.priceY.options.y) {
             this.drawHLine('#eeeeee', 0, this.implements.priceY.options.y[i], this.paintRegion['main.width'], 1, 'solid');
         }
@@ -221,8 +221,10 @@
             //if (w * 10 % 10 == 0) w += .5;
             this.drawVLine('#eeeeee', w, 0,this.paintRegion['main.height'], 1, 'solid');
         }*/
-        
-            for (var i in this.implements.dateX.options.x) {
+            var v_c = Math.round((this.implements.dateX.options.x.length)/this.implements.dateX.options.verticalLineCount);
+            for (var i = 0 ; i < this.implements.dateX.options.x.length ; i+= v_c) {
+                var diff = this.implements.dateX.options.x.length - i;
+                if (diff < v_c) i = this.implements.dateX.options.x.length;
                 this.drawVLine('#eeeeee', this.implements.dateX.options.x[i], 0,this.paintRegion['main.height'], 1, 'solid');
             }
         this.ctx.restore();

@@ -24,15 +24,15 @@ kLine.prototype = {
         this.options.yAxis.getYScale(painter.data[painter.implName]);
         this.options.xAxis.getXScale(painter.data[painter.implName]);
         if (this.options.xAxis.options.dataType === 'string') {
-            painter.options.lineWidth = (this.paintRegion[paintName + '.width'] / this.data[this.implName].length) * 0.7;
+            painter.options.lineWidth = (this.paintRegion[paintName + '.width'] / this.data[this.implName].length);
         } else {
-            painter.options.lineWidth = (this.paintRegion[paintName + '.width'] / (this.options.xAxis.options.last - this.options.xAxis.options.first)) * 0.7;
+            painter.options.lineWidth = (this.paintRegion[paintName + '.width'] / (this.options.xAxis.options.last - this.options.xAxis.options.first));
         }
 
         if (this.options.yAxis.options.dataType === 'string') {
-            painter.options.lineHeight = (this.paintRegion[paintName + '.height'] / this.data[this.implName].length) * 0.7;
+            painter.options.lineHeight = (this.paintRegion[paintName + '.height'] / this.data[this.implName].length);
         } else {
-            painter.options.lineHeight = (this.paintRegion[paintName + '.height'] / (this.options.yAxis.options.high - this.options.yAxis.options.low)) * 0.7;
+            painter.options.lineHeight = (this.paintRegion[paintName + '.height'] / (this.options.yAxis.options.high - this.options.yAxis.options.low));
 
         }
         return (typeof this.data[this.implName] != 'undefined') ? this.data[this.implName].length : 0;
@@ -89,8 +89,11 @@ kLine.prototype = {
                 h = y[0] - y[1];
                 yScale = y[0];
             }
-            this.ctx.rect(x, painter.paintRegion[painter.paintName + '.height'] - yScale, w, h);
+            this.ctx.rect(x + (w - w*.7)/2, painter.paintRegion[painter.paintName + '.height'] - yScale, w*.7, h);
             this.ctx.fill();
+            //這邊這樣做是錯的，因為impl流程init沒將x[]只清一次
+            if (this.options.xAxis.options.x.length < this.data[this.implName].length)
+                this.options.xAxis.options.x.push(x + (w/2));
             this.ctx.moveTo(x + (w/2), painter.paintRegion[painter.paintName + '.height'] - y[2]);
             this.ctx.lineTo(x + (w/2), painter.paintRegion[painter.paintName + '.height'] - y[3]);
         } else if (Object.prototype.toString.call(x) === '[object Array]') {
