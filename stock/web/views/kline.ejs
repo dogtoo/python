@@ -32,7 +32,9 @@
     function MACount(maType, date, data) {
         maType = maType - 1;
         var MA = 0;
-        if (date >= maType) {
+        if (maType > 50)
+            console.log(maType + "date:" + date);
+        if (date > maType) {
             for (var ma = date-maType-1; ma <= date-1; ma++)
                 MA = MA + data[ma][5];
             return [data[ma][0], (MA / (maType+1))];
@@ -46,7 +48,7 @@
                 yAxis: 'priceY',
                 xAxis: 'dateX',
                 strokeStyle: 'cyan',
-                lineWidth: 0.5,
+                lineWidth: 1,
                 disX: 5
             });
     //fline.__proto__ = Object.create(line.__proto__);
@@ -85,7 +87,8 @@
                     color: 'black',
                     align: 'right',
                     textBaseline: 'top',
-                    dataType: 'money'
+                    dataType: 'money',
+                    dataRange: 'range'
                 })
             }
         },
@@ -121,7 +124,8 @@
                     color: 'black',
                     align: 'right',
                     textBaseline: 'top',
-                    dataType: 'string'
+                    dataType: 'date',
+                    dataRange: 'seq'
                 })
             }
         },
@@ -133,7 +137,8 @@
                     color: 'black',
                     align: 'right',
                     textBaseline: 'top',
-                    dataType: 'number'
+                    dataType: 'number',
+                    dataRange: 'seq'
                 })
             }
         }
@@ -152,7 +157,7 @@
         var dateXL = [];
         var priceY = {};
         var dateX = {};
-        for (var i = 100; i < 150; i++) {
+        for (var i =　140; i < 150; i++) {
             var rawData = data[i];
             priceY[Number(rawData[3])] = 1;
             priceY[Number(rawData[4])] = 1;

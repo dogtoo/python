@@ -11,12 +11,16 @@ function line(options) {
 }
 
 line.prototype = {
+    /*
     initialize: function (painter) {
         painter.options = this.options;
         if (typeof painter.options.yAxis === 'string' && typeof painter.implements[painter.options.yAxis] != 'undefined')
             painter.options.yAxis = painter.implements[painter.options.yAxis];
         if (typeof painter.options.xAxis === 'string' && typeof painter.implements[painter.options.xAxis] != 'undefined')
             painter.options.xAxis = painter.implements[painter.options.xAxis];
+    },*/
+    initialize: function () {
+        
     },
     start: function () {
         var ctx = this.ctx;
@@ -26,6 +30,11 @@ line.prototype = {
         this.ctx.beginPath();
         this.ctx.strokeStyle = this.options.strokeStyle;
         this.ctx.lineWidth = this.options.lineWidth;
+        
+        if (typeof this.options.yAxis === 'string' && typeof painter.implements[this.options.yAxis] != 'undefined')
+            this.options.yAxis = painter.implements[this.options.yAxis];
+        if (typeof this.options.xAxis === 'string' && typeof painter.implements[this.options.xAxis] != 'undefined')
+            this.options.xAxis = painter.implements[this.options.xAxis];
     },
     end: function () {
         this.ctx.stroke();
@@ -34,24 +43,30 @@ line.prototype = {
         this.ctx.restore();
     },
     getDataLength : function() {
-        this.options.yAxis.getYScale(painter.data[painter.implName]);
-        this.options.xAxis.getXScale(painter.data[painter.implName]);
+        if (typeof this.options.yAxis.getYScale === 'function')
+            this.options.yAxis.getYScale(painter.data[painter.implName])
+        else
+            return 0;
+        if (typeof this.options.xAxis.getXScale === 'function')
+            this.options.xAxis.getXScale(painter.data[painter.implName])
+        else
+            return 0;
         return (typeof this.data[this.implName] != 'undefined') ? this.data[this.implName].length : 0;
     },
     getX: function (i) {
         if (this.data[this.implName][i][0] === null) return null;
-        if (this.options.xAxis.options.dataType === 'string') {
+        if (this.options.xAxis.options.dataRange === 'seq') {
             return (i * this.options.xAxis.options.xScale) + this.options.disX;
-        } else {
+        } else if (this.options.xAxis.options.dataRange === 'range') {
             return painter.paintRegion[painter.paintName + '.width'] - (painter.data[painter.implName][i][1]- this.options.xAxis.options.first) * this.options.xAxis.options.xScale + this.options.disX;
         }
 
     },
     getY: function (i) {
         if (this.data[this.implName][i][1] === null) return null;
-        if (this.options.yAxis.options.dataType === 'string') {
+        if (this.options.yAxis.options.dataRange === 'seq') {
             return (i * this.options.yAxis.options.yScale) + this.options.disY;
-        } else {
+        } else if (this.options.yAxis.options.dataRange === 'range') {
             return painter.paintRegion[painter.paintName + '.height'] - (painter.data[painter.implName][i][1]- this.options.yAxis.options.low) * this.options.yAxis.options.yScale + this.options.disY;
         }
     },

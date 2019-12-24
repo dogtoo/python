@@ -35,8 +35,9 @@ Painter.prototype = {
                 implement = item[paintName][p];
                 painter.implName = p;
                 painter.setPainterImplement(implement, paintName);
+                painter.options = painter.paintImplement.options;
                 if (typeof painter.paintImplement.initialize == 'function')
-                    painter.paintImplement.initialize(painter);
+                    painter.paintImplement.initialize.call(painter);
                 painter.prePaintRegion(paintName, 'x');
                 painter.prePaintRegion(paintName, 'y');
                 painter.prePaintRegion(paintName, 'width');
@@ -52,10 +53,11 @@ Painter.prototype = {
             console.log(paintStream[implt]);
         }
 */
-        painter.ctx.clearRect(0, 0, painter.width, painter.height);
+        //painter.ctx.clearRect(0, 0, painter.width, painter.height);
     },
     build: function() {
         var painter = this;
+        painter.ctx.clearRect(0, 0, painter.width, painter.height);
         if (painter.start) painter.start.call(painter);
         paintStream.forEach(function(item, index, array){
             paintName = Object.keys(item)[0];
@@ -64,8 +66,11 @@ Painter.prototype = {
                 implement = item[paintName][p];
                 painter.implName = p;
                 painter.setPainterImplement(implement, paintName);
+                painter.options = painter.paintImplement.options;
+                /*
                 if (typeof painter.paintImplement.initialize == 'function')
                     painter.paintImplement.initialize(painter);
+                */
                 painter.paint();
             }
         });
@@ -85,6 +90,7 @@ Painter.prototype = {
             for (var i = 0; i < dataLength; i++) {
                 var x = pctx.getX ? pctx.getX.call(this, i) : undefined;
                 var y = pctx.getY ? pctx.getY.call(this, i) : undefined;
+                if (typeof x === 'undefined' || typeof y === 'undefined') continue;
                 pctx.paintItem.call(this, i, x, y);
             }
         }
