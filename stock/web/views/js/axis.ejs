@@ -1,0 +1,24 @@
+function axis(options) {
+  this.options = options;
+  if (typeof this.options.font === 'undefined') this.options.font = '12px Arial';
+  if (typeof this.options.dataType === 'undefined') this.options.dataType = 'undefined';
+  if (typeof this.options.dataRange === 'undefined') this.options.dataRange = 'seq';
+  this.options.build = false;
+}
+
+axis.prototype = {
+    calcAxisValues: function(high, low, count,formatFunc) {
+        var diff = high - low;
+        var space = diff / (count-1);
+        var result = [];
+        //if (typeof formatFunc == 'undefined') formatFunc = toMoney;
+        for (var i = 0; i < count; i++) {
+            if (formatFunc == 'money')
+                result.push(toMoney(high - i * space));
+            if (formatFunc == 'number')
+                result.push(bigNumberToText(high - i * space));
+        }
+        return result;
+    }
+
+}

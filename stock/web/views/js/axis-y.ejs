@@ -1,15 +1,17 @@
 function yAxis(options) {
-  this.options = options;
-  if (typeof this.options.low === 'undefined') this.options.low = 0;
-  if (typeof this.options.high === 'undefined') this.options.high = 0;
-  if (typeof this.options.horizontalLineCount === 'undefined') this.options.horizontalLineCount = 0;
-  if (typeof this.options.font === 'undefined') this.options.font = '12px Arial';
-  if (typeof this.options.dataType === 'undefined') this.options.dataType = 'undefined';
-  if (typeof this.options.dataRange === 'undefined') this.options.dataRange = 'seq';
-  this.options.y = [];
-  this.options.yScale = 0;
+    axis.call(this, options);
+    this.options = options;
+    if (typeof this.options.low === 'undefined') this.options.low = 0;
+    if (typeof this.options.high === 'undefined') this.options.high = 0;
+    if (typeof this.options.horizontalLineCount === 'undefined') this.options.horizontalLineCount = 0;
+    //if (typeof this.options.font === 'undefined') this.options.font = '12px Arial';
+    //if (typeof this.options.dataType === 'undefined') this.options.dataType = 'undefined';
+    //if (typeof this.options.dataRange === 'undefined') this.options.dataRange = 'seq';
+    this.options.y = [];
+    this.options.yScale = 0;
 }
-
+yAxis.prototype = Object.create(axis.prototype);
+yAxis.prototype.constructor = yAxis;
 yAxis.prototype = {
     /*
     initialize: function (painter) {
@@ -28,7 +30,10 @@ yAxis.prototype = {
         ctx.translate(this.paintRegion[paintName + '.x'], this.paintRegion[paintName + '.y']);
         if (this.options.textBaseline) ctx.textBaseline = this.options.textBaseline;
     },
-    end: function () { this.ctx.restore(); },
+    end: function () {
+        this.ctx.restore();
+        this.options.build = true;
+    },
     getDataLength : function() {
         return (typeof this.data[this.implName] != 'undefined') ? this.data[this.implName].length : 0;
     },
@@ -44,17 +49,20 @@ yAxis.prototype = {
         //this.paintImplement.getYScale(this.data[this.implName]);
         //return this.options.yScale;
         //return (this.paintRegion[this.paintName + '.height'] * i / (this.data[this.implName].length - 1) - this.options.fontHeight / 2);
-        if (this.options.dataRange === 'seq') {
+        if (this.options.build) {
             var v_c = Math.round((this.options.y.length)/this.options.horizontalLineCount);
             var y = (i * v_c);
             var diff = this.options.y.length - y;
             if (diff < v_c || y >= this.options.y.length) y = this.options.y.length - 1;
-            return (this.options.y[y] + this.options.fontHeight <= this.paintRegion[this.paintName + '.height']) ? this.options.y[y] : this.paintRegion[this.paintName + '.height'] - this.options.fontHeight;
-        } else if (this.options.dataRange === 'range') {
-            if (i == this.data[this.implName].length-1) return this.paintRegion[this.paintName + '.height'] ;
+            return (this.options.y[y] + this.options.fontHeight <= this.paintRegion[this.paintName + '.height']) ? this.options.y[y] : this.paintRegion[this.paintName + '.height'];
+        } else {
+            if (i == this.data[this.implName].length-1) 
+                return this.paintRegion[this.paintName + '.height'];
             this.paintImplement.getYScale(this.data[this.implName]);
-            y = this.paintRegion[this.paintName + '.height'] - this.options.yScale * (this.data[this.implName][i] - this.options.low);
-            return y;
+            if (this.options.dataRange === 'seq')
+                return i * this.options.yScale;
+            if (this.options.dataRange === 'range')
+                return this.paintRegion[this.paintName + '.height'] - this.options.yScale * (this.data[this.implName][i] - this.options.low);
         }
     },
     paintItem: function (i, x, y) {
@@ -87,12 +95,11 @@ yAxis.prototype = {
                 this.options.horizontalLineCount = data.length;
                 stepLength = 1;
             }
-            yScalers.push(convertDate(data[0], false).substr(2));
+            yScalers.push(data[0]);
             for (var i = 1; i < this.options.horizontalLineCount; i++) {
                 var index = Math.ceil(i * stepLength);
                 if (index >= data.length) index = data.length - 1;
-                var quoteTime = convertDate(data[index], false);
-                quoteTime = quoteTime.substr(2);
+                var quoteTime = data[index];
                 yScalers.push(quoteTime);
             }
             this.data[this.implName] = yScalers;
@@ -124,7 +131,7 @@ function calcAxisValues(high, low, count,formatFunc) {
         if (formatFunc == 'money')
             result.push(toMoney(high - i * space));
         if (formatFunc == 'number')
-            result.push(bigNumberToText(high - i * space));
+            result.push(high - i * space);
     }
     return result;
 }

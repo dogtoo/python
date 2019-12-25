@@ -7,6 +7,7 @@
     <title></title>
     <script src="js/util.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/absPainter.js" type="text/javascript" charset="UTF8"></script>
+    <script src="js/axis.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/axis-x.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/axis-y.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/k-line.js" type="text/javascript" charset="UTF8"></script>
@@ -118,7 +119,7 @@
         },
         {
             'date':{
-                region: { x: 'main.x', y: {'$and':['main.height', 'main.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: 'f:00-00-00' },
+                region: { x: 'main.x', y: {'$and':['main.height', 'main.y', determineFontHeight('11px Arial')]}, width: 'main.width', height: 'f:00-00-00' },
                 'dateX':new xAxis({
                     font: '11px Arial',
                     color: 'black',
@@ -138,7 +139,7 @@
                     align: 'right',
                     textBaseline: 'top',
                     dataType: 'number',
-                    dataRange: 'seq'
+                    dataRange: 'range'
                 })
             }
         }
@@ -157,6 +158,8 @@
         var dateXL = [];
         var priceY = {};
         var dateX = {};
+        
+        var volume = [];
         for (var i =　140; i < 150; i++) {
             var rawData = data[i];
             priceY[Number(rawData[3])] = 1;
@@ -167,6 +170,8 @@
             fline.push(MACount(5, i, data));
             tline.push(MACount(10, i, data));
             sline.push(MACount(20, i, data));
+            
+            volume.push(rawData[6]);
         }
         this.data.kline = kline;
         this.data.fline = fline;
@@ -190,7 +195,10 @@
         });
         this.data.dateX = dateXL;
 
-        this.data.volumeY = ["0", "1000","2000"];
+        volume.sort(function(a, b) {
+            return a - b;
+        });
+        this.data.volumeY = volume;
     }
 
     painterKline.prototype.start = function () {
@@ -226,12 +234,23 @@
             //if (w * 10 % 10 == 0) w += .5;
             this.drawVLine('#eeeeee', w, 0,this.paintRegion['main.height'], 1, 'solid');
         }*/
-            var v_c = Math.round((this.implements.dateX.options.x.length)/this.implements.dateX.options.verticalLineCount);
-            for (var i = 0 ; i < this.implements.dateX.options.x.length ; i+= v_c) {
-                var diff = this.implements.dateX.options.x.length - i;
-                if (diff < v_c) i = this.implements.dateX.options.x.length;
-                this.drawVLine('#eeeeee', this.implements.dateX.options.x[i], 0,this.paintRegion['main.height'], 1, 'solid');
-            }
+        var v_c = Math.round((this.implements.dateX.options.x.length)/this.implements.dateX.options.verticalLineCount);
+        for (var i = 0 ; i < this.implements.dateX.options.x.length ; i+= v_c) {
+            var diff = this.implements.dateX.options.x.length - i;
+            if (diff < v_c) i = this.implements.dateX.options.x.length;
+            this.drawVLine('#eeeeee', this.implements.dateX.options.x[i], 0,this.paintRegion['main.height'], 1, 'solid');
+        }
+        
+        this.ctx.restore();
+        
+        this.ctx.save();
+        this.ctx.translate(this.paintRegion['main.x']
+                       , this.paintRegion['volume.y']);
+        
+        for (var i in this.implements.volumeY.options.y) {
+            this.drawHLine('#eeeeee', 0, this.implements.volumeY.options.y[i], this.paintRegion['main.width'], 1, 'solid');
+        }    
+            
         this.ctx.restore();
     }
 }

@@ -17,6 +17,10 @@ router.get('/js/absPainter.js', async(ctx) => {
     await ctx.render('js/absPainter')
 });
 
+router.get('/js/axis.js', async(ctx) => {
+    await ctx.render('js/axis')
+});
+
 router.get('/js/axis-x.js', async(ctx) => {
     await ctx.render('js/axis-x')
 });

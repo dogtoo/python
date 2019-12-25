@@ -28,7 +28,14 @@ kLine.prototype = {
         if (typeof this.options.xAxis === 'string' && typeof painter.implements[this.options.xAxis] != 'undefined')
             this.options.xAxis = painter.implements[this.options.xAxis];
     },
-    end: function () { this.ctx.restore(); },
+    end: function () { 
+        this.ctx.restore();
+        if (this.options.xAxis.options.dataRange === 'seq') {
+            this.options.xAxis.options.build = true;
+        } else if (this.options.yAxis.options.dataRange === 'seq') {
+            this.options.yAxis.options.build = true;
+        }
+    },
     getDataLength : function() {
         if (typeof this.options.yAxis.getYScale === 'function')
             this.options.yAxis.getYScale(painter.data[painter.implName])
