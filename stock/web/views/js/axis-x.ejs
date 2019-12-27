@@ -10,37 +10,31 @@ function xAxis(options){
     this.options.x = [];
     this.options.xScale = 0;
 }
-xAxis.prototype = Object.create(axis.prototype);
-xAxis.prototype.constructor = xAxis;
-xAxis.prototype = {
-    /*
-    initialize: function (painter) {
-        painter.options = this.options;
-    },
-    */
-    initialize: function () {
+    xAxis.prototype = Object.create(axis.prototype);
+    xAxis.prototype.constructor = xAxis;
+    xAxis.prototype.initialize = function () {
         this.options.x = [];
         this.options.xScale = 0;
-    },
-    start: function () {
+    };
+    xAxis.prototype.start = function () {
         var ctx = this.ctx;
         ctx.save();
         ctx.fillStyle = this.options.color;
         ctx.font = this.options.font;
         //if (this.options.textBaseline) ctx.textBaseline = this.options.textBaseline;
         ctx.translate(this.paintRegion[paintName + '.x'], this.paintRegion[paintName + '.y']);
-    },
-    end: function () {
+    };
+    xAxis.prototype.end = function () {
         this.ctx.restore();
         this.options.build = true;
-    },
-    getDataLength : function() {
+    };
+    xAxis.prototype.getDataLength  = function() {
         return (typeof this.data[this.implName] != 'undefined') ? this.data[this.implName].length : 0;
-    },
-    getY: function () {
+    };
+    xAxis.prototype.getY = function () {
         return 0;
-    },
-    getX: function (i) {
+    };
+    xAxis.prototype.getX = function (i) {
         //if (i == 0) return 0;
         //var w = this.ctx.measureText(this.data[this.implName][i]).width;
         //if (i == this.data[this.implName].length - 1) return this.paintRegion[this.paintName + '.width'] - w;
@@ -51,17 +45,17 @@ xAxis.prototype = {
             var x = (i * v_c);
             var diff = this.options.x.length - x;
             if (diff < v_c || x >= this.options.x.length) x = this.options.x.length - 1;
-            return (this.options.x[x] + this.options.fontWidth <= this.paintRegion[this.paintName + '.width']) ? this.options.x[x] : this.paintRegion[this.paintName + '.width'] - this.options.fontWidth;
+            return (this.options.x[x] + this.options.fontWidth/2 <= this.paintRegion[this.paintName + '.width']) ? this.options.x[x] - this.options.fontWidth/2 : this.paintRegion[this.paintName + '.width'] - this.options.fontWidth/2;
         } else {
             if (i == this.data[this.implName].length-1) return this.paintRegion[this.paintName + '.width'] ;
-            this.paintImplement.getXScale(this.data[this.implName]);
+            this.paintImplement.getXScale(format(this.data[this.implName][i], this.options.dataType));
             if (this.options.dataRange === 'seq')
-                return i * this.options.xScale;
+                return (i * this.options.xScale) - this.options.fontWidth/2;
             if (this.options.dataRange === 'range')
                 return this.paintRegion[this.paintName + '.width'] - this.options.xScale * (this.data[this.implName][i] - this.options.first);
         }        
-    },
-    paintItem: function (i, x, y) {
+    };
+    xAxis.prototype.paintItem = function (i, x, y) {
         /*x = x * i;
         if (typeof this.options.x[i] === 'undefined')
             this.options.x.push(x);
@@ -70,14 +64,14 @@ xAxis.prototype = {
         */
         //console.log(this.data[this.implName][i]);
         (typeof this.options.x[i] === 'undefined') ? this.options.x.push(x) : this.options.x[i][x];
-        this.ctx.fillText(this.data[this.implName][i], x, y);
-    },
-    getHeight: function(format) {
+        this.ctx.fillText(format(this.data[this.implName][i], this.options.dataType), x, y);
+    };
+    xAxis.prototype.getHeight = function(format) {
         if (typeof format === 'undefined') format = 'TEST';
         this.options.fontHeight = determineFontHeight(this.options.font, format);
         return this.options.fontHeight + 2;
-    },
-    preData: function(data) {
+    };
+    xAxis.prototype.preData = function(data) {
         if (Object.prototype.toString.call(data) != '[object Array]') return;
         if (data.length <= 0) return;
 
@@ -95,7 +89,8 @@ xAxis.prototype = {
                 this.options.verticalLineCount = data.length;
                 stepLength = 1;
             }
-            xScalers.push(convertDate(data[0], false).substr(2));
+            //xScalers.push(convertDate(data[0], false).substr(2));
+            xScalers.push(data[0]);
             var index = 1;
             for (var i = 1; i < this.options.verticalLineCount; i++) {
                 /*
@@ -104,22 +99,22 @@ xAxis.prototype = {
                 index = index + stepLength - ((i == 1)?1:0);
                 if (index >= data.length) index = data.length - 1;
                 if (index >= data.length - index) index = data.length - 1;
-                var quoteTime = convertDate(data[index], false);
-                quoteTime = quoteTime.substr(2);
+                var quoteTime = data[index];
+                quoteTime = quoteTime
                 xScalers.push(quoteTime);
             }
-            xScalers.push(convertDate(data[data.length - 1], false).substr(2));
+            xScalers.push(data[data.length - 1]);
             this.data[this.implName] = xScalers;
         } else if (this.options.dataRange === 'range') {
             this.options.first = data[0];
             this.options.last = data[data.length-1];
-            this.data[this.implName] = calcAxisValues(this.options.last
+            this.data[this.implName] = calcRangeValues(this.options.last
                                 , this.options.first
                                 , this.options.verticalLineCount)
         }
 
-    },
-    getXScale: function(data) {
+    };
+    xAxis.prototype.getXScale = function(data) {
         if (this.options.dataRange === 'seq') {
             if (painter.paintRegion.hasOwnProperty(painter.paintName + '.width'))
                 this.options.xScale = painter.paintRegion[painter.paintName + '.width'] / data.length;
@@ -127,38 +122,7 @@ xAxis.prototype = {
             if (painter.paintRegion.hasOwnProperty(painter.paintName + '.width'))
                 this.options.xScale = painter.paintRegion[painter.paintName + '.width'] / Math.abs(this.options.last - this.options.first);
         }
-    },
-    toString: function() {
+    };
+    xAxis.prototype.toString = function() {
         return 'xAxis';
-    }
-};
-
-function convertDate(val, withWeek) {
-    var year = Math.ceil(val / 10000) - 1;
-    var day = val % 100;
-    var month = (Math.ceil(val / 100) - 1) % 100;
-    var d = new Date();
-    d.setYear(year);
-    d.setMonth(month - 1);
-    d.setDate(day);
-    if (month < 10) month = '0' + month;
-    if (day < 10) day = '0' + day;
-    if (withWeek) {
-        var weekNames = ['日', '一', '二', '三', '四', '五', '六'];
-        return year + '-' + month + '-' + day + '(星期' + weekNames[d.getDay()] + ')';
-    }
-    else {
-        return year + '-' + month + '-' + day;
-    }
-}
-
-function calcAxisValues(high, low, count,formatFunc) {
-    var diff = high - low;
-    var space = diff / (count-1);
-    var result = [];
-    if (typeof formatFunc == 'undefined') formatFunc = toMoney;
-    for (var i = 0; i < count; i++) {
-        result.push(toMoney(high - i * space));
-    }
-    return result;
-}
+    };

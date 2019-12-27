@@ -160,7 +160,7 @@
         var dateX = {};
         
         var volume = [];
-        for (var i =　140; i < 150; i++) {
+        for (var i =　50; i < 150; i++) {
             var rawData = data[i];
             priceY[Number(rawData[3])] = 1;
             priceY[Number(rawData[4])] = 1;
@@ -428,5 +428,7 @@
 
     painter.build();
 painter.build();
+
+    //painter.implements.priceY.isTouch.call(painter, 1, 1);
 </script>
 </html>

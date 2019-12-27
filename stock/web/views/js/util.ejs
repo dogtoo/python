@@ -54,15 +54,33 @@
             var result;
             var yi = val / 100000000;
             if (yi > 1) {
-                result = yi.toFixed(2) + '亿';
+                result = yi.toFixed(2) + '億';
             } else {
                 var wan = val / 10000;
                 if (wan > 1)
-                    result = wan.toFixed() + '万';
+                    result = wan.toFixed() + '萬';
                 else
                     result = val;
             }
             return result;
+        },
+        convertDate: function(val, withWeek) {
+            var year = Math.ceil(val / 10000) - 1;
+            var day = val % 100;
+            var month = (Math.ceil(val / 100) - 1) % 100;
+            var d = new Date();
+            d.setYear(year);
+            d.setMonth(month - 1);
+            d.setDate(day);
+            if (month < 10) month = '0' + month;
+            if (day < 10) day = '0' + day;
+            if (withWeek) {
+                var weekNames = ['日', '一', '二', '三', '四', '五', '六'];
+                return year + '-' + month + '-' + day + '(星期' + weekNames[d.getDay()] + ')';
+            }
+            else {
+                return year + '-' + month + '-' + day;
+            }
         },
         getOffset: function (e) {
             if (!isNaN(e.offsetX) && !isNaN(e.offsetY)) return e;
@@ -125,6 +143,15 @@
         getEventTarget: function (e) {
             return e.srcElement || e.target || e.relatedTarget;
         },
+        calcRangeValues: function(high, low, count) {
+            var diff = high - low;
+            var space = diff / (count-1);
+            var result = [];
+            for (var i = 0; i < count; i++) {
+                result.push(high - i * space);
+            }
+            return result;
+        },
         $id: function (id) { return document.getElementById(id); }
     };
 
@@ -185,3 +212,18 @@ function determineFontWidth(fontStyle, format = "M") {
     ctx.font = fontStyle;
     return ctx.measureText(format).width;
 };
+
+function format(val, type) {
+    if (typeof type === 'undefined') return val;
+    if (typeof type === 'string') {
+        if (type === 'money') {
+            return toMoney(val);
+        } else if (type === 'money') {
+
+        } else if (type === 'date') {
+            return convertDate(val);
+        } else if (type === 'number') {
+            return bigNumberToText(val);
+        }           
+    }
+}
