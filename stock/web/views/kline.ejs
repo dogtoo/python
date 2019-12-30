@@ -119,7 +119,7 @@
         },
         {
             'date':{
-                region: { x: 'main.x', y: {'$and':['main.height', 'main.y', determineFontHeight('11px Arial')]}, width: 'main.width', height: 'f:00-00-00' },
+                region: { x: 'main.x', y: {'$and':['main.height', 'main.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: 'f:00-00-00' },
                 'dateX':new xAxis({
                     font: '11px Arial',
                     color: 'black',
@@ -132,7 +132,7 @@
         },
         {
             'volume':{
-                region: { x: 'price.x', y: {'$and':['price.height', {'$mul':['date.height',2]}]}, width: 'f:0000', height: '10%' },
+                region: { x: 'price.x', y: {'$and':['price.height', 'price.y', {'$mul':['date.height',2]}]}, width: 'f:0000', height: '15%' },
                 'volumeY':new yAxis({
                     font: '11px Arial',
                     color: 'black',
@@ -140,6 +140,17 @@
                     textBaseline: 'top',
                     dataType: 'number',
                     dataRange: 'range'
+                })
+            }
+        },
+        {
+            'volmain':{
+                region: { x: 'main.x', y: {'$and':['volume.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: '15%' },
+                'volKline':new kLine({
+                    lineWidth: 1,
+                    lineStyle: 'solid',
+                    yAxis: 'volumeY',
+                    xAxis: 'dateX'
                 })
             }
         }
@@ -159,8 +170,9 @@
         var priceY = {};
         var dateX = {};
         
-        var volume = [];
-        for (var i =　50; i < 150; i++) {
+        var volume = [0];
+        var volKline = [];
+        for (var i =　99; i < 203; i++) {
             var rawData = data[i];
             priceY[Number(rawData[3])] = 1;
             priceY[Number(rawData[4])] = 1;
@@ -172,6 +184,10 @@
             sline.push(MACount(20, i, data));
             
             volume.push(rawData[6]);
+            if (rawData[5] > rawData[2])
+                volKline.push([rawData[0], 0, rawData[6], 0, rawData[6] ]);
+            else
+                volKline.push([rawData[0], rawData[6], 0,  rawData[6], 0]);
         }
         this.data.kline = kline;
         this.data.fline = fline;
@@ -199,6 +215,8 @@
             return a - b;
         });
         this.data.volumeY = volume;
+        
+        this.data.volKline = volKline;
     }
 
     painterKline.prototype.start = function () {
@@ -213,48 +231,43 @@
                        , this.paintRegion['main.height']);
         this.ctx.stroke();
         var spaceHeight = 0;
-        //console.log('height:'+this.paintRegion['price.height']+',length:'+(this.implements.priceY.options.horizontalLineCount - 1)+',fontHeight:'+this.implements.priceY.options.fontHeight / 2);
-        /*
-        for (var i = 1; i <= (this.implements.priceY.options.horizontalLineCount-2); i++) {
-            spaceHeight = this.paintRegion['price.height'] * i / (this.implements.priceY.options.horizontalLineCount - 1) - (this.implements.priceY.options.fontHeight/2);
-            var y = spaceHeight;
-            this.drawHLine('#eeeeee', 0, y, this.paintRegion['main.width'], 1, 'solid');
-        }*/
 
         for (var i in this.implements.priceY.options.y) {
             this.drawHLine('#eeeeee', 0, this.implements.priceY.options.y[i], this.paintRegion['main.width'], 1, 'solid');
         }
-        /*
-        console.log('lineWidth:'+this.implements.kline.options.lineWidth);
-        console.log('width:'+this.paintRegion['main.width']+',Count:'+this.implements.dateX.options.verticalLineCount);
-        var spaceWidth;
-        for (var i = 1; i <= this.implements.dateX.options.verticalLineCount-2; i++) {
-            spaceWidth = (this.paintRegion['main.width'] * i) / (this.implements.dateX.options.verticalLineCount - 1) - this.implements.kline.options.lineWidth / 2;
-            var w = spaceWidth ;
-            //if (w * 10 % 10 == 0) w += .5;
-            this.drawVLine('#eeeeee', w, 0,this.paintRegion['main.height'], 1, 'solid');
-        }*/
+
         var v_c = Math.round((this.implements.dateX.options.x.length)/this.implements.dateX.options.verticalLineCount);
         for (var i = 0 ; i < this.implements.dateX.options.x.length ; i+= v_c) {
             var diff = this.implements.dateX.options.x.length - i;
             if (diff < v_c) i = this.implements.dateX.options.x.length;
             this.drawVLine('#eeeeee', this.implements.dateX.options.x[i], 0,this.paintRegion['main.height'], 1, 'solid');
+            this.ctx.stroke();
         }
         
         this.ctx.restore();
         
         this.ctx.save();
-        this.ctx.translate(this.paintRegion['main.x']
-                       , this.paintRegion['volume.y']);
+        this.ctx.translate(this.paintRegion['volmain.x']
+                       , this.paintRegion['volmain.y']);
         
+        this.ctx.rect(0, 0
+                       , this.paintRegion['volmain.width']
+                       , this.paintRegion['volmain.height']);
+        this.ctx.stroke();
         for (var i in this.implements.volumeY.options.y) {
             this.drawHLine('#eeeeee', 0, this.implements.volumeY.options.y[i], this.paintRegion['main.width'], 1, 'solid');
-        }    
+        }
+        
+        var v_c = Math.round((this.implements.dateX.options.x.length)/this.implements.dateX.options.verticalLineCount);
+        for (var i = 0 ; i < this.implements.dateX.options.x.length ; i+= v_c) {
+            var diff = this.implements.dateX.options.x.length - i;
+            if (diff < v_c) i = this.implements.dateX.options.x.length;
+            this.drawVLine('#eeeeee', this.implements.dateX.options.x[i], 0,this.paintRegion['volume.height'], 1, 'solid');
+        }
             
         this.ctx.restore();
     }
 }
-
 
 /*
 {
@@ -301,7 +314,8 @@
                     color: 'black',
                     align: 'right',
                     textBaseline: 'top',
-                    dataType: 'string'
+                    dataRange: 'seq',
+                    dataType: 'date'
                 })
             }
         },
@@ -309,7 +323,7 @@
             'main':{
                 region: {
                     x: {'$and':['date.x', 'date.width', 3]}, y: {'$and':['date.y', (determineFontHeight('11px Arial')/2)]}
-                    , width: {'$sub':['100%','date.width','padding.right','padding.left']}, height: {'$sub':['50%', determineFontHeight('11px Arial')]},
+                    , width: {'$sub':['100%','date.width','padding.right','padding.left']}, height: '50%',
                     //horizontalLineCount: 7, verticalLineCount: 7,
                     //backgroundColor:'#fff',
                     riseColor: 'red',
@@ -338,6 +352,7 @@
                     color: 'black',
                     align: 'right',
                     textBaseline: 'top',
+                    dataRange: 'range',
                     dataType: 'money'
                 })
             }
@@ -402,17 +417,19 @@
                        , this.paintRegion['main.width']
                        , this.paintRegion['main.height']);
         this.ctx.stroke();
+        
         var spaceHeight = (this.paintRegion['main.height'] - (this.implements.dateY.options.fontHeight/2)) / (this.implements.dateY.options.horizontalLineCount - 1);
-        for (var i = 1; i <= (this.implements.dateY.options.horizontalLineCount-2); i++) {
-            var y = spaceHeight * i;
-            this.drawHLine('#eeeeee', 0, y, this.paintRegion['main.width'], 1, 'solid');
+        
+        for (var i in this.implements.dateY.options.y) {
+            this.drawHLine('#eeeeee', 0, this.implements.dateY.options.y[i], this.paintRegion['main.width'], 1, 'solid');
         }
 
-        var spaceWidth = this.paintRegion['main.width'] / (this.implements.priceX.options.verticalLineCount - 1);
-        for (var i = 1; i <= this.implements.priceX.options.verticalLineCount; i++) {
-            var w = spaceWidth * i;
-            if (w * 10 % 10 == 0) w += .5;
-            this.drawVLine('#eeeeee', w, 0,this.paintRegion['main.height'], 1, 'solid');
+        var v_c = Math.round((this.implements.priceX.options.x.length)/this.implements.priceX.options.verticalLineCount);
+        for (var i = 0 ; i < this.implements.priceX.options.x.length ; i+= v_c) {
+            var diff = this.implements.priceX.options.x.length - i;
+            if (diff < v_c) i = this.implements.priceX.options.x.length;
+            this.drawVLine('#eeeeee', this.implements.priceX.options.x[i], 0,this.paintRegion['main.height'], 1, 'solid');
+            this.ctx.stroke();
         }
 
         this.ctx.restore();

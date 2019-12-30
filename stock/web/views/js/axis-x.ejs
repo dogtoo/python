@@ -7,39 +7,19 @@ function xAxis(options){
     //if (typeof this.options.font === 'undefined') this.options.font = '12px Arial';
     //if (typeof this.options.dataType === 'undefined') this.options.dataType = 'undefined';
     //if (typeof this.options.dataRange === 'undefined') this.options.dataRange = 'seq';    
-    this.options.x = [];
-    this.options.xScale = 0;
+    //this.options.x = [];
+    //this.options.xScale = 0;
 }
     xAxis.prototype = Object.create(axis.prototype);
     xAxis.prototype.constructor = xAxis;
-    xAxis.prototype.initialize = function () {
+    /*xAxis.prototype.initialize = function () {
         this.options.x = [];
         this.options.xScale = 0;
-    };
-    xAxis.prototype.start = function () {
-        var ctx = this.ctx;
-        ctx.save();
-        ctx.fillStyle = this.options.color;
-        ctx.font = this.options.font;
-        //if (this.options.textBaseline) ctx.textBaseline = this.options.textBaseline;
-        ctx.translate(this.paintRegion[paintName + '.x'], this.paintRegion[paintName + '.y']);
-    };
-    xAxis.prototype.end = function () {
-        this.ctx.restore();
-        this.options.build = true;
-    };
-    xAxis.prototype.getDataLength  = function() {
-        return (typeof this.data[this.implName] != 'undefined') ? this.data[this.implName].length : 0;
-    };
+    };*/
     xAxis.prototype.getY = function () {
         return 0;
     };
     xAxis.prototype.getX = function (i) {
-        //if (i == 0) return 0;
-        //var w = this.ctx.measureText(this.data[this.implName][i]).width;
-        //if (i == this.data[this.implName].length - 1) return this.paintRegion[this.paintName + '.width'] - w;
-        //console.log('width:'+this.paintRegion[this.paintName + '.width']+'count:'+(this.data[this.implName].length - 1));
-        //return (this.paintRegion[this.paintName + '.width'] * i / (this.data[this.implName].length - 1)) - w / 2;
         if (this.options.build) {
             var v_c = Math.round((this.options.x.length)/this.options.verticalLineCount);
             var x = (i * v_c);
@@ -48,23 +28,12 @@ function xAxis(options){
             return (this.options.x[x] + this.options.fontWidth/2 <= this.paintRegion[this.paintName + '.width']) ? this.options.x[x] - this.options.fontWidth/2 : this.paintRegion[this.paintName + '.width'] - this.options.fontWidth/2;
         } else {
             if (i == this.data[this.implName].length-1) return this.paintRegion[this.paintName + '.width'] ;
-            this.paintImplement.getXScale(format(this.data[this.implName][i], this.options.dataType));
+            this.paintImplement.getXScale(this.data[this.implName][i]);
             if (this.options.dataRange === 'seq')
-                return (i * this.options.xScale) - this.options.fontWidth/2;
+                return (i * this.options.scale) - this.options.fontWidth/2;
             if (this.options.dataRange === 'range')
-                return this.paintRegion[this.paintName + '.width'] - this.options.xScale * (this.data[this.implName][i] - this.options.first);
+                return this.paintRegion[this.paintName + '.width'] - this.options.scale * (this.data[this.implName][i] - this.options.first);
         }        
-    };
-    xAxis.prototype.paintItem = function (i, x, y) {
-        /*x = x * i;
-        if (typeof this.options.x[i] === 'undefined')
-            this.options.x.push(x);
-        else
-            this.options.x[i][x];
-        */
-        //console.log(this.data[this.implName][i]);
-        (typeof this.options.x[i] === 'undefined') ? this.options.x.push(x) : this.options.x[i][x];
-        this.ctx.fillText(format(this.data[this.implName][i], this.options.dataType), x, y);
     };
     xAxis.prototype.getHeight = function(format) {
         if (typeof format === 'undefined') format = 'TEST';
@@ -79,14 +48,14 @@ function xAxis(options){
         //this.options.fontWidth= this.ctx.measureText(data[0]).width;
         this.options.fontWidth= determineFontWidth(this.options.font, data[0]);
 
-        this.options.verticalLineCount = Math.round((this.paintRegion[this.paintName + '.width'] - this.options.fontWidth) / this.options.fontWidth /2 );
+        this.options.verticalLineCount = Math.round((this.paintRegion[this.paintName + '.width'] - this.options.fontWidth) / this.options.fontWidth /3 );
         this.options.verticalLineCount = (this.options.verticalLineCount <= 1) ? 2 : this.options.verticalLineCount;
         if (this.options.dataRange === 'seq') {
             var xScalers = [];
-
+            if (data.length < this.options.verticalLineCount) this.options.verticalLineCount = data.length - 1;
             var stepLength = Math.round(data.length / this.options.verticalLineCount);
             if (stepLength < 1) {
-                this.options.verticalLineCount = data.length;
+                this.options.verticalLineCount = data.length - 1;
                 stepLength = 1;
             }
             //xScalers.push(convertDate(data[0], false).substr(2));
@@ -117,12 +86,9 @@ function xAxis(options){
     xAxis.prototype.getXScale = function(data) {
         if (this.options.dataRange === 'seq') {
             if (painter.paintRegion.hasOwnProperty(painter.paintName + '.width'))
-                this.options.xScale = painter.paintRegion[painter.paintName + '.width'] / data.length;
+                this.options.scale = painter.paintRegion[painter.paintName + '.width'] / data.length;
         } else if (this.options.dataRange === 'range') {
             if (painter.paintRegion.hasOwnProperty(painter.paintName + '.width'))
-                this.options.xScale = painter.paintRegion[painter.paintName + '.width'] / Math.abs(this.options.last - this.options.first);
+                this.options.scale = painter.paintRegion[painter.paintName + '.width'] / Math.abs(this.options.last - this.options.first);
         }
-    };
-    xAxis.prototype.toString = function() {
-        return 'xAxis';
     };

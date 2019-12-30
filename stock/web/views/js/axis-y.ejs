@@ -7,48 +7,23 @@ function yAxis(options) {
     //if (typeof this.options.font === 'undefined') this.options.font = '12px Arial';
     //if (typeof this.options.dataType === 'undefined') this.options.dataType = 'undefined';
     //if (typeof this.options.dataRange === 'undefined') this.options.dataRange = 'seq';
-    this.options.y = [];
-    this.options.yScale = 0;
+    //this.options.y = [];
+    //this.options.yScale = 0;
 }
 
     yAxis.prototype = axis.prototype;
     //yAxis.prototype.constructor = yAxis;
-    yAxis.prototype.initialize = function () {
-        this.options.y = [];
-        this.options.yScale = 0;
-    };
-
-    yAxis.prototype.start = function () {
-        var ctx = this.ctx;
-        ctx.save();
-        if (typeof this.options.color == 'string') ctx.fillStyle = this.options.color;
-        ctx.font = this.options.font;
-        ctx.translate(this.paintRegion[paintName + '.x'], this.paintRegion[paintName + '.y']);
-        if (this.options.textBaseline) ctx.textBaseline = this.options.textBaseline;
-    };
-    
-    yAxis.prototype.end = function () {
-        this.ctx.restore();
-        this.options.build = true;
-    };
-    
-    yAxis.prototype.getDataLength = function() {
-        return (typeof this.data[this.implName] != 'undefined') ? this.data[this.implName].length : 0;
-    };
-    
+    //yAxis.prototype.initialize = function () {
+    //    this.options.x = [];
+    //    this.options.y = [];
+    //    this.options.yScale = 0;
+    //};
     yAxis.prototype.getX = function (i) {
-        /*未使用
-        if (this.options.align == 'left') return 0;*/
         var w = this.ctx.measureText(format(this.data[this.implName][i], this.options.dataType)).width;
         return this.paintRegion[this.paintName + '.width'] - w;
     };
     
     yAxis.prototype.getY = function (i) {
-        //if (i == 0) return 0;
-        //console.log('height:'+this.paintRegion[this.paintName + '.height']+',length:'+(this.data[this.implName].length - 1)+',fontHeight:'+this.options.fontHeight / 2);
-        //this.paintImplement.getYScale(this.data[this.implName]);
-        //return this.options.yScale;
-        //return (this.paintRegion[this.paintName + '.height'] * i / (this.data[this.implName].length - 1) - this.options.fontHeight / 2);
         if (this.options.build) {
             var v_c = Math.round((this.options.y.length)/this.options.horizontalLineCount);
             var y = (i * v_c);
@@ -58,34 +33,16 @@ function yAxis(options) {
         } else {
             if (i == this.data[this.implName].length-1) 
                 return this.paintRegion[this.paintName + '.height'];
-            this.paintImplement.getYScale(format(this.data[this.implName][i], this.options.dataType));
+            this.paintImplement.getYScale(this.data[this.implName][i]);
             if (this.options.dataRange === 'seq')
-                return i * this.options.yScale;
+                return i * this.options.scale;
             if (this.options.dataRange === 'range')
-                return this.paintRegion[this.paintName + '.height'] - this.options.yScale * (this.data[this.implName][i] - this.options.low);
+                return this.paintRegion[this.paintName + '.height'] - this.options.scale * (this.data[this.implName][i] - this.options.low);
         }
     };
-    
-    yAxis.prototype.paintItem = function (i, x, y) {
-        /*未使用
-        if (typeof this.options.color == 'function')
-            this.ctx.fillStyle = this.options.color(this.data[this.implName][i]);*/
-        (typeof this.options.y[i] === 'undefined') ? this.options.y.push(y) : this.options.y[i][y];
-        this.ctx.fillText(format(this.data[this.implName][i], this.options.dataType), x, y);
-    };
-    
-    yAxis.prototype.getName = function() {
-        return 'yAxis';
-    };
-    
     yAxis.prototype.getWidth = function(format) {
         return determineFontWidth(this.options.font, format);
     };
-    
-    yAxis.prototype.getHeight = function(format) {
-        return 0;
-    };
-    
     yAxis.prototype.preData = function(data) {
         if (Object.prototype.toString.call(data) != '[object Array]') return;
         if (data.length <= 0) return;
@@ -120,9 +77,9 @@ function yAxis(options) {
     yAxis.prototype.getYScale = function(data) {
         if (this.options.dataRange === 'seq') {
             if (painter.paintRegion.hasOwnProperty(painter.paintName + '.height'))
-                this.options.yScale = painter.paintRegion[painter.paintName + '.height'] / data.length;
+                this.options.scale = painter.paintRegion[painter.paintName + '.height'] / data.length;
         } else if (this.options.dataRange === 'range') {
             if (painter.paintRegion.hasOwnProperty(painter.paintName + '.height'))
-                this.options.yScale = painter.paintRegion[painter.paintName + '.height'] / Math.abs(this.options.high - this.options.low);
+                this.options.scale = painter.paintRegion[painter.paintName + '.height'] / Math.abs(this.options.high - this.options.low);
         }
     };

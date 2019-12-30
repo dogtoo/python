@@ -61,32 +61,32 @@ kLine.prototype = {
     },
     getX: function (i) {
         if (this.options.xAxis.options.dataRange === 'seq') {
-            return i * this.options.xAxis.options.xScale;
+            return i * this.options.xAxis.options.scale;
         } else if (this.options.xAxis.options.dataRange === 'range') {
             var open = this.data[this.implName][i][1];
             var close = this.data[this.implName][i][2];
             var last = this.data[this.implName][i][3];
             var first = this.data[this.implName][i][4];
             //console.log('open:'+open+', close:'+close+', last:'+last+', first'+first);
-            return [(open - this.options.xAxis.options.first) * this.options.xAxis.options.xScale
-                  , (close - this.options.xAxis.options.first) * this.options.xAxis.options.xScale
-                  , (last - this.options.xAxis.options.first) * this.options.xAxis.options.xScale
-                  , (first- this.options.xAxis.options.first) * this.options.xAxis.options.xScale];
+            return [(open - this.options.xAxis.options.first) * this.options.xAxis.options.scale
+                  , (close - this.options.xAxis.options.first) * this.options.xAxis.options.scale
+                  , (last - this.options.xAxis.options.first) * this.options.xAxis.options.scale
+                  , (first- this.options.xAxis.options.first) * this.options.xAxis.options.scale];
         }
     },
     getY: function (i) {
         if (this.options.yAxis.options.dataRange === 'seq') {
-            return i * this.options.yAxis.options.yScale;
+            return i * this.options.yAxis.options.scale;
         } else if (this.options.yAxis.options.dataRange === 'range') {
             var open = this.data[this.implName][i][1];
             var close = this.data[this.implName][i][2];
             var high = this.data[this.implName][i][3];
             var low = this.data[this.implName][i][4];
             //console.log('open:'+open+', close:'+close+', high:'+high+', low'+low);
-            return [(open - this.options.yAxis.options.low) * this.options.yAxis.options.yScale
-                  , (close - this.options.yAxis.options.low) * this.options.yAxis.options.yScale
-                  , (high - this.options.yAxis.options.low) * this.options.yAxis.options.yScale
-                  , (low - this.options.yAxis.options.low) * this.options.yAxis.options.yScale];
+            return [(open - this.options.yAxis.options.low) * this.options.yAxis.options.scale
+                  , (close - this.options.yAxis.options.low) * this.options.yAxis.options.scale
+                  , (high - this.options.yAxis.options.low) * this.options.yAxis.options.scale
+                  , (low - this.options.yAxis.options.low) * this.options.yAxis.options.scale];
         }
     },
     paintItem: function (i, x, y) {
