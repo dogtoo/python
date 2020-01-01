@@ -2,8 +2,10 @@ function kLine(options) {
   this.options = options;
   if (typeof this.options.yAxis === 'undefined') this.options.yAxis = new yAxis({});
   if (typeof this.options.xAxis === 'undefined') this.options.xAxis = new xAxis({});
-  if (typeof this.options.lineHeight === 'undefined') this.options.lineHeight = 10;
-  if (typeof this.options.lineWidth === 'undefined') this.options.lineWidth = 10;
+  this.options.kLineHeight = 10;
+  this.options.kLineWidth = 10;
+  this.options.x = [];
+  this.options.y = [];
 }
 
 kLine.prototype = {
@@ -46,15 +48,15 @@ kLine.prototype = {
         else
             return 0;
         if (this.options.xAxis.options.dataRange === 'seq') {
-            painter.options.lineWidth = (this.paintRegion[paintName + '.width'] / this.data[this.implName].length);
+            painter.options.kLineWidth = (this.paintRegion[paintName + '.width'] / this.data[this.implName].length);
         } else if (this.options.xAxis.options.dataRange === 'range') {
-            painter.options.lineWidth = (this.paintRegion[paintName + '.width'] / (this.options.xAxis.options.last - this.options.xAxis.options.first));
+            painter.options.kLineWidth = (this.paintRegion[paintName + '.width'] / (this.options.xAxis.options.last - this.options.xAxis.options.first));
         }
 
         if (this.options.yAxis.options.dataRange === 'seq') {
-            painter.options.lineHeight = (this.paintRegion[paintName + '.height'] / this.data[this.implName].length);
+            painter.options.kLineHeight = (this.paintRegion[paintName + '.height'] / this.data[this.implName].length);
         } else if (this.options.yAxis.options.dataRange === 'range') {
-            painter.options.lineHeight = (this.paintRegion[paintName + '.height'] / (this.options.yAxis.options.high - this.options.yAxis.options.low));
+            painter.options.kLineHeight = (this.paintRegion[paintName + '.height'] / (this.options.yAxis.options.high - this.options.yAxis.options.low));
 
         }
         return (typeof this.data[this.implName] != 'undefined') ? this.data[this.implName].length : 0;
@@ -102,7 +104,7 @@ kLine.prototype = {
         this.ctx.strokeStyle = 'red';
         this.ctx.fillStyle = 'red';
         if (Object.prototype.toString.call(y) === '[object Array]') {
-            var w = painter.options.lineWidth;
+            var w = painter.options.kLineWidth;
             var h = y[1] - y[0];
             var yScale = y[1];
             if (y[1] < y[0]) {
@@ -113,13 +115,13 @@ kLine.prototype = {
             }
             this.ctx.rect(x + (w - w*.7)/2, painter.paintRegion[painter.paintName + '.height'] - yScale, w*.7, h);
             this.ctx.fill();
-            //這邊這樣做是錯的，因為impl流程init沒將x[]只清一次
-            if (this.options.xAxis.options.x.length < this.data[this.implName].length)
-                this.options.xAxis.options.x.push(x + (w/2));
+            //if (this.options.xAxis.options.x.length < this.data[this.implName].length)
+            //    this.options.xAxis.options.x.push(x + (w/2));
+            (typeof this.options.xAxis.options.x[i] === 'undefined') ? this.options.xAxis.options.x.push(x + (w/2)) : this.options.xAxis.options.x[i][x + (w/2)];
             this.ctx.moveTo(x + (w/2), painter.paintRegion[painter.paintName + '.height'] - y[2]);
             this.ctx.lineTo(x + (w/2), painter.paintRegion[painter.paintName + '.height'] - y[3]);
         } else if (Object.prototype.toString.call(x) === '[object Array]') {
-            var h = painter.options.lineHeight;
+            var h = painter.options.kLineHeight;
             var w = x[1] - x[0];
             var xScale = x[1];
             if (x[1] < x[0]) {
@@ -128,10 +130,11 @@ kLine.prototype = {
                 w = x[0] - x[1];
                 xScale = x[0];
             }
-            this.ctx.rect(painter.paintRegion[painter.paintName + '.width'] - xScale, y, w, h);
+            this.ctx.rect(painter.paintRegion[painter.paintName + '.width'] - xScale, y + (h - h*.7)/2, w, h*.7);
             this.ctx.fill();
-            this.ctx.moveTo(painter.paintRegion[painter.paintName + '.width'] - x[2], y + (painter.options.lineHeight/2));
-            this.ctx.lineTo(painter.paintRegion[painter.paintName + '.width'] - x[3], y + (painter.options.lineHeight/2));
+            (typeof this.options.yAxis.options.y[i] === 'undefined') ? this.options.yAxis.options.y.push(y + (h/2)) : this.options.yAxis.options.y[i][y + (h/2)];
+            this.ctx.moveTo(painter.paintRegion[painter.paintName + '.width'] - x[2], y + (h/2));
+            this.ctx.lineTo(painter.paintRegion[painter.paintName + '.width'] - x[3], y + (h/2));
         }
         this.ctx.stroke();
     },
