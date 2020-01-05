@@ -24,6 +24,8 @@
     var painterKline = function(canvasId, paintStream, data) {
         Painter.call(this, canvasId, paintStream);
         this.data = data;
+        this.begin = 100;
+        this.end = 203;
     };
     painterKline.prototype = Object.create(Painter.prototype);
     painterKline.prototype.constructor = painterKline;
@@ -179,7 +181,7 @@
         
         var volume = [0];
         var volKline = [];
-        for (var i =　99; i < 203; i++) {
+        for (var i =　this.begin; i < this.end; i++) {
         //for (var i =　100; i < 113; i++) {
             var rawData = data[i];
             priceY[Number(rawData[3])] = 1;

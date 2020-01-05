@@ -20,10 +20,14 @@ function Painter(canvasId, paintStream) {
     this.paintName = 'absPainter';
     this.implName = 'absPainter';
     this.imgData = {};
+    this.onMove = false;
+    this.hadEvenBind = false;//這個應該跟算畫面位置分開因為再拉動時不用再重bind event
+    this.onBuild = false;
 }
 Painter.prototype = {
     init: function() {
         var painter = this;
+        if (painter.onBuild) return;
         painter.preData.call(painter);
         paintStream.forEach(function(item, index, array){
             paintName = Object.keys(item)[0];
@@ -68,21 +72,35 @@ Painter.prototype = {
         }
 */
         //painter.ctx.clearRect(0, 0, painter.width, painter.height);
-        
-        if (isTouchDevice()) {
-            addEvent(painter.canvas, 'touchmove', function (e) {
-                //console.log('touchmove:'+e);
-            });
-        } else {
-            addEvent(painter.canvas, 'mousemove', function (e) {
-                var offset = getOffset(e);
-                //console.log('mousemove(x:'+offset.offsetX+',y:'+offset.offsetY+')');
-                painter.moveEvent.call(painter, 'mousemove', offset);
-            });
+        if (!this.hadEvenBind) {
+            if (isTouchDevice()) {
+                addEvent(painter.canvas, 'touchmove', function (e) {
+                    //console.log('touchmove:'+e);
+                });
+            } else {
+                addEvent(painter.canvas, 'mousedown', function (e) {
+                    var offset = getOffset(e);
+                    //console.log('mousemove(x:'+offset.offsetX+',y:'+offset.offsetY+')');
+                    painter.moveEvent.call(painter, 'mousedown', offset);
+                });
+                addEvent(painter.canvas, 'mousemove', function (e) {
+                    var offset = getOffset(e);
+                    //console.log('mousemove(x:'+offset.offsetX+',y:'+offset.offsetY+')');
+                    painter.moveEvent.call(painter, 'mousemove', offset);
+                });
+                addEvent(painter.canvas, 'mouseup', function (e) {
+                    var offset = getOffset(e);
+                    //console.log('mousemove(x:'+offset.offsetX+',y:'+offset.offsetY+')');
+                    painter.moveEvent.call(painter, 'mouseup', offset);
+                });
+            }
+            this.hadEvenBind = true;
         }
     },
     build: function() {
         var painter = this;
+        if (painter.onBuild) return;
+        painter.onBuild = true;
         painter.ctx.clearRect(0, 0, painter.width, painter.height);
         if (painter.start) painter.start.call(painter);
         paintStream.forEach(function(item, index, array){
@@ -102,6 +120,7 @@ Painter.prototype = {
             }
         });
         painter.imgData = painter.ctx.getImageData(0, 0, painter.width, painter.height);
+        painter.onBuild = false;
     },
     paint: function () {
         var pctx = this.implement;
@@ -127,6 +146,7 @@ Painter.prototype = {
     moveEvent: function(eventName, offset) {
         //painter.ctx.clearRect(0, 0, painter.width, painter.height);
         var painter = this;
+        if (painter.onBuild) return;
         painter.ctx.putImageData(painter.imgData, 0, 0);
         paintStream.forEach(function(item, index, array){
             paintName = Object.keys(item)[0];
@@ -136,7 +156,8 @@ Painter.prototype = {
                 painter.implName = p;
                 painter.setImplement(implement, paintName);
                 painter.options = painter.implement.options;
-                if (painter.implement[eventName]) painter.implement[eventName].call(painter, offset);
+                if (!this.onBuild)
+                    if (painter.implement[eventName]) painter.implement[eventName].call(painter, offset);
             }
         })
     },

@@ -10,6 +10,7 @@ function kLine(options) {
   this.options.kLineDrawWidth = 10;
   this.options.x = [];
   this.options.y = [];
+  this.options.moveAcc = 0;
 }
 
 kLine.prototype = {
@@ -183,5 +184,61 @@ kLine.prototype = {
             }
         }
         if (chk) return;
+    },
+    mousedown: function(offset) {
+        //this.implement.start.call(this);
+        if (this.implement.isTouch.call(this, offset)) {
+            console.log(this.paintName + ' isTouch');
+            this.onMove = true;
+        }
+        //this.implement.end.call(this);
+    },
+    mousemove: function(offset) {
+        //this.options.yAxis.options.build = false;
+        if (this.onMove) {
+            //this.implement.start.call(this);
+            if (this.onBuild) {
+                console.log(this.paintName + ' yAxis onBuild');
+                this.options.yAxis.options.build = false;
+                return;
+            }
+            if (this.options.axial === 'ver')
+                this.options.moveAcc = this.options.moveAcc + offset.movementX;
+            else if (this.options.axial === 'hor')
+                this.options.moveAcc = this.options.moveAcc + offset.movementY;
+            //console.log('moveAcc:'+this.options.moveAcc+'w:'+ Math.round(this.options.kLineDrawWidth));
+            var t = 0;
+            if (this.options.moveAcc >= Math.round(this.options.kLineDrawWidth))
+                t = 1;
+            else if (Math.abs(this.options.moveAcc) >= Math.round(this.options.kLineDrawWidth))
+                t = -1;
+            if (t != 0) {
+                console.log(this.paintName + ' ' +this.options.yAxis.options.dataType);
+                this.options.yAxis.options.build = false;       
+                this.options.moveAcc = 0;
+                this.begin = this.begin - t;
+                this.end = this.end - t;
+                //console.log('begin:'+this.begin+', end:'+this.end );
+                this.init.call(this);
+                this.build.call(this);
+                this.build.call(this);
+                t = 0;
+            }
+            //this.implement.end.call(this);
+        }
+    },    
+    mouseup: function(offset) {
+        if (this.onMove) {
+            this.onMove = false;
+            this.options.moveAcc = 0;
+        }
+    },
+    isTouch: function(offset) {
+        if (offset.offsetX >= this.paintRegion[this.paintName + '.x']
+         && offset.offsetY >= this.paintRegion[this.paintName + '.y']
+         && offset.offsetX <= this.paintRegion[this.paintName + '.width']
+         && offset.offsetY <= this.paintRegion[this.paintName + '.height'])
+            return true;
+        return false;
     }
 };
