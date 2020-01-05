@@ -1,0 +1,86 @@
+function cross(options) {
+  this.options = options;
+  if (typeof this.options.height === 'undefined') this.options.height = 500;
+  if (typeof this.options.width === 'undefined') this.options.width = 1000;
+  if (typeof this.options.yAxisName === 'undefined') this.options.yAxisName = 'yAxis';
+  if (typeof this.options.xAxisName === 'undefined') this.options.xAxisName = 'xAxis';
+  this.options.yAxis = new yAxis({});
+  this.options.xAxis = new xAxis({});
+  this.options.isRun = false;
+  if (typeof this.options.strokeStyle === 'undefined') this.options.strokeStyle = "#000000";
+}
+
+cross.prototype = {
+    initialize : function () {
+        this.options.height = this.paintRegion[paintName + '.height'];
+        this.options.width = this.paintRegion[paintName + '.width'];
+        if (typeof this.implements[this.options.yAxisName] != 'undefined')
+            this.options.yAxis = this.implements[this.options.yAxisName];
+        if (typeof this.implements[this.options.xAxisName] != 'undefined')
+            this.options.xAxis = this.implements[this.options.xAxisName];
+    },
+    start : function () {
+        var ctx = this.ctx;
+        ctx.save();
+        ctx.translate(this.paintRegion[paintName + '.x'], this.paintRegion[paintName + '.y']);
+    },
+    end : function () {
+        this.ctx.restore();
+    },
+    paintItems : function(x, y) {
+        if (typeof x === 'undefined') return;
+        if (typeof y === 'undefined') return;
+        if (!this.options.isRun) {
+            this.options.isRun = true;
+        }
+        if (x <= this.paintRegion[paintName + '.x']) x = this.paintRegion[paintName + '.x'];
+        if (y <= this.paintRegion[paintName + '.y']) y = this.paintRegion[paintName + '.y'];
+        x = x - this.paintRegion[paintName + '.x'];
+        y = y - this.paintRegion[paintName + '.y'];
+        
+        if (Object.prototype.toString.call(this.options.xAxis.options.x) === '[object Array]') {
+            for (var i in this.options.xAxis.options.x) {
+                var xx = this.options.xAxis.options.x[i];
+                var x1 = xx - ((typeof this.options.xAxis.options.kLineWidth === 'undefined') ? 0 : this.options.xAxis.options.kLineWidth/2);
+                var x2 = xx + ((typeof this.options.xAxis.options.kLineWidth === 'undefined') ? 0 : this.options.xAxis.options.kLineWidth);
+                if (x >= x1 && x <= x2) {
+                    //console.log(xx);
+                    x = xx;
+                }
+            }
+        }
+        
+        if (Object.prototype.toString.call(this.options.yAxis.options.y) === '[object Array]') {
+            for (var i in this.options.yAxis.options.y) {
+                var yy = this.options.yAxis.options.y[i];
+                var y1 = yy - ((typeof this.options.yAxis.options.kLineWidth === 'undefined') ? 0 : this.options.yAxis.options.kLineWidth/2);
+                var y2 = yy + ((typeof this.options.yAxis.options.kLineWidth === 'undefined') ? 0 : this.options.yAxis.options.kLineWidth);
+                if (y >= y1 && y <= y2) {
+                    //console.log(yy);
+                    y = yy;
+                }
+            }
+        }
+        
+        this.options.isRun = false;
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = this.options.strokeStyle;
+        //if (x > this.options.width) x = this.options.width;
+        if (x < this.options.width) {
+            this.ctx.moveTo(x, 0);
+            this.ctx.lineTo(x, this.options.height);
+            this.ctx.stroke();
+        }
+        //if (y > this.options.height) y = this.options.height;
+        if (y < this.options.height) {;
+            this.ctx.moveTo(0, y);
+            this.ctx.lineTo(this.options.width, y);
+            this.ctx.stroke()
+        };
+    },
+    mousemove: function(offset) {
+        this.implement.start.call(this);
+        this.implement.paintItems.call(this, offset.offsetX, offset.offsetY);
+        this.implement.end.call(this);
+    }
+}

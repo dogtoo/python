@@ -1,7 +1,9 @@
 function line(options) {
   this.options = options;
-  if (typeof this.options.yAxis === 'undefined') this.options.yAxis = new yAxis({});
-  if (typeof this.options.xAxis === 'undefined') this.options.xAxis = new xAxis({});
+  if (typeof this.options.yAxisName === 'undefined') this.options.yAxisName = 'yAxis';
+  if (typeof this.options.xAxisName === 'undefined') this.options.xAxisName = 'xAxis';
+  this.options.yAxis = new yAxis({});
+  this.options.xAxis = new xAxis({});
   this.options.prevX = null;
   this.options.prevY = null;
   //if (typeof this.options.disX === 'undefined') this.options.disX = 0;
@@ -20,7 +22,10 @@ line.prototype = {
             painter.options.xAxis = painter.implements[painter.options.xAxis];
     },*/
     initialize: function () {
-        
+        if (typeof this.implements[this.options.yAxisName] != 'undefined')
+            this.options.yAxis = this.implements[this.options.yAxisName];
+        if (typeof this.implements[this.options.xAxisName] != 'undefined')
+            this.options.xAxis = this.implements[this.options.xAxisName];
     },
     start: function () {
         var ctx = this.ctx;
@@ -30,11 +35,6 @@ line.prototype = {
         this.ctx.beginPath();
         this.ctx.strokeStyle = this.options.strokeStyle;
         this.ctx.lineWidth = this.options.lineWidth;
-        
-        if (typeof this.options.yAxis === 'string' && typeof painter.implements[this.options.yAxis] != 'undefined')
-            this.options.yAxis = painter.implements[this.options.yAxis];
-        if (typeof this.options.xAxis === 'string' && typeof painter.implements[this.options.xAxis] != 'undefined')
-            this.options.xAxis = painter.implements[this.options.xAxis];
     },
     end: function () {
         this.ctx.stroke();
@@ -58,8 +58,8 @@ line.prototype = {
         if (this.options.xAxis.options.dataRange === 'seq') {
             return this.options.xAxis.options.x[i];
         } else if (this.options.xAxis.options.dataRange === 'range') {
-            return painter.paintRegion[painter.paintName + '.width']
-                - (painter.data[painter.implName][i][1]- this.options.xAxis.options.first) * this.options.xAxis.options.scale;// + this.options.disX;
+            return this.paintRegion[this.paintName + '.width']
+                - (this.data[this.implName][i][1]- this.options.xAxis.options.first) * this.options.xAxis.options.scale;// + this.options.disX;
         }
         //return this.options.xAxis.getX.call(this, i);
         //return this.options.xAxis.options.x[i];
@@ -69,8 +69,8 @@ line.prototype = {
         if (this.options.yAxis.options.dataRange === 'seq') {
             return this.options.yAxis.options.y[i];
         } else if (this.options.yAxis.options.dataRange === 'range') {
-            return painter.paintRegion[painter.paintName + '.height']
-                - (painter.data[painter.implName][i][1]- this.options.yAxis.options.low) * this.options.yAxis.options.scale;//+ this.options.disY;
+            return this.paintRegion[this.paintName + '.height']
+                - (this.data[this.implName][i][1]- this.options.yAxis.options.low) * this.options.yAxis.options.scale;//+ this.options.disY;
         }
         //return this.options.yAxis.getY.call(this, i);
         //return this.options.yAxis.options.y[i];
@@ -84,7 +84,7 @@ line.prototype = {
             this.ctx.lineTo(painter.paintRegion[painter.paintName + '.width'], painter.paintRegion[painter.paintName + '.height']);
             this.ctx.stroke();
         }*/
-        if (x === null && y === null ) return;
+        if (x === null || y === null ) return;
         //y =  - y;
         //x =  - x;
 

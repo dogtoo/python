@@ -9,6 +9,7 @@ function yAxis(options) {
     //if (typeof this.options.dataRange === 'undefined') this.options.dataRange = 'seq';
     //this.options.y = [];
     //this.options.yScale = 0;
+    this.options.className = 'yAxis';
 }
 
     yAxis.prototype = axis.prototype;
@@ -33,7 +34,7 @@ function yAxis(options) {
         } else {
             if (i == this.data[this.implName].length-1) 
                 return this.paintRegion[this.paintName + '.height'];
-            this.paintImplement.getYScale(this.data[this.implName][i]);
+            this.implement.getYScale.call(this, this.options, this.data[this.implName][i]);
             if (this.options.dataRange === 'seq')
                 return i * this.options.scale;
             if (this.options.dataRange === 'range')
@@ -74,12 +75,12 @@ function yAxis(options) {
         }
     };
     
-    yAxis.prototype.getYScale = function(data) {
-        if (this.options.dataRange === 'seq') {
-            if (painter.paintRegion.hasOwnProperty(painter.paintName + '.height'))
-                this.options.scale = painter.paintRegion[painter.paintName + '.height'] / data.length;
-        } else if (this.options.dataRange === 'range') {
-            if (painter.paintRegion.hasOwnProperty(painter.paintName + '.height'))
-                this.options.scale = painter.paintRegion[painter.paintName + '.height'] / Math.abs(this.options.high - this.options.low);
+    yAxis.prototype.getYScale = function(options, data) {
+        if (options.dataRange === 'seq') {
+            if (this.paintRegion.hasOwnProperty(this.paintName + '.height'))
+                options.scale = this.paintRegion[this.paintName + '.height'] / data.length;
+        } else if (options.dataRange === 'range') {
+            if (this.paintRegion.hasOwnProperty(this.paintName + '.height'))
+                options.scale = this.paintRegion[this.paintName + '.height'] / Math.abs(options.high - options.low);
         }
     };

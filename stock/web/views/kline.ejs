@@ -13,6 +13,7 @@
     <script src="js/k-line.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/line.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/k-data.js" type="text/javascript" charset="UTF8"></script>
+    <script src="js/cross.js" type="text/javascript" charset="UTF8"></script>
 </head>
 <body>
     <h1 id="h1"><%=msg%></h1>
@@ -46,38 +47,38 @@
 
 {
     var fline = new line({
-                yAxis: 'priceY',
-                xAxis: 'dateX',
+                yAxisName: 'priceY',
+                xAxisName: 'dateX',
                 strokeStyle: 'cyan',
                 lineWidth: 1,
                 disX: 5
             });
     //fline.__proto__ = Object.create(line.__proto__);
-    fline.__proto__.preData =  function(data) {
-        fline.options.disX = painter.implements.kline.options.lineWidth;
-    }
+    //fline.__proto__.preData =  function(data) {
+    //    fline.options.disX = painter.implements.kline.options.lineWidth;
+    //}
 
     var tline = new line({
-                yAxis: 'priceY',
-                xAxis: 'dateX',
+                yAxisName: 'priceY',
+                xAxisName: 'dateX',
                 strokeStyle: 'limegreen',
                 lineWidth: 1,
                 disX: 5
             });
-    tline.__proto__.preData =  function(data) {
-        tline.options.disX = painter.implements.kline.options.lineWidth;
-    }
+    //tline.__proto__.preData =  function(data) {
+    //    tline.options.disX = painter.implements.kline.options.lineWidth;
+    //}
 
     var sline = new line({
-                yAxis: 'priceY',
-                xAxis: 'dateX',
+                yAxisName: 'priceY',
+                xAxisName: 'dateX',
                 strokeStyle: 'magenta',
                 lineWidth: 1,
                 disX: 5
             });
-    sline.__proto__.preData =  function(data) {
-        sline.options.disX = painter.implements.kline.options.lineWidth;
-    }
+    //sline.__proto__.preData =  function(data) {
+    //    sline.options.disX = painter.implements.kline.options.lineWidth;
+    //}
 
     var paintStream = [
         {
@@ -108,12 +109,15 @@
                 },
                 'kline':new kLine({
                     lineStyle: 'solid',
-                    yAxis: 'priceY',
-                    xAxis: 'dateX'
+                    yAxisName: 'priceY',
+                    xAxisName: 'dateX'
                 }),
                 'fline': fline,
                 'tline': tline,
-                'sline': sline
+                'sline': sline,
+                'kCross': new cross({
+                    xAxisName: 'kline'
+                })
             }
         },
         {
@@ -131,7 +135,7 @@
         },
         {
             'volume':{
-                region: { x: 'price.x', y: {'$and':['price.height', 'price.y', {'$mul':['date.height',2]}]}, width: 'f:0000', height: '15%' },
+                region: { x: 'price.x', y: {'$and':['price.height', 'price.y', {'$mul':['date.height',2]}]}, width: 'f:0000', height: '18%' },
                 'volumeY':new yAxis({
                     font: '11px Arial',
                     color: 'black',
@@ -144,17 +148,21 @@
         },
         {
             'volmain':{
-                region: { x: 'main.x', y: {'$and':['volume.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: '15%' },
+                region: { x: 'main.x', y: {'$and':['volume.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: '18%' },
                 'volKline':new kLine({
                     lineWidth: 1,
                     lineStyle: 'solid',
-                    yAxis: 'volumeY',
-                    xAxis: 'dateX'
+                    yAxisName: 'volumeY',
+                    xAxisName: 'dateX'
+                }),
+                'mCross': new cross({
+                    xAxisName: 'kline'
                 })
             }
         }
     ];
 
+    //var painter = new painterKline('kline',paintStream, getKLData());
     var painter = new painterKline('kline',paintStream, getKLData());
     painterKline.prototype.preData = function() {
         //this.data.priceY = [];
@@ -171,8 +179,8 @@
         
         var volume = [0];
         var volKline = [];
-        //for (var i =　99; i < 203; i++) {
-        for (var i =　100; i < 113; i++) {
+        for (var i =　99; i < 203; i++) {
+        //for (var i =　100; i < 113; i++) {
             var rawData = data[i];
             priceY[Number(rawData[3])] = 1;
             priceY[Number(rawData[4])] = 1;

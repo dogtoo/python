@@ -9,6 +9,7 @@ function xAxis(options){
     //if (typeof this.options.dataRange === 'undefined') this.options.dataRange = 'seq';    
     //this.options.x = [];
     //this.options.xScale = 0;
+    this.options.className = 'xAxis';
 }
     xAxis.prototype = Object.create(axis.prototype);
     xAxis.prototype.constructor = xAxis;
@@ -28,7 +29,7 @@ function xAxis(options){
             return (this.options.x[x] + this.options.fontWidth/2 <= this.paintRegion[this.paintName + '.width']) ? this.options.x[x] - this.options.fontWidth/2 : this.paintRegion[this.paintName + '.width'] - this.options.fontWidth/2;
         } else {
             if (i == this.data[this.implName].length-1) return this.paintRegion[this.paintName + '.width'] ;
-            this.paintImplement.getXScale(this.data[this.implName][i]);
+            this.implement.getXScale.call(this, this.options, this.data[this.implName][i]);
             if (this.options.dataRange === 'seq')
                 return (i * this.options.scale) - this.options.fontWidth/2;
             if (this.options.dataRange === 'range')
@@ -83,12 +84,12 @@ function xAxis(options){
         }
 
     };
-    xAxis.prototype.getXScale = function(data) {
-        if (this.options.dataRange === 'seq') {
-            if (painter.paintRegion.hasOwnProperty(painter.paintName + '.width'))
-                this.options.scale = painter.paintRegion[painter.paintName + '.width'] / data.length;
-        } else if (this.options.dataRange === 'range') {
-            if (painter.paintRegion.hasOwnProperty(painter.paintName + '.width'))
-                this.options.scale = painter.paintRegion[painter.paintName + '.width'] / Math.abs(this.options.last - this.options.first);
+    xAxis.prototype.getXScale = function(options, data) {
+        if (options.dataRange === 'seq') {
+            if (this.paintRegion.hasOwnProperty(this.paintName + '.width'))
+                options.scale = this.paintRegion[this.paintName + '.width'] / data.length;
+        } else if (options.dataRange === 'range') {
+            if (this.paintRegion.hasOwnProperty(this.paintName + '.width'))
+                options.scale = this.paintRegion[this.paintName + '.width'] / Math.abs(options.last - options.first);
         }
     };

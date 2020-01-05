@@ -43,7 +43,7 @@
             if (ev.preventDefault) ev.preventDefault(); else ev.returnValue = false;
         },
         isTouchDevice: function () {
-            return !!('ontouchstart' in window);
+            return !!('ontouchstart' in window || window.hasOwnProperty('ontouchstart'));
         },
         toMoney: function (val) {
             /*var pos = 2;

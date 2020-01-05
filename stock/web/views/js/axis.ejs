@@ -39,6 +39,9 @@ axis.prototype = {
     getDataLength : function() {
         return (typeof this.data[this.implName] != 'undefined') ? this.data[this.implName].length : 0;
     },
+    toString: function() {
+        return this.options.className;
+    },
     isTouch: function(x, y) {
         for (var i in this.options.text) {
             
