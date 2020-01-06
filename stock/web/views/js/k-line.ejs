@@ -196,12 +196,6 @@ kLine.prototype = {
     mousemove: function(offset) {
         //this.options.yAxis.options.build = false;
         if (this.onMove) {
-            //this.implement.start.call(this);
-            if (this.onBuild) {
-                console.log(this.paintName + ' yAxis onBuild');
-                this.options.yAxis.options.build = false;
-                return;
-            }
             if (this.options.axial === 'ver')
                 this.options.moveAcc = this.options.moveAcc + offset.movementX;
             else if (this.options.axial === 'hor')
@@ -213,15 +207,14 @@ kLine.prototype = {
             else if (Math.abs(this.options.moveAcc) >= Math.round(this.options.kLineDrawWidth))
                 t = -1;
             if (t != 0) {
-                console.log(this.paintName + ' ' +this.options.yAxis.options.dataType);
+                //console.log(this.paintName + ' ' +this.options.yAxis.options.dataType);
                 this.options.yAxis.options.build = false;       
                 this.options.moveAcc = 0;
                 this.begin = this.begin - t;
                 this.end = this.end - t;
                 //console.log('begin:'+this.begin+', end:'+this.end );
-                this.init.call(this);
-                this.build.call(this);
-                this.build.call(this);
+                this.reInit = true;
+                this.reBuild = true;
                 t = 0;
             }
             //this.implement.end.call(this);

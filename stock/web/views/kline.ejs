@@ -52,8 +52,7 @@
                 yAxisName: 'priceY',
                 xAxisName: 'dateX',
                 strokeStyle: 'cyan',
-                lineWidth: 1,
-                disX: 5
+                lineWidth: 1
             });
     //fline.__proto__ = Object.create(line.__proto__);
     //fline.__proto__.preData =  function(data) {
@@ -64,8 +63,7 @@
                 yAxisName: 'priceY',
                 xAxisName: 'dateX',
                 strokeStyle: 'limegreen',
-                lineWidth: 1,
-                disX: 5
+                lineWidth: 1
             });
     //tline.__proto__.preData =  function(data) {
     //    tline.options.disX = painter.implements.kline.options.lineWidth;
@@ -75,8 +73,7 @@
                 yAxisName: 'priceY',
                 xAxisName: 'dateX',
                 strokeStyle: 'magenta',
-                lineWidth: 1,
-                disX: 5
+                lineWidth: 1
             });
     //sline.__proto__.preData =  function(data) {
     //    sline.options.disX = painter.implements.kline.options.lineWidth;
@@ -159,6 +156,30 @@
                 }),
                 'mCross': new cross({
                     xAxisName: 'kline'
+                })
+            }
+        },
+        {
+            'yHistory':{
+                region: { x: 'main.x', y: {'$and':['volume.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: '18%' },
+                'yHistory':new yAxis({
+                    font: '11px Arial',
+                    color: 'black',
+                    align: 'right',
+                    textBaseline: 'top',
+                    dataType: 'money',
+                    dataRange: 'range'
+                })
+            }
+        },
+        {
+            'history':{
+                region: { x: 'main.x', y: {'$and':['volume.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: '18%' },
+                'hline':new line({
+                    yAxisName: 'dateX',
+                    xAxisName: 'yHistory',
+                    strokeStyle: 'magenta',
+                    lineWidth: 1
                 })
             }
         }
