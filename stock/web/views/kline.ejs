@@ -17,7 +17,7 @@
 </head>
 <body>
     <h1 id="h1"><%=msg%></h1>
-    <canvas id="kline" width="1002" height="500" style="z-index: 2; border: 1px solid #69c"></canvas>
+    <canvas id="kline" width="900" height="500" style="z-index: 2; border: 1px solid #69c"></canvas>
 </body>
 <script type="text/javascript">
 
@@ -51,6 +51,7 @@
     var fline = new line({
                 yAxisName: 'priceY',
                 xAxisName: 'dateX',
+                xAxisFocus: true,
                 strokeStyle: 'cyan',
                 lineWidth: 1
             });
@@ -62,6 +63,7 @@
     var tline = new line({
                 yAxisName: 'priceY',
                 xAxisName: 'dateX',
+                xAxisFocus: true,
                 strokeStyle: 'limegreen',
                 lineWidth: 1
             });
@@ -72,6 +74,7 @@
     var sline = new line({
                 yAxisName: 'priceY',
                 xAxisName: 'dateX',
+                xAxisFocus: true,
                 strokeStyle: 'magenta',
                 lineWidth: 1
             });
@@ -161,7 +164,7 @@
         },
         {
             'yHistory':{
-                region: { x: 'main.x', y: {'$and':['volume.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: '18%' },
+                region: { x: 'price.x', y: {'$and':['volume.height', 'volmain.y', determineFontHeight('11px Arial')/2]}, width: 'f:00.00', height: '12%' },
                 'yHistory':new yAxis({
                     font: '11px Arial',
                     color: 'black',
@@ -174,10 +177,9 @@
         },
         {
             'history':{
-                region: { x: 'main.x', y: {'$and':['volume.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: '18%' },
+                region: { x: 'main.x', y: {'$and':['yHistory.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: '12%' },
                 'hline':new line({
-                    yAxisName: 'dateX',
-                    xAxisName: 'yHistory',
+                    yAxisName: 'yHistory',
                     strokeStyle: 'magenta',
                     lineWidth: 1
                 })
@@ -202,23 +204,32 @@
         
         var volume = [0];
         var volKline = [];
-        for (var i =　this.begin; i < this.end; i++) {
+        
+        var yHistory = {};
+        var hline = [];
+        for (var i =　0; i < data.length; i++) {
         //for (var i =　100; i < 113; i++) {
             var rawData = data[i];
-            priceY[Number(rawData[3])] = 1;
-            priceY[Number(rawData[4])] = 1;
-            dateX[rawData[0]] = 1;
-            kline.push([rawData[0], rawData[2], rawData[5], rawData[3], rawData[4] ]);
+            yHistory[Number(rawData[3])] = 1;
+            yHistory[Number(rawData[4])] = 1;
+            hline.push([rawData[0], rawData[5]]);
+            if (i >= this.begin && i <= this.end) {
+                priceY[Number(rawData[3])] = 1;
+                priceY[Number(rawData[4])] = 1;
+                dateX[rawData[0]] = 1;
+                kline.push([rawData[0], rawData[2], rawData[5], rawData[3], rawData[4] ]);
 
-            fline.push(MACount(5, i, data));
-            tline.push(MACount(10, i, data));
-            sline.push(MACount(20, i, data));
-            
-            volume.push(rawData[6]);
-            if (rawData[5] > rawData[2])
-                volKline.push([rawData[0], 0, rawData[6], 0, rawData[6] ]);
-            else
-                volKline.push([rawData[0], rawData[6], 0,  rawData[6], 0]);
+                fline.push(MACount(5, i, data));
+                tline.push(MACount(10, i, data));
+                sline.push(MACount(20, i, data));
+                
+                volume.push(rawData[6]);
+                if (rawData[5] > rawData[2])
+                    volKline.push([rawData[0], 0, rawData[6], 0, rawData[6] ]);
+                else
+                    volKline.push([rawData[0], rawData[6], 0,  rawData[6], 0]);
+                    
+            }
         }
         this.data.kline = kline;
         this.data.fline = fline;
@@ -248,6 +259,16 @@
         this.data.volumeY = volume;
         
         this.data.volKline = volKline;
+        
+        var yHistoryL = [];
+        for (var pk in yHistory)
+            yHistoryL.push(pk);
+
+        yHistoryL.sort(function(a, b) {
+            return a - b;
+        });
+        this.data.yHistory = yHistoryL;
+        this.data.hline = hline;
     }
 
     painterKline.prototype.start = function () {

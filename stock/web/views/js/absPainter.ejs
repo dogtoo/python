@@ -257,13 +257,13 @@ Painter.prototype = {
 
 function prePaintRegionObj(key_, type_, v_) {
     if (type_ === 'number') {
-        if (key_.match(/x/))
+        if (key_.match(/\.x/))
             return v_;
-        if (key_.match(/y/))
+        if (key_.match(/\.y/))
             return v_;
-        if (key_.match(/width/))
+        if (key_.match(/\.width/))
             return v_;
-        if (key_.match(/height/))
+        if (key_.match(/\.height/))
             return v_;
         if (key_.match(/padding\.(.+)/)) {
             if (this.padding.hasOwnProperty(key_.match(/padding\.(.+)/)[1])) {
@@ -275,24 +275,25 @@ function prePaintRegionObj(key_, type_, v_) {
             && typeof v_.match(/^(\d+)\%$/)[1] === 'string') {
             var percentage = parseInt(v_.match(/^(\d+)\%$/)[1]);
             if (percentage > 100) percentage = 100;
-            if (key_.match(/x/))
+            if (key_.match(/\.x/))
                 return this.width * (percentage / 100);
-            if (key_.match(/y/))
+            if (key_.match(/\.y/))
                 return this.height * (percentage / 100);
-            if (key_.match(/width/))
+            if (key_.match(/\.width/))
                 return this.width * (percentage / 100);
-            if (key_.match(/height/))
+            if (key_.match(/\.height/))
                 return this.height * (percentage / 100);
         } else if (Object.prototype.toString.call(v_.match(/^f\:(.+)/)) === '[object Array]'
             && typeof v_.match(/^f\:(.+)/)[1] === 'string') {
             var format_ = v_.match(/^f\:(.+)/)[1];
-            if (key_.match(/x/))
+            /*
+            if (key_.match(/\.x/))
                 return this.implement.getX.call(format_);
-            if (key_.match(/y/))
-                return this.implement.getY.call(format_);
-            if (key_.match(/width/))
+            if (key_.match(/\.y/))
+                return this.implement.getY.call(format_);*/
+            if (key_.match(/\.width/))
                 return this.implement.getWidth.call(this, format_);
-            if (key_.match(/height/))
+            if (key_.match(/\.height/))
                 return this.implement.getHeight.call(this, format_);
         } else if (this.paintRegion.hasOwnProperty(v_)) {
             return this.paintRegion[v_];

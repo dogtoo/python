@@ -13,9 +13,11 @@ function axis(options) {
 
 axis.prototype = {
     initialize : function () {
-        this.options.x = [];
-        this.options.y = [];
-        this.options.scale = 0;
+        if (!this.options.build) {
+            this.options.x = [];
+            this.options.y = [];
+            this.options.scale = 0;
+        }
     },
     start : function () {
         var ctx = this.ctx;
