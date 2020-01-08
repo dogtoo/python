@@ -54,28 +54,42 @@ line.prototype = {
     },
     getX: function (i) {
         if (this.data[this.implName][i][0] === null) return null;
-        if (this.options.xAxis.options.dataRange === 'seq') {
-            if (this.options.xAxisFocus)
-                return this.options.xAxis.options.x[i];
-            else
+        if (this.options.xAxisFocus) {
+            return this.options.xAxis.options.x[i];
+        } else {
+            if (this.options.xAxis.options.dataRange === 'seq') 
                 return i * this.options.xAxis.options.scale;
-        } else if (this.options.xAxis.options.dataRange === 'range') {
-            return this.paintRegion[this.paintName + '.width']
-                - (this.data[this.implName][i][1]- this.options.xAxis.options.first) * this.options.xAxis.options.scale;// + this.options.disX;
+            else if (this.options.xAxis.options.dataRange === 'range') {
+                if (this.data[this.implName][i][1] < this.options.yAxis.options.first) this.options.yAxis.options.first = this.data[this.implName][i][1];
+                if (this.data[this.implName][i][1] > this.options.yAxis.options.last) this.options.yAxis.options.last = this.data[this.implName][i][1];
+                if (typeof this.data[this.options.xAxisName] != 'undefined')
+                    this.data[this.options.xAxisName] = calcRangeValues(this.options.xAxis.options.last
+                                    , this.options.xAxis.options.first
+                                    , this.options.xAxis.options.verticalLineCount);
+                return this.paintRegion[this.paintName + '.width']
+                    - (this.data[this.implName][i][1]- this.options.xAxis.options.first) * this.options.xAxis.options.scale;// + this.options.disX;
+            }
         }
         //return this.options.xAxis.getX.call(this, i);
         //return this.options.xAxis.options.x[i];
     },
     getY: function (i) {
         if (this.data[this.implName][i][1] === null) return null;
-        if (this.options.yAxis.options.dataRange === 'seq') {
-            if (this.options.yAxisFocus)
-                return this.options.yAxis.options.y[i];
-            else
+        if (this.options.yAxisFocus){
+            return this.options.yAxis.options.y[i];
+        } else {
+            if (this.options.yAxis.options.dataRange === 'seq') 
                 return i * this.options.yAxis.options.scale;
-        } else if (this.options.yAxis.options.dataRange === 'range') {
-            return this.paintRegion[this.paintName + '.height']
-                - (this.data[this.implName][i][1]- this.options.yAxis.options.low) * this.options.yAxis.options.scale;//+ this.options.disY;
+            else if (this.options.yAxis.options.dataRange === 'range') {
+                if (this.data[this.implName][i][1] < this.options.yAxis.options.low) this.options.yAxis.options.low = this.data[this.implName][i][1];
+                if (this.data[this.implName][i][1] > this.options.yAxis.options.high) this.options.yAxis.options.high = this.data[this.implName][i][1];
+                if (typeof this.data[this.options.yAxisName] != 'undefined')
+                    this.data[this.options.yAxisName] = calcRangeValues(this.options.yAxis.options.high
+                                    , this.options.yAxis.options.low
+                                    , this.options.yAxis.options.horizontalLineCount);
+                return this.paintRegion[this.paintName + '.height']
+                    - (this.data[this.implName][i][1]- this.options.yAxis.options.low) * this.options.yAxis.options.scale;//+ this.options.disY;
+            }
         }
         //return this.options.yAxis.getY.call(this, i);
         //return this.options.yAxis.options.y[i];

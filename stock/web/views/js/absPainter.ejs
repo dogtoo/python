@@ -23,7 +23,7 @@ function Painter(canvasId, paintStream) {
     
     this.reInit = false;
     this.reBuild = false;
-    this.onMove = false;
+    //this.onMove = false;
     this.hadEvenBind = false;//這個應該跟算畫面位置分開因為再拉動時不用再重bind event
     this.onBuild = false;
 }
@@ -164,10 +164,13 @@ Painter.prototype = {
             }
         })
         if (this.reBuild) {
+            var d1 = new Date();
             if (this.reInit)
                 this.init.call(this);
             this.build.call(this);
             this.build.call(this);
+            var d2 = new Date();
+            console.log(parseInt(d2 - d1)/ 1000);
         }
         this.reInit = false;
         this.reBuild = false;

@@ -11,6 +11,7 @@ function kLine(options) {
   this.options.x = [];
   this.options.y = [];
   this.options.moveAcc = 0;
+  this.options.onMove = false;
 }
 
 kLine.prototype = {
@@ -42,14 +43,10 @@ kLine.prototype = {
         }
     },
     getDataLength : function() {
-        if (typeof this.options.yAxis.getYScale === 'function')
+        if (Object.prototype.toString.call(this.data[this.implName]) === '[object Array]') {
             this.options.yAxis.getYScale.call(this, this.options.yAxis.options, this.data[this.implName])
-        else
-            return 0;
-        if (typeof this.options.xAxis.getXScale === 'function')
             this.options.xAxis.getXScale.call(this, this.options.xAxis.options, this.data[this.implName])
-        else
-            return 0;
+        }
         
         if (this.options.axial === 'ver') {
             if (this.options.xAxis.options.dataRange === 'seq') {
@@ -188,14 +185,14 @@ kLine.prototype = {
     mousedown: function(offset) {
         //this.implement.start.call(this);
         if (this.implement.isTouch.call(this, offset)) {
-            console.log(this.paintName + ' isTouch');
-            this.onMove = true;
+            //console.log(this.paintName + ' isTouch');
+            this.options.onMove = true;
         }
         //this.implement.end.call(this);
     },
     mousemove: function(offset) {
         //this.options.yAxis.options.build = false;
-        if (this.onMove) {
+        if (this.options.onMove) {
             if (this.options.axial === 'ver')
                 this.options.moveAcc = this.options.moveAcc + offset.movementX;
             else if (this.options.axial === 'hor')
@@ -208,7 +205,6 @@ kLine.prototype = {
                 t = -1;
             if (t != 0) {
                 //console.log(this.paintName + ' ' +this.options.yAxis.options.dataType);
-                this.options.yAxis.options.build = false;       
                 this.options.moveAcc = 0;
                 this.begin = this.begin - t;
                 this.end = this.end - t;
@@ -219,10 +215,13 @@ kLine.prototype = {
             }
             //this.implement.end.call(this);
         }
+        if (this.reBuild) {
+            this.options.yAxis.options.build = false;       
+        }
     },    
     mouseup: function(offset) {
-        if (this.onMove) {
-            this.onMove = false;
+        if (this.options.onMove) {
+            this.options.onMove = false;
             this.options.moveAcc = 0;
         }
     },

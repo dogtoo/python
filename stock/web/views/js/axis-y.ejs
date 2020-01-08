@@ -29,7 +29,7 @@ function yAxis(options) {
             var v_c = Math.round((this.options.y.length)/this.options.horizontalLineCount);
             var y = (i * v_c);
             var diff = this.options.y.length - y;
-            if (diff < v_c || y >= this.options.y.length) y = this.options.y.length - 1;
+            //if (diff < v_c || y >= this.options.y.length) y = this.options.y.length - 1;
             return (this.options.y[y] + this.options.fontHeight <= this.paintRegion[this.paintName + '.height']) ? this.options.y[y] : this.paintRegion[this.paintName + '.height'];
         } else {
             if (i == this.data[this.implName].length-1) 
@@ -40,6 +40,9 @@ function yAxis(options) {
             if (this.options.dataRange === 'range')
                 return this.paintRegion[this.paintName + '.height'] - this.options.scale * (this.data[this.implName][i] - this.options.low);
         }
+    };
+    yAxis.prototype.getHeight = function(format) {
+        return this.paintRegion[this.paintName + '.height'];
     };
     yAxis.prototype.getWidth = function(format) {
         return determineFontWidth(this.options.font, format);
@@ -62,8 +65,8 @@ function yAxis(options) {
             for (var i = 1; i < this.options.horizontalLineCount; i++) {
                 var index = Math.ceil(i * stepLength);
                 if (index >= data.length) index = data.length - 1;
-                var quoteTime = data[index];
-                yScalers.push(quoteTime);
+                //var quoteTime = data[index];
+                yScalers.push(data[index]);
             }
             this.data[this.implName] = yScalers;
         } else if (this.options.dataRange === 'range') {

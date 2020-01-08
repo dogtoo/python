@@ -33,6 +33,10 @@ router.get('/js/k-line.js', async(ctx) => {
     await ctx.render('js/k-line')
 });
 
+router.get('/js/controlbar.js', async(ctx) => {
+    await ctx.render('js/controlbar')
+});
+
 router.get('/js/line.js', async(ctx) => {
     await ctx.render('js/line')
 });

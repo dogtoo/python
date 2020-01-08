@@ -25,8 +25,9 @@ function xAxis(options){
             var v_c = Math.round((this.options.x.length)/this.options.verticalLineCount);
             var x = (i * v_c);
             var diff = this.options.x.length - x;
-            if (diff < v_c || x >= this.options.x.length) x = this.options.x.length - 1;
-            return (this.options.x[x] + this.options.fontWidth/2 <= this.paintRegion[this.paintName + '.width']) ? this.options.x[x] - this.options.fontWidth/2 : this.paintRegion[this.paintName + '.width'] - this.options.fontWidth/2;
+            //if (diff < v_c || x >= this.options.x.length) x = this.options.x.length - 1;
+            return (this.options.x[x] + this.options.fontWidth/2 <= this.paintRegion[this.paintName + '.width']) ? 
+                this.options.x[x] - this.options.fontWidth/2 : this.paintRegion[this.paintName + '.width'] - this.options.fontWidth/2;
         } else {
             if (i == this.data[this.implName].length-1) return this.paintRegion[this.paintName + '.width'] ;
             this.implement.getXScale.call(this, this.options, this.data[this.implName][i]);
@@ -41,14 +42,15 @@ function xAxis(options){
         this.options.fontHeight = determineFontHeight(this.options.font, format);
         return this.options.fontHeight + 2;
     };
+    xAxis.prototype.getWidth = function(format) {
+        return this.paintRegion[this.implName + ".width"];
+    };
     xAxis.prototype.preData = function(data) {
         if (Object.prototype.toString.call(data) != '[object Array]') return;
         if (data.length <= 0) return;
 
         this.ctx.font = this.options.font;
-        //this.options.fontWidth= this.ctx.measureText(data[0]).width;
         this.options.fontWidth= determineFontWidth(this.options.font, data[0]);
-
         this.options.verticalLineCount = Math.round((this.paintRegion[this.paintName + '.width'] - this.options.fontWidth) / this.options.fontWidth /3 );
         this.options.verticalLineCount = (this.options.verticalLineCount <= 1) ? 2 : this.options.verticalLineCount;
         if (this.options.dataRange === 'seq') {
@@ -59,19 +61,16 @@ function xAxis(options){
                 this.options.verticalLineCount = data.length - 1;
                 stepLength = 1;
             }
+            
             //xScalers.push(convertDate(data[0], false).substr(2));
             xScalers.push(data[0]);
             var index = 1;
             for (var i = 1; i < this.options.verticalLineCount; i++) {
                 /*
                 var index = Math.ceil(i * stepLength) - 1;*/
-
                 index = index + stepLength - ((i == 1)?1:0);
                 if (index >= data.length) index = data.length - 1;
-                if (index >= data.length - index) index = data.length - 1;
-                var quoteTime = data[index];
-                quoteTime = quoteTime
-                xScalers.push(quoteTime);
+                xScalers.push(data[index]);
             }
             xScalers.push(data[data.length - 1]);
             this.data[this.implName] = xScalers;
