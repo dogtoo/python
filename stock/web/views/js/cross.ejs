@@ -78,6 +78,9 @@ cross.prototype = {
             this.ctx.stroke()
         };
     },
+    reBuild: function() {
+        
+    },
     mousemove: function(offset) {
         this.implement.start.call(this);
         this.implement.paintItems.call(this, offset.offsetX, offset.offsetY);

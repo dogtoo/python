@@ -23,7 +23,6 @@ function Painter(canvasId, paintStream) {
     
     this.reInit = false;
     this.reBuild = false;
-    //this.onMove = false;
     this.hadEvenBind = false;//這個應該跟算畫面位置分開因為再拉動時不用再重bind event
     this.onBuild = false;
 }
@@ -163,7 +162,23 @@ Painter.prototype = {
                     if (painter.implement[eventName]) painter.implement[eventName].call(painter, offset);
             }
         })
-        if (this.reBuild) {
+        
+        if (!this.onBuild && this.reBuild) {
+            paintStream.forEach(function(item, index, array){
+                paintName = Object.keys(item)[0];
+                for (var p in item[paintName]) {
+                    if (p === 'region') continue;
+                    implement = painter.implements[p];
+                    painter.implName = p;
+                    painter.setImplement(implement, paintName);
+                    painter.options = painter.implement.options;
+                    
+                    if (painter.implement.reBuild) painter.implement.reBuild.call(painter);
+                }
+            })
+        }
+        
+        if (!this.onBuild && this.reBuild) {
             var d1 = new Date();
             if (this.reInit)
                 this.init.call(this);

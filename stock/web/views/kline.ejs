@@ -82,6 +82,13 @@
     //sline.__proto__.preData =  function(data) {
     //    sline.options.disX = painter.implements.kline.options.lineWidth;
     //}
+    
+    var hisbar = 
+        new controlbar({
+            range: 100,
+            step: 5,
+            datasource: 'hline'
+        });
 
     var paintStream = [
         {
@@ -113,7 +120,8 @@
                 'kline':new kLine({
                     lineStyle: 'solid',
                     yAxisName: 'priceY',
-                    xAxisName: 'dateX'
+                    xAxisName: 'dateX',
+                    controlbarName: 'hisbar'
                 }),
                 'fline': fline,
                 'tline': tline,
@@ -156,7 +164,8 @@
                     lineWidth: 1,
                     lineStyle: 'solid',
                     yAxisName: 'volumeY',
-                    xAxisName: 'dateX'
+                    xAxisName: 'dateX',
+                    controlbarName: 'hisbar'
                 }),
                 'mCross': new cross({
                     xAxisName: 'kline'
@@ -183,7 +192,8 @@
                     yAxisName: 'yHistory',
                     strokeStyle: 'magenta',
                     lineWidth: 1
-                })
+                }),
+                'hisbar':hisbar
             }
         }
     ];

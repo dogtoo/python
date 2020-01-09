@@ -12,6 +12,8 @@ function kLine(options) {
   this.options.y = [];
   this.options.moveAcc = 0;
   this.options.onMove = false;
+  if (typeof this.options.controlbarName === 'undefined') this.options.controlbarName = 'controlbar';
+  this.options.controlbar = {'options':{begin:0, end:0, step:1, load:false}};
 }
 
 kLine.prototype = {
@@ -28,6 +30,10 @@ kLine.prototype = {
             this.options.yAxis = this.implements[this.options.yAxisName];
         if (typeof this.implements[this.options.xAxisName] != 'undefined')
             this.options.xAxis = this.implements[this.options.xAxisName];
+        if (typeof this.implements[this.options.controlbarName] != 'undefined') {
+            this.options.controlbar = this.implements[this.options.controlbarName];
+            this.options.controlbar.options.load = true;
+        }
     },
     start: function () {
         var ctx = this.ctx;
@@ -183,12 +189,10 @@ kLine.prototype = {
         if (chk) return;
     },
     mousedown: function(offset) {
-        //this.implement.start.call(this);
         if (this.implement.isTouch.call(this, offset)) {
-            //console.log(this.paintName + ' isTouch');
+            console.log(this.paintName + ' isTouch');
             this.options.onMove = true;
         }
-        //this.implement.end.call(this);
     },
     mousemove: function(offset) {
         //this.options.yAxis.options.build = false;
@@ -199,24 +203,32 @@ kLine.prototype = {
                 this.options.moveAcc = this.options.moveAcc + offset.movementY;
             //console.log('moveAcc:'+this.options.moveAcc+'w:'+ Math.round(this.options.kLineDrawWidth));
             var t = 0;
-            if (this.options.moveAcc >= Math.round(this.options.kLineDrawWidth))
+            if (this.options.moveAcc >= Math.round(this.options.kLineDrawWidth)) {
                 t = 1;
-            else if (Math.abs(this.options.moveAcc) >= Math.round(this.options.kLineDrawWidth))
+                this.options.controlbar.options.dec = 'add';
+            }
+            else if (Math.abs(this.options.moveAcc) >= Math.round(this.options.kLineDrawWidth)) {
                 t = -1;
+                this.options.controlbar.options.dec = 'sub';
+            }
             if (t != 0) {
-                //console.log(this.paintName + ' ' +this.options.yAxis.options.dataType);
+                console.log(this.paintName + ' ' +this.options.yAxis.options.dataType);
+                if (this.options.controlbar.options.load) {
+                    this.options.controlbar.setNext.call(this.options.controlbar);
+                    this.begin = this.options.controlbar.options.begin;
+                    this.end = this.options.controlbar.options.end;
+                } else {
+                    this.begin = this.begin - t;
+                    this.end = this.end - t;
+                }
                 this.options.moveAcc = 0;
-                this.begin = this.begin - t;
-                this.end = this.end - t;
+                
                 //console.log('begin:'+this.begin+', end:'+this.end );
                 this.reInit = true;
                 this.reBuild = true;
                 t = 0;
             }
             //this.implement.end.call(this);
-        }
-        if (this.reBuild) {
-            this.options.yAxis.options.build = false;       
         }
     },    
     mouseup: function(offset) {
@@ -225,11 +237,17 @@ kLine.prototype = {
             this.options.moveAcc = 0;
         }
     },
+    reBuild: function() {
+        if (this.options.axial === 'ver')
+            this.options.yAxis.options.build = false;       
+        else if (this.options.axial === 'hor')
+            this.options.xAxis.options.build = false;
+    },
     isTouch: function(offset) {
         if (offset.offsetX >= this.paintRegion[this.paintName + '.x']
          && offset.offsetY >= this.paintRegion[this.paintName + '.y']
-         && offset.offsetX <= this.paintRegion[this.paintName + '.width']
-         && offset.offsetY <= this.paintRegion[this.paintName + '.height'])
+         && offset.offsetX <= this.paintRegion[this.paintName + '.x'] + this.paintRegion[this.paintName + '.width']
+         && offset.offsetY <= this.paintRegion[this.paintName + '.y'] + this.paintRegion[this.paintName + '.height'])
             return true;
         return false;
     }

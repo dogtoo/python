@@ -8,21 +8,22 @@ function controlbar(options) {
   if (typeof this.options.dec === 'undefined') this.options.dec = 'add'; //add:+ / sub:-
   if (typeof this.options.order === 'undefined') this.options.order = 'asc';
   if (typeof this.options.axial  === 'undefined') this.options.axial = 'ver';
-  this.options.moveAcc = 0;
+  if (typeof this.options.datasource  === 'undefined') this.options.datasource = '';
+  this.options.load = false;
   this.options.onMove = false;
 }
 
 controlbar.prototype = {
     initialize : function () {
-        if (!this.options.build) {
-            this.options.begin = 0;
-            this.options.end = 0;
-        }
-        if (this.options.length == 0 || this.options.range == 0) return;
-        if (this.options.order === 'asc') {
-            this.options.end = this.options.begin + this.options.range - 1;
-        } else if (this.options.order === 'desc') {
-            this.options.begin = this.options.length - this.options.range;
+        if (!this.reBuild) {
+            if (this.options.datasource != '') {
+                this.options.length = this.data[this.options.datasource].length;
+            }
+            if (this.options.order === 'asc') {
+                this.options.end = this.options.begin + this.options.range - 1;
+            } else if (this.options.order === 'desc') {
+                this.options.begin = this.options.length - this.options.range;
+            }
         }
     },
     start : function () {
@@ -43,7 +44,7 @@ controlbar.prototype = {
     },
     mousedown: function(offset) {
         if (this.implement.isTouch.call(this, offset)) {
-            //console.log(this.paintName + ' isTouch');
+            console.log(this.paintName + ' isTouch');
             this.options.onMove = true;
         }
     },
@@ -59,48 +60,50 @@ controlbar.prototype = {
             
             
         } else if (this.options.order === 'desc') {
-            this.options.begin = this.options.begin +this.options.step;
-            this.options.end = this.options.end +this.options.step;
+            if (this.options.dec === 'add') dec = -1;
+            if (this.options.begin + (this.options.step * dec) < 0 ) return;
+            if (this.options.end + (this.options.step * dec) > this.options.length ) step = this.options.length- this.options.end;
+            this.options.begin = this.options.begin + (this.options.step * dec);
+            this.options.end = this.options.end + (this.options.step * dec);
         }
     },
     mousemove: function(offset) {
         if (this.options.onMove) {
-            if (this.options.axial === 'ver')
-                this.options.moveAcc = this.options.moveAcc + offset.movementX;
-            else if (this.options.axial === 'hor')
-                this.options.moveAcc = this.options.moveAcc + offset.movementY;
-            //console.log('moveAcc:'+this.options.moveAcc+'w:'+ Math.round(this.options.kLineDrawWidth));
-            var t = 0;
-            if (this.options.moveAcc >= Math.round(this.options.kLineDrawWidth))
-                t = 1;
-            else if (Math.abs(this.options.moveAcc) >= Math.round(this.options.kLineDrawWidth))
-                t = -1;
-            if (t != 0) {
-                //console.log(this.paintName + ' ' +this.options.yAxis.options.dataType);
-                this.options.moveAcc = 0;
-                this.begin = this.begin - t;
-                this.end = this.end - t;
-                //console.log('begin:'+this.begin+', end:'+this.end );
+            if (this.options.axial === 'ver') {
+                if (offset.movementX > 0)
+                    this.options.dec = 'add';
+                else
+                    this.options.dec = 'sub';
+            }
+            else if (this.options.axial === 'hor') {
+                if (offset.movementY > 0)
+                    this.options.dec = 'add';
+                else
+                    this.options.dec = 'sub';
+            }
+            if ((this.options.axial === 'ver' && offset.movementX != 0) || (this.options.axial === 'hor' && offset.movementY != 0)){
+                this.implement.setNext.call(this);
+                
+                this.begin = this.options.begin;
+                this.end = this.options.end;
                 this.reInit = true;
                 this.reBuild = true;
-                t = 0;
             }
-        }
-        if (this.reBuild) {
-            this.options.yAxis.options.build = false;       
         }
     },    
     mouseup: function(offset) {
         if (this.options.onMove) {
             this.options.onMove = false;
-            this.options.moveAcc = 0;
         }
     },
-    isTouch: function(x, y) {
+    reBuild: function() {
+        
+    },
+    isTouch: function(offset) {
         if (offset.offsetX >= this.paintRegion[this.paintName + '.x']
          && offset.offsetY >= this.paintRegion[this.paintName + '.y']
-         && offset.offsetX <= this.paintRegion[this.paintName + '.width']
-         && offset.offsetY <= this.paintRegion[this.paintName + '.height'])
+         && offset.offsetX <= this.paintRegion[this.paintName + '.x'] + this.paintRegion[this.paintName + '.width']
+         && offset.offsetY <= this.paintRegion[this.paintName + '.y'] + this.paintRegion[this.paintName + '.height'])
             return true;
         return false;
     }
