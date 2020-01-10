@@ -25,7 +25,7 @@
     var painterKline = function(canvasId, paintStream, data) {
         Painter.call(this, canvasId, paintStream);
         this.data = data;
-        this.begin = 100;
+        this.begin = 0;
         this.end = 203;
     };
     painterKline.prototype = Object.create(Painter.prototype);
@@ -85,8 +85,10 @@
     
     var hisbar = 
         new controlbar({
-            range: 100,
-            step: 5,
+            range: 204,
+            step: 10,
+            begin: this.begin,
+            end: this.end,
             datasource: 'hline'
         });
 
@@ -125,10 +127,10 @@
                 }),
                 'fline': fline,
                 'tline': tline,
-                'sline': sline,
+                'sline': sline/*,
                 'kCross': new cross({
                     xAxisName: 'kline'
-                })
+                })*/
             }
         },
         {
@@ -166,10 +168,10 @@
                     yAxisName: 'volumeY',
                     xAxisName: 'dateX',
                     controlbarName: 'hisbar'
-                }),
+                })/*,
                 'mCross': new cross({
                     xAxisName: 'kline'
-                })
+                })*/
             }
         },
         {

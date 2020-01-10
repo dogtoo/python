@@ -9,8 +9,11 @@ function controlbar(options) {
   if (typeof this.options.order === 'undefined') this.options.order = 'asc';
   if (typeof this.options.axial  === 'undefined') this.options.axial = 'ver';
   if (typeof this.options.datasource  === 'undefined') this.options.datasource = '';
+  if (typeof this.options.barButtonWidth === 'undefined') this.options.barButtonWidth = 15;
   this.options.load = false;
   this.options.onMove = false;
+  this.options.scale = 0;
+  this.options.isButtonTouch = false;
 }
 
 controlbar.prototype = {
@@ -24,6 +27,7 @@ controlbar.prototype = {
             } else if (this.options.order === 'desc') {
                 this.options.begin = this.options.length - this.options.range;
             }
+            this.implement.getScale.call(this, this.options, this.data[this.options.datasource]);
         }
     },
     start : function () {
@@ -37,7 +41,44 @@ controlbar.prototype = {
         this.options.build = true;
     },
     paintItems : function() {
-        
+        var fl = this.options.begin * this.options.scale;
+        var ll = this.options.end * this.options.scale;
+        var pWidth = this.paintRegion[this.paintName + '.width'];
+        var pHeight = this.paintRegion[this.paintName + '.height'];
+        var barW =this.options.barButtonWidth;
+        if (this.options.axial === 'ver') {
+            this.ctx.rect(fl
+                        , 0
+                        , ll - fl
+                        , pHeight);
+
+            this.ctx.rect(fl - barW/2
+                        , pHeight-pHeight*.8
+                        , barW
+                        , pHeight-pHeight*.4);
+            
+            this.ctx.rect(ll - barW/2
+                        , pHeight-pHeight*.8
+                        , barW
+                        , pHeight-pHeight*.4);
+        } else if (this.options.axial === 'hor') {
+            this.ctx.rect(fl
+                        , 0
+                        , ll - fl
+                        , pWidth);
+
+            this.ctx.rect(fl - barW/2
+                        , pWidth-pWidth*.8
+                        , barW
+                        , pWidth-pWidth*.4);
+            
+            this.ctx.rect(ll - barW/2
+                        , pWidth-pWidth*.8
+                        , barW
+                        , pWidth-pWidth*.4);
+            
+        }
+        this.ctx.stroke();
     },
     toString: function() {
         return 'controlbar';
@@ -69,17 +110,21 @@ controlbar.prototype = {
     },
     mousemove: function(offset) {
         if (this.options.onMove) {
-            if (this.options.axial === 'ver') {
-                if (offset.movementX > 0)
-                    this.options.dec = 'add';
-                else
-                    this.options.dec = 'sub';
-            }
-            else if (this.options.axial === 'hor') {
-                if (offset.movementY > 0)
-                    this.options.dec = 'add';
-                else
-                    this.options.dec = 'sub';
+            if (this.options.isButtonTouch) {
+                //this.options.range += 
+            } else {
+                if (this.options.axial === 'ver') {
+                    if (offset.movementX > 0)
+                        this.options.dec = 'add';
+                    else
+                        this.options.dec = 'sub';
+                }
+                else if (this.options.axial === 'hor') {
+                    if (offset.movementY > 0)
+                        this.options.dec = 'add';
+                    else
+                        this.options.dec = 'sub';
+                }
             }
             if ((this.options.axial === 'ver' && offset.movementX != 0) || (this.options.axial === 'hor' && offset.movementY != 0)){
                 this.implement.setNext.call(this);
@@ -103,8 +148,39 @@ controlbar.prototype = {
         if (offset.offsetX >= this.paintRegion[this.paintName + '.x']
          && offset.offsetY >= this.paintRegion[this.paintName + '.y']
          && offset.offsetX <= this.paintRegion[this.paintName + '.x'] + this.paintRegion[this.paintName + '.width']
-         && offset.offsetY <= this.paintRegion[this.paintName + '.y'] + this.paintRegion[this.paintName + '.height'])
-            return true;
+         && offset.offsetY <= this.paintRegion[this.paintName + '.y'] + this.paintRegion[this.paintName + '.height']) {
+            var fl = this.options.begin * this.options.scale;
+            var ll = this.options.end * this.options.scale;
+            var pWidth = this.paintRegion[this.paintName + '.width'];
+            var pHeight = this.paintRegion[this.paintName + '.height'];
+            var barW =this.options.barButtonWidth;
+            var pw = 0;
+            
+            if (this.options.axial === 'ver') {
+                pw = pHeight;
+                fl = fl + this.paintRegion[this.paintName + '.x'] - barW/2;
+                ll = ll + this.paintRegion[this.paintName + '.x'] + barW/2;
+            } else if (this.options.axial === 'hor') {
+                pw = pWidth;
+                fl = fl + this.paintRegion[this.paintName + '.y'] - barW/2;
+                ll = ll + this.paintRegion[this.paintName + '.y'] + barW/2;
+            }
+            
+            if (offset.offsetX >= fl && offset.offsetX <= ll) {
+                if ((offset.offsetX >= fl && offset.offsetX <= fl + barW) || (offset.offsetX <= ll && offset.offsetX <= ll - barW))
+                    this.options.isButtonTouch = true;
+                return true;
+            }
+         }
         return false;
+    },
+    getScale: function(options, data) {
+        if (options.axial === 'ver') {
+            if (this.paintRegion.hasOwnProperty(this.paintName + '.width'))
+                options.scale = this.paintRegion[this.paintName + '.width'] / data.length;
+        } else if (options.axial === 'hor') {
+            if (this.paintRegion.hasOwnProperty(this.paintName + '.height'))
+                options.scale = this.paintRegion[this.paintName + '.height'] / Math.abs(options.high - options.low);
+        }
     }
 }

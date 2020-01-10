@@ -203,11 +203,11 @@ kLine.prototype = {
                 this.options.moveAcc = this.options.moveAcc + offset.movementY;
             //console.log('moveAcc:'+this.options.moveAcc+'w:'+ Math.round(this.options.kLineDrawWidth));
             var t = 0;
-            if (this.options.moveAcc >= Math.round(this.options.kLineDrawWidth)) {
+            if (this.options.moveAcc >= Math.round(this.options.kLineDrawWidth)-5) {
                 t = 1;
                 this.options.controlbar.options.dec = 'add';
             }
-            else if (Math.abs(this.options.moveAcc) >= Math.round(this.options.kLineDrawWidth)) {
+            else if (Math.abs(this.options.moveAcc) >= Math.round(this.options.kLineDrawWidth)-5) {
                 t = -1;
                 this.options.controlbar.options.dec = 'sub';
             }
