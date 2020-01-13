@@ -121,7 +121,7 @@ Painter.prototype = {
                 painter.paint();
             }
         });
-        //painter.imgData = painter.ctx.getImageData(0, 0, painter.width, painter.height);
+        painter.imgData = painter.ctx.getImageData(0, 0, painter.width, painter.height);
         painter.onBuild = false;
     },
     paint: function () {
@@ -151,7 +151,7 @@ Painter.prototype = {
         var painter = this;
         if (painter.onBuild) return;
         //var d1 = new Date();
-        //painter.ctx.putImageData(painter.imgData, 0, 0);
+        painter.ctx.putImageData(painter.imgData, 0, 0);
         paintStream.forEach(function(item, index, array){
             paintName = Object.keys(item)[0];
             for (var p in item[paintName]) {

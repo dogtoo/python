@@ -85,7 +85,7 @@ controlbar.prototype = {
     },
     mousedown: function(offset) {
         if (this.implement.isTouch.call(this, offset)) {
-            console.log(this.paintName + ' isTouch');
+            //console.log(this.paintName + ' isTouch');
             this.options.onMove = true;
         }
     },

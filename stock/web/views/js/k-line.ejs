@@ -190,7 +190,7 @@ kLine.prototype = {
     },
     mousedown: function(offset) {
         if (this.implement.isTouch.call(this, offset)) {
-            console.log(this.paintName + ' isTouch');
+            //console.log(this.paintName + ' isTouch');
             this.options.onMove = true;
         }
     },
@@ -212,7 +212,7 @@ kLine.prototype = {
                 this.options.controlbar.options.dec = 'sub';
             }
             if (t != 0) {
-                console.log(this.paintName + ' ' +this.options.yAxis.options.dataType);
+                //console.log(this.paintName + ' ' +this.options.yAxis.options.dataType);
                 if (this.options.controlbar.options.load) {
                     this.options.controlbar.setNext.call(this.options.controlbar);
                     this.begin = this.options.controlbar.options.begin;
