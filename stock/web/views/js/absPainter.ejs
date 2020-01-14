@@ -81,16 +81,19 @@ Painter.prototype = {
                 });
             } else {
                 addEvent(painter.canvas, 'mousedown', function (e) {
+                    e = e || event;
                     var offset = getOffset(e);
                     //console.log('mousemove(x:'+offset.offsetX+',y:'+offset.offsetY+')');
                     painter.moveEvent.call(painter, 'mousedown', offset);
                 });
                 addEvent(painter.canvas, 'mousemove', function (e) {
+                    e = e || event;
                     var offset = getOffset(e);
                     //console.log('mousemove(x:'+offset.offsetX+',y:'+offset.offsetY+')');
                     painter.moveEvent.call(painter, 'mousemove', offset);
                 });
                 addEvent(painter.canvas, 'mouseup', function (e) {
+                    e = e || event;
                     var offset = getOffset(e);
                     //console.log('mousemove(x:'+offset.offsetX+',y:'+offset.offsetY+')');
                     painter.moveEvent.call(painter, 'mouseup', offset);

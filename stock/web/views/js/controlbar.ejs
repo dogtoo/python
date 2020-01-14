@@ -14,6 +14,8 @@ function controlbar(options) {
   this.options.onMove = false;
   this.options.scale = 0;
   this.options.isButtonTouch = false;
+  this.options.isButtonTouchR = false;
+  this.options.isButtonTouchL = false;
 }
 
 controlbar.prototype = {
@@ -96,23 +98,31 @@ controlbar.prototype = {
             if (this.options.dec === 'sub') dec = -1;
             if (this.options.begin + (this.options.step * dec) < 0 ) return;
             if (this.options.end + (this.options.step * dec) > this.options.length ) step = this.options.length- this.options.end;
+            console.log('step(' + this.options.dec + '):' + (this.options.step * dec));
+            if (this.options.isButtonTouchR) 
+                this.options.range += step * dec;
+            if (this.options.isButtonTouch) 
+                step = 0            
             this.options.begin = this.options.begin + (this.options.step * dec);
             this.options.end = this.options.end + (this.options.step * dec);
+            
             
             
         } else if (this.options.order === 'desc') {
             if (this.options.dec === 'add') dec = -1;
             if (this.options.begin + (this.options.step * dec) < 0 ) return;
             if (this.options.end + (this.options.step * dec) > this.options.length ) step = this.options.length- this.options.end;
+            console.log('step(' + this.options.dec + '):' + (this.options.step * dec));
             this.options.begin = this.options.begin + (this.options.step * dec);
             this.options.end = this.options.end + (this.options.step * dec);
         }
     },
     mousemove: function(offset) {
         if (this.options.onMove) {
-            if (this.options.isButtonTouch) {
-                //this.options.range += 
-            } else {
+            console.log('contrmove('+offset.movementX+')');
+            
+
+            
                 if (this.options.axial === 'ver') {
                     if (offset.movementX > 0)
                         this.options.dec = 'add';
@@ -125,7 +135,7 @@ controlbar.prototype = {
                     else
                         this.options.dec = 'sub';
                 }
-            }
+            
             if ((this.options.axial === 'ver' && offset.movementX != 0) || (this.options.axial === 'hor' && offset.movementY != 0)){
                 this.implement.setNext.call(this);
                 
@@ -167,8 +177,14 @@ controlbar.prototype = {
             }
             
             if (offset.offsetX >= fl && offset.offsetX <= ll) {
-                if ((offset.offsetX >= fl && offset.offsetX <= fl + barW) || (offset.offsetX <= ll && offset.offsetX <= ll - barW))
+                if (offset.offsetX >= fl && offset.offsetX <= fl + barW) {
                     this.options.isButtonTouch = true;
+                    this.options.isButtonTouchL = true;
+                }
+                if (offset.offsetX <= ll && offset.offsetX >= ll - barW) {
+                    this.options.isButtonTouch = true;
+                    this.options.isButtonTouchR = true;
+                }
                 return true;
             }
          }
