@@ -23,9 +23,11 @@ cross.prototype = {
         var ctx = this.ctx;
         ctx.save();
         ctx.translate(this.paintRegion[paintName + '.x'], this.paintRegion[paintName + '.y']);
+        this.onBuild = true;
     },
     end : function () {
         this.ctx.restore();
+        this.onBuild = false;
     },
     paintItems : function(x, y) {
         if (typeof x === 'undefined') return;

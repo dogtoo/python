@@ -83,19 +83,19 @@ Painter.prototype = {
                 addEvent(painter.canvas, 'mousedown', function (e) {
                     e = e || event;
                     var offset = getOffset(e);
-                    //console.log('mousemove(x:'+offset.offsetX+',y:'+offset.offsetY+')');
+                    console.log('mousedown(x:'+offset.offsetX+',y:'+offset.offsetY+')');
                     painter.moveEvent.call(painter, 'mousedown', offset);
                 });
                 addEvent(painter.canvas, 'mousemove', function (e) {
                     e = e || event;
                     var offset = getOffset(e);
-                    //console.log('mousemove(x:'+offset.offsetX+',y:'+offset.offsetY+')');
+                    console.log('mousemove(x:'+offset.offsetX+',y:'+offset.offsetY+')');
                     painter.moveEvent.call(painter, 'mousemove', offset);
                 });
                 addEvent(painter.canvas, 'mouseup', function (e) {
                     e = e || event;
                     var offset = getOffset(e);
-                    //console.log('mousemove(x:'+offset.offsetX+',y:'+offset.offsetY+')');
+                    console.log('mouseup(x:'+offset.offsetX+',y:'+offset.offsetY+')');
                     painter.moveEvent.call(painter, 'mouseup', offset);
                 });
             }
@@ -149,9 +149,8 @@ Painter.prototype = {
         if (pctx.end) pctx.end.call(this);
     },
     moveEvent: function(eventName, offset) {
-        //painter.ctx.clearRect(0, 0, painter.width, painter.height);
-        
         var painter = this;
+        //painter.ctx.clearRect(0, 0, painter.width, painter.height);
         if (painter.onBuild) return;
         //var d1 = new Date();
         painter.ctx.putImageData(painter.imgData, 0, 0);

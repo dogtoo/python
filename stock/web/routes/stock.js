@@ -2,11 +2,15 @@ const router = require('koa-router')();
 
 // Router -> /
 router.get('/kline', async(ctx) => {
-    console.log(`   getT86`);
     let code = ctx.request.query.code;
     await ctx.render('kline', {
         msg:'stock:' + code
     })
+});
+
+router.get('/crossline', async(ctx) => {
+    let code = ctx.request.query.code;
+    await ctx.render('crossline')
 });
 
 router.get('/js/util.js', async(ctx) => {
