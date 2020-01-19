@@ -83,7 +83,7 @@ Painter.prototype = {
                 addEvent(painter.canvas, 'mousedown', function (e) {
                     e = e || event;
                     var offset = getOffset(e);
-                    console.log('mousedown(x:'+offset.offsetX+',y:'+offset.offsetY+')');
+                    //console.log('mousedown(x:'+offset.offsetX+',y:'+offset.offsetY+')');
                     painter.moveEvent.call(painter, 'mousedown', offset);
                 });
                 addEvent(painter.canvas, 'mousemove', function (e) {
@@ -95,14 +95,14 @@ Painter.prototype = {
                 addEvent(painter.canvas, 'mouseup', function (e) {
                     e = e || event;
                     var offset = getOffset(e);
-                    console.log('mouseup(x:'+offset.offsetX+',y:'+offset.offsetY+')');
+                    //console.log('mouseup(x:'+offset.offsetX+',y:'+offset.offsetY+')');
                     painter.moveEvent.call(painter, 'mouseup', offset);
                 });
             }
             this.hadEvenBind = true;
         }
     },
-    build: function() {
+    build: function(isImage = false) {
         var painter = this;
         if (painter.onBuild) return;
         painter.onBuild = true;
@@ -113,18 +113,14 @@ Painter.prototype = {
             for (var p in item[paintName]) {
                 if (p === 'region') continue;
                 implement = item[paintName][p];
-                //implement = painter.implements[p];
                 painter.implName = p;
                 painter.setImplement(implement, paintName);
                 painter.options = painter.implement.options;
-                /*
-                if (typeof painter.implement.initialize == 'function')
-                    painter.implement.initialize(painter);
-                */
                 painter.paint();
             }
         });
-        painter.imgData = painter.ctx.getImageData(0, 0, painter.width, painter.height);
+        if (isImage)
+            painter.imgData = painter.ctx.getImageData(0, 0, painter.width, painter.height);
         painter.onBuild = false;
     },
     paint: function () {
@@ -189,9 +185,9 @@ Painter.prototype = {
             if (this.reInit)
                 this.init.call(this);
             this.build.call(this);
-            this.build.call(this);
+            this.build.call(this, true);
             var d2 = new Date();
-            console.log('begin:' + this.end + ', end:' + this.begin + ', ' + parseInt(d2 - d1)/ 1000);
+            //console.log('begin:' + this.end + ', end:' + this.begin + ', ' + parseInt(d2 - d1)/ 1000);
             this.reInit = false;
             this.reBuild = false;
         }
