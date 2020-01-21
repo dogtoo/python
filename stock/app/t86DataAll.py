@@ -7,7 +7,7 @@ import pandas as pd
 import logging
 from datetime import datetime
 
-logging.basicConfig(level=logging.INFO,
+logging.basicConfig(level=logging.ERROR,
                     format='%(asctime)s - %(levelname)s : %(message)s',
                     datefmt='%Y-%m-%dT %H:%M:%S',
                     filename='../../log/t86_{:%Y-%m-%d}.log'.format(datetime.now()))
