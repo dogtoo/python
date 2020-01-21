@@ -1,22 +1,25 @@
 function controlbar(options) {
-  this.options = options;
-  if (typeof this.options.begin === 'undefined')  this.options.begin = 0;
-  if (typeof this.options.end === 'undefined')    this.options.end = 0;
-  if (typeof this.options.length === 'undefined') this.options.length = 0;
-  if (typeof this.options.range === 'undefined') this.options.range = 0;
-  if (typeof this.options.step === 'undefined') this.options.step = 1;
-  if (typeof this.options.dec === 'undefined') this.options.dec = 'add'; //add:+ / sub:-
-  if (typeof this.options.order === 'undefined') this.options.order = 'asc';
-  if (typeof this.options.axial  === 'undefined') this.options.axial = 'ver';
-  if (typeof this.options.datasource  === 'undefined') this.options.datasource = '';
-  if (typeof this.options.barButtonWidth === 'undefined') this.options.barButtonWidth = 15;
-  this.options.load = false;
-  this.options.onMove = false;
-  this.options.scale = 0;
-  this.options.isButtonTouch = false;
-  this.options.isButtonTouchR = false;
-  this.options.isButtonTouchL = false;
+    control.call(this, options);
+    this.options = options;
+    if (typeof this.options.begin === 'undefined')  this.options.begin = 0;
+    if (typeof this.options.end === 'undefined')    this.options.end = 0;
+    if (typeof this.options.length === 'undefined') this.options.length = 0;
+    if (typeof this.options.range === 'undefined') this.options.range = 0;
+    //if (typeof this.options.step === 'undefined') this.options.step = 1;
+    if (typeof this.options.dec === 'undefined') this.options.dec = 'add'; //add:+ / sub:-
+    if (typeof this.options.order === 'undefined') this.options.order = 'asc';
+    if (typeof this.options.axial  === 'undefined') this.options.axial = 'ver';
+    if (typeof this.options.datasource  === 'undefined') this.options.datasource = '';
+    if (typeof this.options.barButtonWidth === 'undefined') this.options.barButtonWidth = 15;
+    this.options.load = false;
+    this.options.onMove = false;
+    this.options.scale = 0;
+    this.options.isButtonTouch = false;
+    this.options.isButtonTouchR = false;
+    this.options.isButtonTouchL = false;
 }
+
+//controlbar.prototype = control.prototype;
 
 controlbar.prototype = {
     initialize : function () {
@@ -24,11 +27,12 @@ controlbar.prototype = {
             if (this.options.datasource != '') {
                 this.options.length = this.data[this.options.datasource].length;
             }
+            /*
             if (this.options.order === 'asc') {
                 this.options.end = this.options.begin + this.options.range - 1;
             } else if (this.options.order === 'desc') {
                 this.options.begin = this.options.length - this.options.range;
-            }
+            }*/
             this.implement.getScale.call(this, this.options, this.data[this.options.datasource]);
         }
     },
@@ -93,6 +97,36 @@ controlbar.prototype = {
     },
     setNext: function() {
         var dec = 1;
+        if (this.options.order === 'asc') {
+            //if (this.options.begin + (this.options.step * dec) < 0 ) return;
+            if (this.options.begin < 0) {
+                this.options.begin = 0;
+            }
+            this.options.end = this.options.begin + this.options.range;
+            if (this.options.end > this.options.length) {
+                this.options.end = this.options.length - 1;
+                this.options.begin = this.options.end - this.options.range;
+            }
+            
+            //console.log('step(' + this.options.dec + '):' + (this.options.step * dec));
+            
+        } else if (this.options.order === 'desc') {
+            var t_ = 0;
+            if (this.options.length - this.options.begin < this.options.end + this.options.range ) {
+                this.options.begin = this.options.end + this.options.range;
+            } else {
+                this.options.begin = this.options.length - this.options.begin;
+            }
+            this.options.end = this.options.begin - this.options.range;
+            if (this.options.end < 0) {
+                this.options.end = 0;
+                this.options.begin = this.options.range;
+            }
+            t_ = this.options.end;
+            this.options.end = this.options.begin;
+            this.options.begin = t_;
+        }
+        /*
         var step = this.options.step;
         if (this.options.order === 'asc') {
             if (this.options.dec === 'sub') dec = -1;
@@ -116,12 +150,11 @@ controlbar.prototype = {
             this.options.begin = this.options.begin + (this.options.step * dec);
             this.options.end = this.options.end + (this.options.step * dec);
         }
+        */
     },
     mousemove: function(offset) {
         if (this.options.onMove) {
             //console.log('contrmove('+offset.movementX+')');
-            
-
             
                 if (this.options.axial === 'ver') {
                     if (offset.movementX > 0)

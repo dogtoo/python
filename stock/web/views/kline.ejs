@@ -11,6 +11,7 @@
     <script src="js/axis-x.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/axis-y.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/k-line.js" type="text/javascript" charset="UTF8"></script>
+    <script src="js/control.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/controlbar.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/line.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/k-data.js" type="text/javascript" charset="UTF8"></script>
@@ -21,12 +22,9 @@
     <canvas id="kline" width="900" height="500" style="z-index: 2; border: 1px solid #69c"></canvas>
 </body>
 <script type="text/javascript">
-
     var painterKline = function(canvasId, paintStream, data) {
         Painter.call(this, canvasId, paintStream);
         this.data = data;
-        this.begin = 100;
-        this.end = 203;
     };
     painterKline.prototype = Object.create(Painter.prototype);
     painterKline.prototype.constructor = painterKline;
@@ -83,16 +81,19 @@
     //    sline.options.disX = painter.implements.kline.options.lineWidth;
     //}
     
-    var hisbar = 
+    /*
+    var c = new control({
+        begin: 0,
+        range: 203});*/
+    
+    var c = 
         new controlbar({
-            range: 104,
-            step: 10,
-            begin: this.begin,
-            end: this.end,
+            begin: 0,
+            range: 203,
             datasource: 'hline',
-            order: 'asc'
+            order: 'desc'
         });
-
+    
     var paintStream = [
         {
             'price':{
@@ -196,7 +197,7 @@
                     strokeStyle: 'magenta',
                     lineWidth: 1
                 }),
-                'hisbar':hisbar
+                'hisbar':c
             }
         }
     ];
@@ -220,13 +221,14 @@
         
         var yHistory = {};
         var hline = [];
+        c.options.length = data.length;
+        c.setNext.call(c);
         for (var i =　0; i < data.length; i++) {
-        //for (var i =　100; i < 113; i++) {
             var rawData = data[i];
             yHistory[Number(rawData[3])] = 1;
             yHistory[Number(rawData[4])] = 1;
             hline.push([rawData[0], rawData[5]]);
-            if (i >= this.begin && i <= this.end) {
+            if (i >= c.options.begin && i <= c.options.end) {
                 priceY[Number(rawData[3])] = 1;
                 priceY[Number(rawData[4])] = 1;
                 dateX[rawData[0]] = 1;
