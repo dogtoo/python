@@ -89,7 +89,7 @@ Painter.prototype = {
                 addEvent(painter.canvas, 'mousemove', function (e) {
                     e = e || event;
                     var offset = getOffset(e);
-                    console.log('mousemove(x:'+offset.offsetX+',y:'+offset.offsetY+')');
+                    //console.log('mousemove(x:'+offset.offsetX+',y:'+offset.offsetY+')');
                     painter.moveEvent.call(painter, 'mousemove', offset);
                 });
                 addEvent(painter.canvas, 'mouseup', function (e) {
