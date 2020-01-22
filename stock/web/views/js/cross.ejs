@@ -42,7 +42,7 @@ cross.prototype = {
             for (var i in this.options.xAxis.options.x) {
                 var xx = this.options.xAxis.options.x[i];
                 var x1 = xx - ((typeof this.options.xAxis.options.kLineWidth === 'undefined') ? 0 : this.options.xAxis.options.kLineWidth/2);
-                var x2 = xx + ((typeof this.options.xAxis.options.kLineWidth === 'undefined') ? 0 : this.options.xAxis.options.kLineWidth);
+                var x2 = xx + ((typeof this.options.xAxis.options.kLineWidth === 'undefined') ? 0 : this.options.xAxis.options.kLineWidth/2);
                 if (x >= x1 && x <= x2) {
                     //console.log(xx);
                     x = xx;
@@ -54,7 +54,7 @@ cross.prototype = {
             for (var i in this.options.yAxis.options.y) {
                 var yy = this.options.yAxis.options.y[i];
                 var y1 = yy - ((typeof this.options.yAxis.options.kLineWidth === 'undefined') ? 0 : this.options.yAxis.options.kLineWidth/2);
-                var y2 = yy + ((typeof this.options.yAxis.options.kLineWidth === 'undefined') ? 0 : this.options.yAxis.options.kLineWidth);
+                var y2 = yy + ((typeof this.options.yAxis.options.kLineWidth === 'undefined') ? 0 : this.options.yAxis.options.kLineWidth/2);
                 if (y >= y1 && y <= y2) {
                     //console.log(yy);
                     y = yy;

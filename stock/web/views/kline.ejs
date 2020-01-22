@@ -25,6 +25,9 @@
     var painterKline = function(canvasId, paintStream, data) {
         Painter.call(this, canvasId, paintStream);
         this.data = data;
+        cb.options.length = data.kline.length;
+        cb.setNext.call(cb);
+        console.log(cb.options.begin + ', ' + cb.options.end);
     };
     painterKline.prototype = Object.create(Painter.prototype);
     painterKline.prototype.constructor = painterKline;
@@ -81,18 +84,15 @@
     //    sline.options.disX = painter.implements.kline.options.lineWidth;
     //}
     
-    /*
+    
     var c = new control({
         begin: 0,
-        range: 203});*/
+        range: 50});
     
-    var c = 
-        new controlbar({
-            begin: 0,
-            range: 203,
-            datasource: 'hline',
-            order: 'desc'
-        });
+    var cb = 
+        new controlbar(c.options);
+    cb.options.datasource = 'hline';
+    cb.options.order = 'desc';
     
     var paintStream = [
         {
@@ -125,7 +125,7 @@
                     lineStyle: 'solid',
                     yAxisName: 'priceY',
                     xAxisName: 'dateX',
-                    controlbarName: 'hisbar'
+                    control: c
                 }),
                 'fline': fline,
                 'tline': tline,
@@ -169,7 +169,7 @@
                     lineStyle: 'solid',
                     yAxisName: 'volumeY',
                     xAxisName: 'dateX',
-                    controlbarName: 'hisbar'
+                    control: c
                 }),
                 'mCross': new cross({
                     xAxisName: 'kline'
@@ -197,7 +197,7 @@
                     strokeStyle: 'magenta',
                     lineWidth: 1
                 }),
-                'hisbar':c
+                'hisbar': cb
             }
         }
     ];
@@ -221,14 +221,13 @@
         
         var yHistory = {};
         var hline = [];
-        c.options.length = data.length;
-        c.setNext.call(c);
+        
         for (var i =　0; i < data.length; i++) {
             var rawData = data[i];
             yHistory[Number(rawData[3])] = 1;
             yHistory[Number(rawData[4])] = 1;
             hline.push([rawData[0], rawData[5]]);
-            if (i >= c.options.begin && i <= c.options.end) {
+            if (i >= cb.options.begin && i <= cb.options.end) {
                 priceY[Number(rawData[3])] = 1;
                 priceY[Number(rawData[4])] = 1;
                 dateX[rawData[0]] = 1;
@@ -246,6 +245,7 @@
                     
             }
         }
+        //console.log('kline.length = ' + kline.length + ', begin = ' + cb.options.begin + ', end = ' + cb.options.end);
         this.data.kline = kline;
         this.data.fline = fline;
         this.data.tline = tline;

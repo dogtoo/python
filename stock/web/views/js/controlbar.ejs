@@ -1,12 +1,7 @@
 function controlbar(options) {
     control.call(this, options);
     this.options = options;
-    if (typeof this.options.begin === 'undefined')  this.options.begin = 0;
-    if (typeof this.options.end === 'undefined')    this.options.end = 0;
-    if (typeof this.options.length === 'undefined') this.options.length = 0;
-    if (typeof this.options.range === 'undefined') this.options.range = 0;
     //if (typeof this.options.step === 'undefined') this.options.step = 1;
-    if (typeof this.options.dec === 'undefined') this.options.dec = 'add'; //add:+ / sub:-
     if (typeof this.options.order === 'undefined') this.options.order = 'asc';
     if (typeof this.options.axial  === 'undefined') this.options.axial = 'ver';
     if (typeof this.options.datasource  === 'undefined') this.options.datasource = '';
@@ -27,12 +22,6 @@ controlbar.prototype = {
             if (this.options.datasource != '') {
                 this.options.length = this.data[this.options.datasource].length;
             }
-            /*
-            if (this.options.order === 'asc') {
-                this.options.end = this.options.begin + this.options.range - 1;
-            } else if (this.options.order === 'desc') {
-                this.options.begin = this.options.length - this.options.range;
-            }*/
             this.implement.getScale.call(this, this.options, this.data[this.options.datasource]);
         }
     },
@@ -96,92 +85,90 @@ controlbar.prototype = {
         }
     },
     setNext: function() {
-        var dec = 1;
         if (this.options.order === 'asc') {
-            //if (this.options.begin + (this.options.step * dec) < 0 ) return;
             if (this.options.begin < 0) {
                 this.options.begin = 0;
             }
-            this.options.end = this.options.begin + this.options.range;
+            this.options.end = this.options.begin + this.options.range - 1;
             if (this.options.end > this.options.length) {
                 this.options.end = this.options.length - 1;
-                this.options.begin = this.options.end - this.options.range;
+                this.options.begin = this.options.end - this.options.range + 1;
             }
-            
-            //console.log('step(' + this.options.dec + '):' + (this.options.step * dec));
-            
         } else if (this.options.order === 'desc') {
-            var t_ = 0;
-            if (this.options.length - this.options.begin < this.options.end + this.options.range ) {
-                this.options.begin = this.options.end + this.options.range;
+            if (!this.options.load) {
+                var t_ = 0;
+                this.options.begin = this.options.length - this.options.begin - 1;
+                this.options.end = this.options.begin - this.options.range + 1;
+                t_ = this.options.end;
+                this.options.end = this.options.begin;
+                this.options.begin = t_;
+                this.options.load = true;
             } else {
-                this.options.begin = this.options.length - this.options.begin;
+                if (this.options.begin < 0) {
+                    this.options.begin = 0;
+                }
+                this.options.end = this.options.begin + this.options.range - 1;
+                if (this.options.end > this.options.length) {
+                    this.options.end = this.options.length - 1;
+                    this.options.begin = this.options.end - this.options.range + 1;
+                }
+                //console.log('begin :' + this.options.begin + ', end :' + this.options.end);
             }
-            this.options.end = this.options.begin - this.options.range;
-            if (this.options.end < 0) {
-                this.options.end = 0;
-                this.options.begin = this.options.range;
-            }
-            t_ = this.options.end;
-            this.options.end = this.options.begin;
-            this.options.begin = t_;
+            
         }
-        /*
-        var step = this.options.step;
-        if (this.options.order === 'asc') {
-            if (this.options.dec === 'sub') dec = -1;
-            if (this.options.begin + (this.options.step * dec) < 0 ) return;
-            if (this.options.end + (this.options.step * dec) > this.options.length ) step = this.options.length- this.options.end;
-            console.log('step(' + this.options.dec + '):' + (this.options.step * dec));
-            if (this.options.isButtonTouchR) 
-                this.options.range += step * dec;
-            if (this.options.isButtonTouch) 
-                step = 0            
-            this.options.begin = this.options.begin + (this.options.step * dec);
-            this.options.end = this.options.end + (this.options.step * dec);
-            
-            
-            
-        } else if (this.options.order === 'desc') {
-            if (this.options.dec === 'add') dec = -1;
-            if (this.options.begin + (this.options.step * dec) < 0 ) return;
-            if (this.options.end + (this.options.step * dec) > this.options.length ) step = this.options.length- this.options.end;
-            console.log('step(' + this.options.dec + '):' + (this.options.step * dec));
-            this.options.begin = this.options.begin + (this.options.step * dec);
-            this.options.end = this.options.end + (this.options.step * dec);
-        }
-        */
     },
     mousemove: function(offset) {
         if (this.options.onMove) {
-            //console.log('contrmove('+offset.movementX+')');
-            
-                if (this.options.axial === 'ver') {
-                    if (offset.movementX > 0)
-                        this.options.dec = 'add';
-                    else
-                        this.options.dec = 'sub';
+            if (this.options.isButtonTouch) {
+                var b = '';
+                if (this.options.isButtonTouchR) {
+                    b = 'R';
+                    if (this.options.axial === 'ver' && offset.movementX != 0) {
+                        //this.options.range += offset.movementX;
+                        this.options.range = Math.round((Math.round(this.options.range * this.options.scale) + offset.movementX)/ this.options.scale);
+                    } else if (this.options.axial === 'hor' && offset.movementY != 0) {
+                        this.options.range += offset.movementY;
+                    }
+                } else {
+                    b = 'L';
+                    if (this.options.axial === 'ver' && offset.movementX != 0) {
+                        //this.options.range += offset.movementX * -1;
+                        //this.options.begin += offset.movementX;
+                        this.options.range = Math.round((Math.round(this.options.range * this.options.scale) + offset.movementX*-1)/ this.options.scale);
+                        this.options.begin = Math.round((Math.round(this.options.begin * this.options.scale) + offset.movementX)/ this.options.scale);
+                    } else if (this.options.axial === 'hor' && offset.movementY != 0) {
+                        this.options.range += offset.movementY;
+                    }
                 }
-                else if (this.options.axial === 'hor') {
-                    if (offset.movementY > 0)
-                        this.options.dec = 'add';
-                    else
-                        this.options.dec = 'sub';
-                }
-            
-            if ((this.options.axial === 'ver' && offset.movementX != 0) || (this.options.axial === 'hor' && offset.movementY != 0)){
                 this.implement.setNext.call(this);
                 
-                this.begin = this.options.begin;
-                this.end = this.options.end;
-                this.reInit = true;
-                this.reBuild = true;
+                console.log('contrmove '+b+'('+ this.options.begin
+                          + ',' + this.options.end
+                          + ',' + this.options.range
+                +')');
+            } else {
+                if (this.options.axial === 'ver' && offset.movementX != 0) {
+                    /*console.log('contrmove('+ (Math.round(this.options.begin * this.options.scale) + this.paintRegion[this.paintName + '.x'])
+                              + ',' + offset.movementX 
+                              + ',' + Math.round((Math.round(this.options.begin * this.options.scale) + this.paintRegion[this.paintName + '.x'] + offset.movementX)/ this.options.scale));*/
+                    this.options.begin = Math.round((Math.round(this.options.begin * this.options.scale) + offset.movementX)/ this.options.scale);
+                    this.implement.setNext.call(this);
+                } else if (this.options.axial === 'hor' && offset.movementY != 0) {
+                    this.options.begin = Math.round((offset.offsetY- this.paintRegion[this.paintName + '.y'])/ this.options.scale);
+                    this.implement.setNext.call(this);
+                }
             }
+            this.reInit = true;
+            this.reBuild = true;
+            
         }
     },    
     mouseup: function(offset) {
         if (this.options.onMove) {
             this.options.onMove = false;
+            this.options.isButtonTouch = false;
+            this.options.isButtonTouchR = false;
+            this.options.isButtonTouchL = false;
         }
     },
     reBuild: function() {

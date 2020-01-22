@@ -11,10 +11,10 @@ control.prototype = {
         if (this.options.begin < 0) {
             this.options.begin = 0;
         }
-        this.options.end = this.options.begin + this.options.range;
+        this.options.end = this.options.begin + this.options.range - 1;
         if (this.options.end > this.options.length) {
             this.options.end = this.options.length - 1;
-            this.options.begin = this.options.end - this.options.range;
+            this.options.begin = this.options.end - this.options.range + 1;
         }
     },
     toString: function() {

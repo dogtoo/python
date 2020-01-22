@@ -12,8 +12,7 @@ function kLine(options) {
   this.options.y = [];
   this.options.moveAcc = 0;
   this.options.onMove = false;
-  if (typeof this.options.controlbarName === 'undefined') this.options.controlbarName = 'controlbar';
-  this.options.controlbar = {'options':{begin:0, end:0, load:false}};
+  if (typeof this.options.control === 'undefined') this.options.control = new control({});
 }
 
 kLine.prototype = {
@@ -30,15 +29,20 @@ kLine.prototype = {
             this.options.yAxis = this.implements[this.options.yAxisName];
         if (typeof this.implements[this.options.xAxisName] != 'undefined')
             this.options.xAxis = this.implements[this.options.xAxisName];
+        /*
         if (typeof this.implements[this.options.controlbarName] != 'undefined') {
             this.options.controlbar = this.implements[this.options.controlbarName];
             this.options.controlbar.options.load = true;
-        }
+        }*/
     },
     start: function () {
         var ctx = this.ctx;
         ctx.save();
         ctx.translate(this.paintRegion[paintName + '.x'], this.paintRegion[paintName + '.y']);
+        this.options.xAxis.options.x = [];
+        this.options.xAxis.options.y = [];
+        this.options.x = [];
+        this.options.y = [];
     },
     end: function () { 
         this.ctx.restore();
@@ -133,13 +137,17 @@ kLine.prototype = {
                         , h);
             this.ctx.fill();
             var x_ = x + (w/2);
+            this.options.xAxis.options.x.push(x_);
+            this.options.x.push(x_);
+            this.options.y.push(y);
+            /*
             (typeof this.options.xAxis.options.x[i] === 'undefined') ? 
-                this.options.xAxis.options.x.push(x_) : this.options.xAxis.options.x[i][x_];
+                this.options.xAxis.options.x.push(x_) : this.options.xAxis.options.x[i] = x_;
             (typeof this.options.x[i] === 'undefined') ? 
-                this.options.x.push(x_) : this.options.x[i][x_];
+                this.options.x.push(x_) : this.options.x[i] = x_;
             (typeof this.options.y[i] === 'undefined') ? 
-                this.options.y.push(y) : this.options.y[i][y];
-            
+                this.options.y.push(y) : this.options.y[i] = y;
+            */
             this.ctx.moveTo(x_, this.paintRegion[this.paintName + '.height'] - y[2]);
             this.ctx.lineTo(x_, this.paintRegion[this.paintName + '.height'] - y[3]);
         } else if (Object.prototype.toString.call(x) === '[object Array]') {
@@ -160,12 +168,16 @@ kLine.prototype = {
                         , kLineDrawWidth);
             this.ctx.fill();
             var y_ = y + (h/2);
+            this.options.yAxis.options.y.push(y_);
+            this.options.x.push(x);
+            this.options.y.push(y_);
+            /*
             (typeof this.options.yAxis.options.y[i] === 'undefined') ? 
-                this.options.yAxis.options.y.push(y_) : this.options.yAxis.options.y[i][y_];
+                this.options.yAxis.options.y.push(y_) : this.options.yAxis.options.y[i] = y_;
             (typeof this.options.x[i] === 'undefined') ? 
-                this.options.x.push(x) : this.options.x[i][x];
+                this.options.x.push(x) : this.options.x[i] = x;
             (typeof this.options.y[i] === 'undefined') ? 
-                this.options.y.push(y_) : this.options.y[i][y_];
+                this.options.y.push(y_) : this.options.y[i] = y_;*/
                 
             this.ctx.moveTo(this.paintRegion[this.paintName + '.width'] - x[2], y_);
             this.ctx.lineTo(this.paintRegion[this.paintName + '.width'] - x[3], y_);
@@ -205,14 +217,15 @@ kLine.prototype = {
             var t = 0;
             if (this.options.moveAcc >= Math.round(this.options.kLineDrawWidth)) {
                 t = 1;
-                this.options.controlbar.options.dec = 'add';
+                //this.options.controlbar.options.dec = 'add';
             }
             else if (Math.abs(this.options.moveAcc) >= Math.round(this.options.kLineDrawWidth)) {
                 t = -1;
-                this.options.controlbar.options.dec = 'sub';
+                //this.options.controlbar.options.dec = 'sub';
             }
             if (t != 0) {
                 //console.log(this.paintName + ' ' +this.options.yAxis.options.dataType);
+                /*
                 if (this.options.controlbar.options.load) {
                     this.options.controlbar.setNext.call(this.options.controlbar);
                     this.begin = this.options.controlbar.options.begin;
@@ -220,10 +233,12 @@ kLine.prototype = {
                 } else {
                     this.begin = this.begin - t * 5;
                     this.end = this.end - t * 5;
-                }
+                }*/
+                this.options.control.options.begin = this.options.control.options.begin - t * 5;
+                this.options.control.setNext.call(this.options.control);
+                //console.log(this.options.control.options.begin + ', ' + this.options.control.options.end);
                 this.options.moveAcc = 0;
                 
-                //console.log('begin:'+this.begin+', end:'+this.end );
                 this.reInit = true;
                 this.reBuild = true;
                 t = 0;
