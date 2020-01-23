@@ -1,0 +1,230 @@
+    var modules = {
+		/*datagrid:{
+			js:'jquery.datagrid.js',
+			css:'datagrid.css',
+			dependencies:['panel','resizable','linkbutton','pagination']
+		}*/
+        util:{
+            js:'util.js'
+        },
+        absPainter:{
+            js:'absPainter.js'
+        },
+        axis:{
+            js:'axis.js'
+        },
+        axisx:{
+            js:'axis-x.js'
+        },
+        axisy:{
+            js:'axis-y.js'
+        },
+        kline:{
+            js:'k-line.js'
+        },
+        control:{
+            js:'control.js'
+        },
+        controlbar:{
+            js:'controlbar.js'
+        },
+        line:{
+            js:'line.js'
+        },
+        cross:{
+            js:'cross.js'
+        }
+    }
+    
+    var painterKline = function(callback) {
+        for (var m in modules) {
+            loadJs('js/' + modules[m]['js'], function(){
+                    document.getElementsByTagName("head")[0].removeChild(this);
+                    if (callback){
+                        callback();
+                    }
+                });
+        }
+    };    
+    painterKline.prototype = Object.create(Painter.prototype);
+    painterKline.prototype.constructor = painterKline;
+    painterKline.prototype.preData = function() {
+        //this.data.priceY = [];
+        var kline = [];
+
+        var fline = [];
+        var tline = [];
+        var sline = [];
+
+        var priceYL = [];
+        var dateXL = [];
+        var priceY = {};
+        var dateX = {};
+        
+        var volume = [0];
+        var volKline = [];
+        
+        var yHistory = {};
+        var hline = [];
+        
+        for (var i =　0; i < data.length; i++) {
+            var rawData = data[i];
+            yHistory[Number(rawData[3])] = 1;
+            yHistory[Number(rawData[4])] = 1;
+            hline.push([rawData[0], rawData[5]]);
+            if (i >= cb.options.begin && i <= cb.options.end) {
+                priceY[Number(rawData[3])] = 1;
+                priceY[Number(rawData[4])] = 1;
+                dateX[rawData[0]] = 1;
+                kline.push([rawData[0], rawData[2], rawData[5], rawData[3], rawData[4] ]);
+
+                fline.push(MACount(5, i, data));
+                tline.push(MACount(10, i, data));
+                sline.push(MACount(20, i, data));
+                
+                volume.push(rawData[6]);
+                if (rawData[5] > rawData[2])
+                    volKline.push([rawData[0], 0, rawData[6], 0, rawData[6] ]);
+                else
+                    volKline.push([rawData[0], rawData[6], 0,  rawData[6], 0]);
+                    
+            }
+        }
+        //console.log('kline.length = ' + kline.length + ', begin = ' + cb.options.begin + ', end = ' + cb.options.end);
+        this.data.kline = kline;
+        this.data.fline = fline;
+        this.data.tline = tline;
+        this.data.sline = sline;
+
+        for (var pk in priceY)
+            priceYL.push(pk);
+
+        priceYL.sort(function(a, b) {
+            return a - b;
+        });
+        this.data.priceY = priceYL;
+        //Object.keys(priceY).reduce((a, c) => (a[c] = priceY[c], a), {});
+
+        for (var dk in dateX)
+            dateXL.push(dk);
+
+        dateXL.sort(function(a, b) {
+            return a - b;
+        });
+        this.data.dateX = dateXL;
+
+        volume.sort(function(a, b) {
+            return a - b;
+        });
+        this.data.volumeY = volume;
+        
+        this.data.volKline = volKline;
+        
+        var yHistoryL = [];
+        for (var pk in yHistory)
+            yHistoryL.push(pk);
+
+        yHistoryL.sort(function(a, b) {
+            return a - b;
+        });
+        this.data.yHistory = yHistoryL;
+        this.data.hline = hline;
+    }
+    painterKline.prototype.start = function () {
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = 'gray';
+        this.ctx.save();
+        this.ctx.translate(this.paintRegion['main.x']
+                       , this.paintRegion['main.y']);
+
+        this.ctx.rect(0, 0
+                       , this.paintRegion['main.width']
+                       , this.paintRegion['main.height']);
+        this.ctx.stroke();
+        var spaceHeight = 0;
+
+        for (var i in this.implements.priceY.options.y) {
+            this.drawHLine('#eeeeee', 0, this.implements.priceY.options.y[i], this.paintRegion['main.width'], 1, 'solid');
+            this.ctx.stroke();
+        }
+
+        var v_c = Math.round((this.implements.dateX.options.x.length)/this.implements.dateX.options.verticalLineCount);
+        for (var i = 0 ; i < this.implements.dateX.options.x.length ; i+= v_c) {
+            var diff = this.implements.dateX.options.x.length - i;
+            if (diff < v_c) v_c = diff;
+            this.drawVLine('#eeeeee', this.implements.dateX.options.x[i], 0,this.paintRegion['main.height'], 1, 'solid');
+            this.ctx.stroke();
+        }
+        this.drawVLine('#eeeeee', 0, 0,0, 1, 'solid');
+        this.ctx.stroke();
+        this.ctx.restore();
+        
+        this.ctx.save();
+        this.ctx.translate(this.paintRegion['volmain.x']
+                       , this.paintRegion['volmain.y']);
+        
+        this.ctx.rect(0, 0
+                       , this.paintRegion['volmain.width']
+                       , this.paintRegion['volmain.height']);
+                       this.ctx.stroke();
+        
+        
+        for (var i in this.implements.volumeY.options.y) {
+            this.drawHLine('#eeeeee', 0, this.implements.volumeY.options.y[i], this.paintRegion['main.width'], 1, 'solid');
+            this.ctx.stroke();
+        }
+        
+        
+        
+        var v_c = Math.round((this.implements.dateX.options.x.length)/this.implements.dateX.options.verticalLineCount);
+        for (var i = 0 ; i < this.implements.dateX.options.x.length ; i+= v_c) {
+            var diff = this.implements.dateX.options.x.length - i;
+            if (diff < v_c) v_c = diff;
+            this.drawVLine('#eeeeee', this.implements.dateX.options.x[i], 0,this.paintRegion['volume.height'], 1, 'solid');
+        }
+            
+        this.ctx.restore();
+    }
+    painterKline.prototype.load = function(canvasId, paintStream, data) {
+        Painter.call(this, canvasId, paintStream);
+        this.data = data;
+        cb.options.length = data.kline.length;
+        cb.setNext.call(cb);
+    };
+    
+    painterKline.prototype.build = function() {
+        painter.build();
+        painter.build(true);
+    }
+
+    function MACount(maType, date, data) {
+        maType = maType - 1;
+        var MA = 0;
+        if (maType > 50)
+            console.log(maType + "date:" + date);
+        if (date > maType) {
+            for (var ma = date-maType-1; ma <= date-1; ma++)
+                MA = MA + data[ma][5];
+            return [data[ma][0], (MA / (maType+1))];
+        } else {
+            return [null, null];
+        }
+    }
+    
+    function loadJs(url, callback){
+		var done = false;
+		var script = document.createElement('script');
+		script.type = 'text/javascript';
+		script.language = 'javascript';
+		script.src = url;
+		script.onload = script.onreadystatechange = function(){
+			if (!done && (!script.readyState || script.readyState == 'loaded' || script.readyState == 'complete')){
+				done = true;
+				script.onload = script.onreadystatechange = null;
+				if (callback){
+					callback.call(script);
+				}
+			}
+		}
+		document.getElementsByTagName("head")[0].appendChild(script);
+	}
