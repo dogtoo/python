@@ -20,189 +20,32 @@
 <body>
     <h1 id="h1"><%=msg%></h1>
     <canvas id="kline" width="900" height="500" style="z-index: 2; border: 1px solid #69c"></canvas>
+    <canvas id="kline2" width="900" height="500" style="z-index: 2; border: 1px solid #69c"></canvas>
 </body>
 <script type="text/javascript">
-    var painterKline = function(canvasId, paintStream, data) {
+    var painterKline = function(canvasId, paintStream, control, data) {
         Painter.call(this, canvasId, paintStream);
         this.data = data;
-        cb.options.length = data.kline.length;
-        cb.setNext.call(cb);
-        console.log(cb.options.begin + ', ' + cb.options.end);
+        this.control.options = control.options;
+        this.control.options.length = data.kline.length;
+        control.setNext.call(this.control);
+        console.log(this.control.options.begin + ', ' + this.control.options.end);
+        /*
+        if (typeof cb != 'undefined') {
+            cb.options.length = data.kline.length;
+            cb.setNext.call(cb);
+            console.log(cb.options.begin + ', ' + cb.options.end);
+        }
+        if (typeof cb2 != 'undefined') {
+            cb2.options.length = data.kline.length;
+            cb2.setNext.call(cb2);
+            console.log(cb2.options.begin + ', ' + cb2.options.end);
+        }*/        
     };
     painterKline.prototype = Object.create(Painter.prototype);
+    //painterKline.prototype = Painter.prototype;
     painterKline.prototype.constructor = painterKline;
-    painterKline.prototype.preData = function() {
-        //this.data = getKLData();
-    }
 
-    function MACount(maType, date, data) {
-        maType = maType - 1;
-        var MA = 0;
-        if (maType > 50)
-            console.log(maType + "date:" + date);
-        if (date > maType) {
-            for (var ma = date-maType-1; ma <= date-1; ma++)
-                MA = MA + data[ma][5];
-            return [data[ma][0], (MA / (maType+1))];
-        } else {
-            return [null, null];
-        }
-    }
-
-{
-    var fline = new line({
-                yAxisName: 'priceY',
-                xAxisName: 'dateX',
-                xAxisFocus: true,
-                strokeStyle: 'cyan',
-                lineWidth: 1
-            });
-    //fline.__proto__ = Object.create(line.__proto__);
-    //fline.__proto__.preData =  function(data) {
-    //    fline.options.disX = painter.implements.kline.options.lineWidth;
-    //}
-
-    var tline = new line({
-                yAxisName: 'priceY',
-                xAxisName: 'dateX',
-                xAxisFocus: true,
-                strokeStyle: 'limegreen',
-                lineWidth: 1
-            });
-    //tline.__proto__.preData =  function(data) {
-    //    tline.options.disX = painter.implements.kline.options.lineWidth;
-    //}
-
-    var sline = new line({
-                yAxisName: 'priceY',
-                xAxisName: 'dateX',
-                xAxisFocus: true,
-                strokeStyle: 'magenta',
-                lineWidth: 1
-            });
-    //sline.__proto__.preData =  function(data) {
-    //    sline.options.disX = painter.implements.kline.options.lineWidth;
-    //}
-    
-    
-    var c = new control({
-        begin: 0,
-        range: 50});
-    
-    var cb = 
-        new controlbar(c.options);
-    cb.options.datasource = 'hline';
-    cb.options.order = 'desc';
-    
-    var paintStream = [
-        {
-            'price':{
-                region: { x: 'padding.left', y: 'padding.top', width: 'f:00.00', height: '55%' },
-                'priceY':new yAxis({
-                    font: '11px Arial',
-                    color: 'black',
-                    align: 'right',
-                    textBaseline: 'top',
-                    dataType: 'money',
-                    dataRange: 'range'
-                })
-            }
-        },
-        {
-            'main':{
-                region: {
-                    x: {'$and':['price.x', 'price.width', 3]}, y: {'$and':['price.y', (determineFontHeight('11px Arial')/2)]}
-                    , width: {'$sub':['100%','price.width','padding.right','padding.left']}, height: '55%',
-                    //horizontalLineCount: 7, verticalLineCount: 7,
-                    //backgroundColor:'#fff',
-                    riseColor: 'red',
-                    fallColor: 'green',
-                    normalColor: 'black',
-                    chartMargin:{left:45.5,top:20.5,right:20.5},
-                    barWidth: 5, spaceWidth: 2, lineStyle: 'solid', borderColor: 'gray', splitLineColor: '#eeeeee', lineWidth: 1
-                },
-                'kline':new kLine({
-                    lineStyle: 'solid',
-                    yAxisName: 'priceY',
-                    xAxisName: 'dateX',
-                    control: c
-                }),
-                'fline': fline,
-                'tline': tline,
-                'sline': sline,
-                'kCross': new cross({
-                    xAxisName: 'kline'
-                })
-            }
-        },
-        {
-            'date':{
-                region: { x: 'main.x', y: {'$and':['main.height', 'main.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: 'f:00-00-00' },
-                'dateX':new xAxis({
-                    font: '11px Arial',
-                    color: 'black',
-                    align: 'right',
-                    textBaseline: 'top',
-                    dataType: 'date',
-                    dataRange: 'seq'
-                })
-            }
-        },
-        {
-            'volume':{
-                region: { x: 'price.x', y: {'$and':['price.height', 'price.y', {'$mul':['date.height',2]}]}, width: 'f:0000', height: '18%' },
-                'volumeY':new yAxis({
-                    font: '11px Arial',
-                    color: 'black',
-                    align: 'right',
-                    textBaseline: 'top',
-                    dataType: 'number',
-                    dataRange: 'range'
-                })
-            }
-        },
-        {
-            'volmain':{
-                region: { x: 'main.x', y: {'$and':['volume.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: '18%' },
-                'volKline':new kLine({
-                    lineWidth: 1,
-                    lineStyle: 'solid',
-                    yAxisName: 'volumeY',
-                    xAxisName: 'dateX',
-                    control: c
-                }),
-                'mCross': new cross({
-                    xAxisName: 'kline'
-                })
-            }
-        },
-        {
-            'yHistory':{
-                region: { x: 'price.x', y: {'$and':['volume.height', 'volmain.y', determineFontHeight('11px Arial')/2]}, width: 'f:00.00', height: '12%' },
-                'yHistory':new yAxis({
-                    font: '11px Arial',
-                    color: 'black',
-                    align: 'right',
-                    textBaseline: 'top',
-                    dataType: 'money',
-                    dataRange: 'range'
-                })
-            }
-        },
-        {
-            'history':{
-                region: { x: 'main.x', y: {'$and':['yHistory.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: '12%' },
-                'hline':new line({
-                    yAxisName: 'yHistory',
-                    strokeStyle: 'magenta',
-                    lineWidth: 1
-                }),
-                'hisbar': cb
-            }
-        }
-    ];
-
-    var painter = new painterKline('kline',paintStream, getKLData());
     painterKline.prototype.preData = function() {
         //this.data.priceY = [];
         var kline = [];
@@ -227,7 +70,7 @@
             yHistory[Number(rawData[3])] = 1;
             yHistory[Number(rawData[4])] = 1;
             hline.push([rawData[0], rawData[5]]);
-            if (i >= cb.options.begin && i <= cb.options.end) {
+            if (i >= this.control.options.begin && i <= this.control.options.end) {
                 priceY[Number(rawData[3])] = 1;
                 priceY[Number(rawData[4])] = 1;
                 dateX[rawData[0]] = 1;
@@ -341,48 +184,306 @@
             
         this.ctx.restore();
     }
+
+    function MACount(maType, date, data) {
+        maType = maType - 1;
+        var MA = 0;
+        if (maType > 50)
+            console.log(maType + "date:" + date);
+        if (date > maType) {
+            for (var ma = date-maType-1; ma <= date-1; ma++)
+                MA = MA + data[ma][5];
+            return [data[ma][0], (MA / (maType+1))];
+        } else {
+            return [null, null];
+        }
+    }
+
+    var c = new control({
+        begin: 0,
+        range: 50});
+    
+    var cb = 
+        new controlbar(c.options);
+    cb.options.datasource = 'hline';
+    cb.options.order = 'desc';
+
+{
+    var fline = new line({
+                yAxisName: 'priceY',
+                xAxisName: 'dateX',
+                xAxisFocus: true,
+                strokeStyle: 'cyan',
+                lineWidth: 1
+            });
+    var tline = new line({
+                yAxisName: 'priceY',
+                xAxisName: 'dateX',
+                xAxisFocus: true,
+                strokeStyle: 'limegreen',
+                lineWidth: 1
+            });
+    var sline = new line({
+                yAxisName: 'priceY',
+                xAxisName: 'dateX',
+                xAxisFocus: true,
+                strokeStyle: 'magenta',
+                lineWidth: 1
+            });
+    
+    var paintStream = [
+        {
+            'price':{
+                region: { x: 'padding.left', y: 'padding.top', width: 'f:00.00', height: '55%' },
+                'priceY':new yAxis({
+                    font: '11px Arial',
+                    color: 'black',
+                    align: 'right',
+                    textBaseline: 'top',
+                    dataType: 'money',
+                    dataRange: 'range'
+                })
+            }
+        },
+        {
+            'main':{
+                region: {
+                    x: {'$and':['price.x', 'price.width', 3]}, y: {'$and':['price.y', (determineFontHeight('11px Arial')/2)]}
+                    , width: {'$sub':['100%','price.width','padding.right','padding.left']}, height: '55%',
+                    riseColor: 'red',
+                    fallColor: 'green',
+                    normalColor: 'black',
+                    chartMargin:{left:45.5,top:20.5,right:20.5},
+                    barWidth: 5, spaceWidth: 2, lineStyle: 'solid', borderColor: 'gray', splitLineColor: '#eeeeee', lineWidth: 1
+                },
+                'kline':new kLine({
+                    lineStyle: 'solid',
+                    yAxisName: 'priceY',
+                    xAxisName: 'dateX'
+                }),
+                'fline': fline,
+                'tline': tline,
+                'sline': sline,
+                'kCross': new cross({
+                    xAxisName: 'kline'
+                })
+            }
+        },
+        {
+            'date':{
+                region: { x: 'main.x', y: {'$and':['main.height', 'main.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: 'f:00-00-00' },
+                'dateX':new xAxis({
+                    font: '11px Arial',
+                    color: 'black',
+                    align: 'right',
+                    textBaseline: 'top',
+                    dataType: 'date',
+                    dataRange: 'seq'
+                })
+            }
+        },
+        {
+            'volume':{
+                region: { x: 'price.x', y: {'$and':['price.height', 'price.y', {'$mul':['date.height',2]}]}, width: 'f:0000', height: '18%' },
+                'volumeY':new yAxis({
+                    font: '11px Arial',
+                    color: 'black',
+                    align: 'right',
+                    textBaseline: 'top',
+                    dataType: 'number',
+                    dataRange: 'range'
+                })
+            }
+        },
+        {
+            'volmain':{
+                region: { x: 'main.x', y: {'$and':['volume.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: '18%' },
+                'volKline':new kLine({
+                    lineWidth: 1,
+                    lineStyle: 'solid',
+                    yAxisName: 'volumeY',
+                    xAxisName: 'dateX'
+                }),
+                'mCross': new cross({
+                    xAxisName: 'kline'
+                })
+            }
+        },
+        {
+            'yHistory':{
+                region: { x: 'price.x', y: {'$and':['volume.height', 'volmain.y', determineFontHeight('11px Arial')/2]}, width: 'f:00.00', height: '12%' },
+                'yHistory':new yAxis({
+                    font: '11px Arial',
+                    color: 'black',
+                    align: 'right',
+                    textBaseline: 'top',
+                    dataType: 'money',
+                    dataRange: 'range'
+                })
+            }
+        },
+        {
+            'history':{
+                region: { x: 'main.x', y: {'$and':['yHistory.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: '12%' },
+                'hline':new line({
+                    yAxisName: 'yHistory',
+                    strokeStyle: 'magenta',
+                    lineWidth: 1
+                }),
+                'hisbar': cb
+            }
+        }
+    ];
+}
+    var painter = new painterKline('kline',paintStream, cb, getKLData());
+    painter.padding.top = 10;
+    painter.padding.left = 10;
+    painter.padding.right = 20;
+    painter.init();
+    painter.build();
+    painter.build(true);
+    
+    var c2 = new control({
+        begin: 0,
+        range: 100});
+    
+    var cb2 = 
+        new controlbar(c2.options);
+    cb2.options.datasource = 'hline';
+    cb2.options.order = 'desc';
+{    
+    var paintStream2 = [
+        {
+            'price':{
+                region: { x: 'padding.left', y: 'padding.top', width: 'f:00.00', height: '55%' },
+                'priceY':new yAxis({
+                    font: '11px Arial',
+                    color: 'black',
+                    align: 'right',
+                    textBaseline: 'top',
+                    dataType: 'money',
+                    dataRange: 'range'
+                })
+            }
+        },
+        {
+            'main':{
+                region: {
+                    x: {'$and':['price.x', 'price.width', 3]}, y: {'$and':['price.y', (determineFontHeight('11px Arial')/2)]}
+                    , width: {'$sub':['100%','price.width','padding.right','padding.left']}, height: '55%',
+                    riseColor: 'red',
+                    fallColor: 'green',
+                    normalColor: 'black',
+                    chartMargin:{left:45.5,top:20.5,right:20.5},
+                    barWidth: 5, spaceWidth: 2, lineStyle: 'solid', borderColor: 'gray', splitLineColor: '#eeeeee', lineWidth: 1
+                },
+                'kline':new kLine({
+                    lineStyle: 'solid',
+                    yAxisName: 'priceY',
+                    xAxisName: 'dateX'
+                }),
+                'fline': fline,
+                'tline': tline,
+                'sline': sline,
+                'kCross': new cross({
+                    xAxisName: 'kline'
+                })
+            }
+        },
+        {
+            'date':{
+                region: { x: 'main.x', y: {'$and':['main.height', 'main.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: 'f:00-00-00' },
+                'dateX':new xAxis({
+                    font: '11px Arial',
+                    color: 'black',
+                    align: 'right',
+                    textBaseline: 'top',
+                    dataType: 'date',
+                    dataRange: 'seq'
+                })
+            }
+        },
+        {
+            'volume':{
+                region: { x: 'price.x', y: {'$and':['price.height', 'price.y', {'$mul':['date.height',2]}]}, width: 'f:0000', height: '18%' },
+                'volumeY':new yAxis({
+                    font: '11px Arial',
+                    color: 'black',
+                    align: 'right',
+                    textBaseline: 'top',
+                    dataType: 'number',
+                    dataRange: 'range'
+                })
+            }
+        },
+        {
+            'volmain':{
+                region: { x: 'main.x', y: {'$and':['volume.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: '18%' },
+                'volKline':new kLine({
+                    lineWidth: 1,
+                    lineStyle: 'solid',
+                    yAxisName: 'volumeY',
+                    xAxisName: 'dateX'
+                }),
+                'mCross': new cross({
+                    xAxisName: 'kline'
+                })
+            }
+        },
+        {
+            'yHistory':{
+                region: { x: 'price.x', y: {'$and':['volume.height', 'volmain.y', determineFontHeight('11px Arial')/2]}, width: 'f:00.00', height: '12%' },
+                'yHistory':new yAxis({
+                    font: '11px Arial',
+                    color: 'black',
+                    align: 'right',
+                    textBaseline: 'top',
+                    dataType: 'money',
+                    dataRange: 'range'
+                })
+            }
+        },
+        {
+            'history':{
+                region: { x: 'main.x', y: {'$and':['yHistory.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: '12%' },
+                'hline':new line({
+                    yAxisName: 'yHistory',
+                    strokeStyle: 'magenta',
+                    lineWidth: 1
+                }),
+                'hisbar': cb2
+            }
+        }
+    ];
 }
 
-/*
 {
     var fline = new line({
                 yAxis: 'dateY',
                 xAxis: 'priceX',
+                xAxisFocus: true,
                 strokeStyle: 'cyan',
-                lineWidth: 0.5,
-                disY: 5
+                lineWidth: 1
             });
-    //fline.__proto__ = Object.create(line.__proto__);
-    fline.__proto__.preData =  function(data) {
-        fline.options.disY = painter.implements.kline.options.lineHigh/2;
-    }
-
     var tline = new line({
                 yAxis: 'dateY',
                 xAxis: 'priceX',
+                xAxisFocus: true,
                 strokeStyle: 'limegreen',
-                lineWidth: 1,
-                disY: 5
+                lineWidth: 1
             });
-    tline.__proto__.preData =  function(data) {
-        tline.options.disY = painter.implements.kline.options.lineWidth/2;
-    }
-
     var sline = new line({
                 yAxis: 'dateY',
                 xAxis: 'priceX',
+                xAxisFocus: true,
                 strokeStyle: 'magenta',
-                lineWidth: 1,
-                disY: 5
+                lineWidth: 1
             });
-    sline.__proto__.preData =  function(data) {
-        sline.options.disY = painter.implements.kline.options.lineWidth/2;
-    }
 
-    var paintStream = [
+    var paintStream2 = [
         {
             'date':{
-                region: { x: 'padding.left', y: 'padding.top', width: 'f:00-00-00', height: '50%' },
+                region: { x: 'padding.left', y: 'padding.top', width: 'f:00-00-00', height: '80%' },
                 'dateY':new yAxis({
                     font: '11px Arial',
                     color: 'black',
@@ -397,9 +498,7 @@
             'main':{
                 region: {
                     x: {'$and':['date.x', 'date.width', 3]}, y: {'$and':['date.y', (determineFontHeight('11px Arial')/2)]}
-                    , width: {'$sub':['100%','date.width','padding.right','padding.left']}, height: '50%',
-                    //horizontalLineCount: 7, verticalLineCount: 7,
-                    //backgroundColor:'#fff',
+                    , width: {'$sub':['100%','date.width','padding.right','padding.left']}, height: '80%',
                     riseColor: 'red',
                     fallColor: 'green',
                     normalColor: 'black',
@@ -411,7 +510,8 @@
                     lineStyle: 'solid',
                     borderColor: 'gray',
                     yAxis: 'dateY',
-                    xAxis: 'priceX'
+                    xAxis: 'priceX',
+                    axial: 'ver'
                 }),
                 'fline': fline,
                 'tline': tline,
@@ -432,31 +532,40 @@
             }
         }
     ];
-
-    var painter = new painterKline('kline',paintStream, getKLData());
-    painterKline.prototype.preData = function() {
+}
+  
+    
+    var painter2 = new painterKline('kline2',paintStream2, cb2, getKLData());
+    painter2.__proto__.preData = function() {
+        //this.data.priceY = [];
         var kline = [];
 
         var fline = [];
         var tline = [];
         var sline = [];
 
-        var priceXL = [];
         var dateYL = [];
-        var priceX = {};
+        var priceXL = [];
         var dateY = {};
-        for (var i = 100; i < 150; i++) {
+        var priceX = {};
+       
+        for (var i =　0; i < data.length; i++) {
             var rawData = data[i];
-            //20111215,11.68,11.65,11.76,11.40,11.41,43356655,502325991
-            priceX[Number(rawData[3])] = 1;
-            priceX[Number(rawData[4])] = 1;
-            dateY[rawData[0]] = 1;
-            kline.push([rawData[0], rawData[2], rawData[5], rawData[3], rawData[4] ]);
 
-            fline.push(MACount(5, i, data));
-            tline.push(MACount(10, i, data));
-            sline.push(MACount(20, i, data));
+            if (i >= this.control.options.begin && i <= this.control.options.end) {
+                priceX[Number(rawData[3])] = 1;
+                priceX[Number(rawData[4])] = 1;
+                dateY[rawData[0]] = 1;
+                kline.push([rawData[0], rawData[2], rawData[5], rawData[3], rawData[4] ]);
+
+                fline.push(MACount(5, i, data));
+                tline.push(MACount(10, i, data));
+                sline.push(MACount(20, i, data));
+                
+                
+            }
         }
+        //console.log('kline.length = ' + kline.length + ', begin = ' + cb.options.begin + ', end = ' + cb.options.end);
         this.data.kline = kline;
         this.data.fline = fline;
         this.data.tline = tline;
@@ -478,9 +587,11 @@
             return a - b;
         });
         this.data.dateY = dateYL;
-    }
 
-    painterKline.prototype.start = function () {
+        
+    }
+    
+    painter2.__proto__.start = function () {
         this.ctx.beginPath();
         this.ctx.strokeStyle = 'gray';
         this.ctx.save();
@@ -491,35 +602,30 @@
                        , this.paintRegion['main.width']
                        , this.paintRegion['main.height']);
         this.ctx.stroke();
-        
-        var spaceHeight = (this.paintRegion['main.height'] - (this.implements.dateY.options.fontHeight/2)) / (this.implements.dateY.options.horizontalLineCount - 1);
-        
+        var spaceHeight = 0;
+
         for (var i in this.implements.dateY.options.y) {
             this.drawHLine('#eeeeee', 0, this.implements.dateY.options.y[i], this.paintRegion['main.width'], 1, 'solid');
+            this.ctx.stroke();
         }
 
         var v_c = Math.round((this.implements.priceX.options.x.length)/this.implements.priceX.options.verticalLineCount);
         for (var i = 0 ; i < this.implements.priceX.options.x.length ; i+= v_c) {
             var diff = this.implements.priceX.options.x.length - i;
-            if (diff < v_c) i = this.implements.priceX.options.x.length;
+            if (diff < v_c) v_c = diff;
             this.drawVLine('#eeeeee', this.implements.priceX.options.x[i], 0,this.paintRegion['main.height'], 1, 'solid');
             this.ctx.stroke();
         }
-
+            
         this.ctx.restore();
     }
-}
-*/
-    painter.padding.top = 10;
-    painter.padding.left = 10;
-    painter.padding.right = 20;
-    painter.init();
-
-
-
-    painter.build();
-painter.build(true);
-
-    //painter.implements.priceY.isTouch.call(painter, 1, 1);
+    
+    
+    painter2.padding.top = 10;
+    painter2.padding.left = 10;
+    painter2.padding.right = 20;
+    painter2.init();
+    painter2.build();
+    painter2.build(true);
 </script>
 </html>

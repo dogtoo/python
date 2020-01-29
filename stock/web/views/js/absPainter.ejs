@@ -3,7 +3,8 @@ function Painter(canvasId, paintStream) {
     if (!this.canvas.getContext) return;
     this.ctx = this.canvas.getContext('2d');
     this.data = {};
-
+    this.paintStream = paintStream;
+    this.control = new control({});
     this.width = this.canvas.width;
     this.height = this.canvas.height;
     this.paintRegion = {}
@@ -31,7 +32,7 @@ Painter.prototype = {
         var painter = this;
         if (painter.onBuild) return;
         painter.preData.call(painter);
-        paintStream.forEach(function(item, index, array){
+        painter.paintStream.forEach(function(item, index, array){
             paintName = Object.keys(item)[0];
             painter.addPaintRegion.call(painter, paintName, item[paintName].region.x
                                                           , item[paintName].region.y
@@ -43,6 +44,9 @@ Painter.prototype = {
                 painter.implName = p;
                 painter.setImplement(implement, paintName);
                 painter.options = painter.implement.options;
+                if (typeof painter.options.control != 'undefined') {
+                    painter.implement.options.control.options = painter.control.options;
+                }
                 if (typeof painter.implement.initialize == 'function')
                     painter.implement.initialize.call(painter);
                 painter.prePaintRegion.call(painter, paintName, 'x');
@@ -56,7 +60,7 @@ Painter.prototype = {
             }
         });
         
-        paintStream.forEach(function(item, index, array){
+        painter.paintStream.forEach(function(item, index, array){
             paintName = Object.keys(item)[0];
             for (var p in item[paintName]) {
                 if (p === 'region') continue;
@@ -108,7 +112,7 @@ Painter.prototype = {
         painter.onBuild = true;
         painter.ctx.clearRect(0, 0, painter.width, painter.height);
         if (painter.start) painter.start.call(painter);
-        paintStream.forEach(function(item, index, array){
+        painter.paintStream.forEach(function(item, index, array){
             paintName = Object.keys(item)[0];
             for (var p in item[paintName]) {
                 if (p === 'region') continue;
@@ -150,7 +154,7 @@ Painter.prototype = {
         if (painter.onBuild) return;
         //var d1 = new Date();
         painter.ctx.putImageData(painter.imgData, 0, 0);
-        paintStream.forEach(function(item, index, array){
+        painter.paintStream.forEach(function(item, index, array){
             paintName = Object.keys(item)[0];
             for (var p in item[paintName]) {
                 if (p === 'region') continue;
@@ -164,7 +168,7 @@ Painter.prototype = {
         })
         
         if (!this.onBuild && this.reBuild) {
-            paintStream.forEach(function(item, index, array){
+            painter.paintStream.forEach(function(item, index, array){
                 paintName = Object.keys(item)[0];
                 for (var p in item[paintName]) {
                     if (p === 'region') continue;

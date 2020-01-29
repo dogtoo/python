@@ -13,6 +13,10 @@ router.get('/crossline', async(ctx) => {
     await ctx.render('crossline')
 });
 
+router.get('/js/painterKline.js', async(ctx) => {
+    await ctx.render('js/painterKline')
+});
+
 router.get('/js/util.js', async(ctx) => {
     await ctx.render('js/util')
 });
