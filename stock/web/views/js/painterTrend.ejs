@@ -1,0 +1,103 @@
+    var painterTrend = function(canvasId, paintStream) {
+        Painter.call(this, canvasId, paintStream);
+    };
+    painterTrend.prototype = Object.create(Painter.prototype);
+    painterTrend.prototype.constructor = painterTrend;
+    painterTrend.prototype.preData = function() {
+        var Tline = [];
+
+        //var priceL = [];
+        var open = 41.75;
+        var up = Math.floor(open * 1.1 * 100) /100;
+        var down = Math.floor(open * 0.9 * 100) /100;
+        var price = [down, up];
+        var time = ['0900','0930','1000','1030','1100','1130','1200','1230','0100','0130'];
+        
+        var volume = [0];
+        var volKline = [];
+
+        
+        for (var i =　0; i < this.data.length; i++) {
+            var rawData = this.data[i];
+            Tline.push([rawData['time'],rawData['price']]);
+                
+            volume.push(rawData['vol']);
+            volKline.push([rawData['time'], 0, rawData['vol'], 0, rawData['vol'] ]);
+        }
+        this.data.Tline = Tline;
+        this.data.price = price;
+        this.data.time = time;
+
+        volume.sort(function(a, b) {
+            return a - b;
+        });
+        this.data.volumeY = volume;
+        
+        this.data.volKline = volKline;
+    }
+    painterTrend.prototype.start = function () {
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = 'gray';
+        this.ctx.save();
+        this.ctx.translate(this.paintRegion['main.x']
+                       , this.paintRegion['main.y']);
+
+        this.ctx.rect(0, 0
+                       , this.paintRegion['main.width']
+                       , this.paintRegion['main.height']);
+        this.ctx.stroke();
+        var spaceHeight = 0;
+
+        for (var i in this.implements.price.options.y) {
+            this.drawHLine('#eeeeee', 0, this.implements.price.options.y[i], this.paintRegion['main.width'], 1, 'solid');
+            this.ctx.stroke();
+        }
+
+        var v_c = Math.round((this.implements.time.options.x.length)/this.implements.time.options.verticalLineCount);
+        for (var i = 0 ; i < this.implements.time.options.x.length ; i+= v_c) {
+            var diff = this.implements.time.options.x.length - i;
+            if (diff < v_c) v_c = diff;
+            this.drawVLine('#eeeeee', this.implements.time.options.x[i], 0,this.paintRegion['main.height'], 1, 'solid');
+            this.ctx.stroke();
+        }
+        this.drawVLine('#eeeeee', 0, 0,0, 1, 'solid');
+        this.ctx.stroke();
+        this.ctx.restore();
+        
+        this.ctx.save();
+        this.ctx.translate(this.paintRegion['volmain.x']
+                       , this.paintRegion['volmain.y']);
+        
+        this.ctx.rect(0, 0
+                       , this.paintRegion['volmain.width']
+                       , this.paintRegion['volmain.height']);
+                       this.ctx.stroke();
+        
+        
+        for (var i in this.implements.volumeY.options.y) {
+            this.drawHLine('#eeeeee', 0, this.implements.volumeY.options.y[i], this.paintRegion['main.width'], 1, 'solid');
+            this.ctx.stroke();
+        }
+        
+        var v_c = Math.round((this.implements.time.options.x.length)/this.implements.time.options.verticalLineCount);
+        for (var i = 0 ; i < this.implements.time.options.x.length ; i+= v_c) {
+            var diff = this.implements.time.options.x.length - i;
+            if (diff < v_c) v_c = diff;
+            this.drawVLine('#eeeeee', this.implements.time.options.x[i], 0,this.paintRegion['volume.height'], 1, 'solid');
+        }
+            
+        this.ctx.restore();
+    }
+    
+    painterTrend.prototype.load = function(control, data) {
+        this.data = data;
+        this.control.options = control.options;
+        this.control.options.length = data.length;
+        control.setNext.call(this.control);
+        console.log(this.control.options.begin + ', ' + this.control.options.end);
+    };
+    painterTrend.prototype.make = function() {
+        painter.init();
+        painter.build();
+        painter.build(true);
+    }

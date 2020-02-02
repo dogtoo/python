@@ -1,9 +1,9 @@
-    var painterKline = function(canvasId, paintStream) {
+    var painterKlineH = function(canvasId, paintStream) {
         Painter.call(this, canvasId, paintStream);
     };
-    painterKline.prototype = Object.create(Painter.prototype);
-    painterKline.prototype.constructor = painterKline;
-    painterKline.prototype.preData = function() {
+    painterKlineH.prototype = Object.create(Painter.prototype);
+    painterKlineH.prototype.constructor = painterKlineH;
+    painterKlineH.prototype.preData = function() {
         var kline = [];
 
         var fline = [];
@@ -84,7 +84,7 @@
         this.data.yHistory = yHistoryL;
         this.data.hline = hline;
     }
-    painterKline.prototype.start = function () {
+    painterKlineH.prototype.start = function () {
         this.ctx.beginPath();
         this.ctx.strokeStyle = 'gray';
         this.ctx.save();
@@ -97,16 +97,16 @@
         this.ctx.stroke();
         var spaceHeight = 0;
 
-        for (var i in this.implements.price.options.y) {
-            this.drawHLine('#eeeeee', 0, this.implements.price.options.y[i], this.paintRegion['main.width'], 1, 'solid');
+        for (var i in this.implements.date.options.y) {
+            this.drawHLine('#eeeeee', 0, this.implements.date.options.y[i], this.paintRegion['main.width'], 1, 'solid');
             this.ctx.stroke();
         }
 
-        var v_c = Math.round((this.implements.date.options.x.length)/this.implements.date.options.verticalLineCount);
-        for (var i = 0 ; i < this.implements.date.options.x.length ; i+= v_c) {
-            var diff = this.implements.date.options.x.length - i;
+        var v_c = Math.round((this.implements.price.options.x.length)/this.implements.price.options.verticalLineCount);
+        for (var i = 0 ; i < this.implements.price.options.x.length ; i+= v_c) {
+            var diff = this.implements.price.options.x.length - i;
             if (diff < v_c) v_c = diff;
-            this.drawVLine('#eeeeee', this.implements.date.options.x[i], 0,this.paintRegion['main.height'], 1, 'solid');
+            this.drawVLine('#eeeeee', this.implements.price.options.x[i], 0,this.paintRegion['main.height'], 1, 'solid');
             this.ctx.stroke();
         }
         this.drawVLine('#eeeeee', 0, 0,0, 1, 'solid');
@@ -114,40 +114,16 @@
         this.ctx.restore();
         
         this.ctx.save();
-        this.ctx.translate(this.paintRegion['volmain.x']
-                       , this.paintRegion['volmain.y']);
-        
-        this.ctx.rect(0, 0
-                       , this.paintRegion['volmain.width']
-                       , this.paintRegion['volmain.height']);
-                       this.ctx.stroke();
-        
-        
-        for (var i in this.implements.volumeY.options.y) {
-            this.drawHLine('#eeeeee', 0, this.implements.volumeY.options.y[i], this.paintRegion['main.width'], 1, 'solid');
-            this.ctx.stroke();
-        }
-        
-        
-        
-        var v_c = Math.round((this.implements.date.options.x.length)/this.implements.date.options.verticalLineCount);
-        for (var i = 0 ; i < this.implements.date.options.x.length ; i+= v_c) {
-            var diff = this.implements.date.options.x.length - i;
-            if (diff < v_c) v_c = diff;
-            this.drawVLine('#eeeeee', this.implements.date.options.x[i], 0,this.paintRegion['volume.height'], 1, 'solid');
-        }
-            
-        this.ctx.restore();
     }
     
-    painterKline.prototype.load = function(control, data) {
+    painterKlineH.prototype.load = function(control, data) {
         this.data = data;
         this.control.options = control.options;
         this.control.options.length = data.kline.length;
         control.setNext.call(this.control);
         console.log(this.control.options.begin + ', ' + this.control.options.end);
     };
-    painterKline.prototype.make = function() {
+    painterKlineH.prototype.make = function() {
         painter.init();
         painter.build();
         painter.build(true);

@@ -30,7 +30,7 @@ function xAxis(options){
                 this.options.x[x] - this.options.fontWidth/2 : this.paintRegion[this.paintName + '.width'] - this.options.fontWidth/2;
         } else {
             if (i == this.data[this.implName].length-1) return this.paintRegion[this.paintName + '.width'] ;
-            this.implement.getXScale.call(this, this.options, this.data[this.implName][i]);
+            this.implement.getXScale.call(this, this.options, this.data[this.implName]);
             if (this.options.dataRange === 'seq')
                 return (i * this.options.scale) - this.options.fontWidth/2;
             if (this.options.dataRange === 'range')
@@ -38,12 +38,22 @@ function xAxis(options){
         }        
     };
     xAxis.prototype.getHeight = function(format) {
-        if (typeof format === 'undefined') format = 'TEST';
-        this.options.fontHeight = determineFontHeight(this.options.font, format);
-        return this.options.fontHeight + 2;
+        if (typeof this.paintRegion[this.paintName + '.height'] != 'undefined' && !isNaN(this.paintRegion[this.paintName + '.height']))
+            return this.paintRegion[this.paintName + '.height'];
+        else {
+            if (typeof format === 'undefined') format = 'TEST';
+            this.options.fontHeight = determineFontHeight(this.options.font, format);
+            return this.options.fontHeight + 2;
+        }
     };
     xAxis.prototype.getWidth = function(format) {
-        return this.paintRegion[this.implName + ".width"];
+        if (typeof this.paintRegion[this.paintName + '.width'] != 'undefined' && !isNaN(this.paintRegion[this.paintName + '.width']))
+            return this.paintRegion[this.paintName + '.width'];
+        else {
+            if (typeof format === 'undefined') format = 'TEST';
+            this.options.fontWidth = determineFontWidth(this.options.font, format);
+            return this.options.fontWidth + 2;
+        }
     };
     xAxis.prototype.preData = function(data) {
         if (Object.prototype.toString.call(data) != '[object Array]') return;
@@ -66,8 +76,6 @@ function xAxis(options){
             xScalers.push(data[0]);
             var index = 1;
             for (var i = 1; i < this.options.verticalLineCount; i++) {
-                /*
-                var index = Math.ceil(i * stepLength) - 1;*/
                 index = index + stepLength - ((i == 1)?1:0);
                 if (index >= data.length) index = data.length - 1;
                 xScalers.push(data[index]);

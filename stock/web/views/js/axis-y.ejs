@@ -34,7 +34,7 @@ function yAxis(options) {
         } else {
             if (i == this.data[this.implName].length-1) 
                 return this.paintRegion[this.paintName + '.height'];
-            this.implement.getYScale.call(this, this.options, this.data[this.implName][i]);
+            this.implement.getYScale.call(this, this.options, this.data[this.implName]);
             if (this.options.dataRange === 'seq')
                 return i * this.options.scale;
             if (this.options.dataRange === 'range')
@@ -42,10 +42,22 @@ function yAxis(options) {
         }
     };
     yAxis.prototype.getHeight = function(format) {
-        return this.paintRegion[this.paintName + '.height'];
+        if (typeof this.paintRegion[this.paintName + '.height'] != 'undefined' && !isNaN(this.paintRegion[this.paintName + '.height']))
+            return this.paintRegion[this.paintName + '.height'];
+        else {
+            if (typeof format === 'undefined') format = 'TEST';
+            this.options.fontHeight = determineFontHeight(this.options.font, format);
+            return this.options.fontHeight + 2;
+        }
     };
     yAxis.prototype.getWidth = function(format) {
-        return determineFontWidth(this.options.font, format);
+        if (typeof this.paintRegion[this.paintName + '.width'] != 'undefined' && !isNaN(this.paintRegion[this.paintName + '.width']))
+            return this.paintRegion[this.paintName + '.width'];
+        else {
+            if (typeof format === 'undefined') format = 'TEST';
+            this.options.fontWidth = determineFontWidth(this.options.font, format);
+            return this.options.fontWidth + 2;
+        }
     };
     yAxis.prototype.preData = function(data) {
         if (Object.prototype.toString.call(data) != '[object Array]') return;

@@ -8,6 +8,20 @@ router.get('/kline', async(ctx) => {
     })
 });
 
+router.get('/KlineH', async(ctx) => {
+    let code = ctx.request.query.code;
+    await ctx.render('KlineH', {
+        msg:'stock:' + code
+    })
+});
+
+router.get('/Trend', async(ctx) => {
+    let code = ctx.request.query.code;
+    await ctx.render('Trend', {
+        msg:'stock:' + code
+    })
+});
+
 router.get('/crossline', async(ctx) => {
     let code = ctx.request.query.code;
     await ctx.render('crossline')
@@ -15,6 +29,14 @@ router.get('/crossline', async(ctx) => {
 
 router.get('/js/painterKline.js', async(ctx) => {
     await ctx.render('js/painterKline')
+});
+
+router.get('/js/painterKlineH.js', async(ctx) => {
+    await ctx.render('js/painterKlineH')
+});
+
+router.get('/js/painterTrend.js', async(ctx) => {
+    await ctx.render('js/painterTrend')
 });
 
 router.get('/js/util.js', async(ctx) => {

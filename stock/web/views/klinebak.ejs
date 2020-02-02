@@ -1,0 +1,369 @@
+    painter2.__proto__.preData = function() {
+        //this.data.priceY = [];
+        var kline = [];
+
+        var fline = [];
+        var tline = [];
+        var sline = [];
+
+        var dateYL = [];
+        var priceXL = [];
+        var dateY = {};
+        var priceX = {};
+       
+        for (var i =　0; i < data.length; i++) {
+            var rawData = data[i];
+
+            if (i >= this.control.options.begin && i <= this.control.options.end) {
+                priceX[Number(rawData[3])] = 1;
+                priceX[Number(rawData[4])] = 1;
+                dateY[rawData[0]] = 1;
+                kline.push([rawData[0], rawData[2], rawData[5], rawData[3], rawData[4] ]);
+
+                fline.push(MACount(5, i, data));
+                tline.push(MACount(10, i, data));
+                sline.push(MACount(20, i, data));
+                
+                
+            }
+        }
+        //console.log('kline.length = ' + kline.length + ', begin = ' + cb.options.begin + ', end = ' + cb.options.end);
+        this.data.kline = kline;
+        this.data.fline = fline;
+        this.data.tline = tline;
+        this.data.sline = sline;
+
+        for (var pk in priceX)
+            priceXL.push(pk);
+
+        priceXL.sort(function(a, b) {
+            return a - b;
+        });
+        this.data.priceX = priceXL;
+        //Object.keys(priceY).reduce((a, c) => (a[c] = priceY[c], a), {});
+
+        for (var dk in dateY)
+            dateYL.push(dk);
+
+        dateYL.sort(function(a, b) {
+            return a - b;
+        });
+        this.data.dateY = dateYL;
+
+        
+    }
+    
+    painterKline.prototype.start = function () {
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = 'gray';
+        this.ctx.save();
+        this.ctx.translate(this.paintRegion['main.x']
+                       , this.paintRegion['main.y']);
+
+        this.ctx.rect(0, 0
+                       , this.paintRegion['main.width']
+                       , this.paintRegion['main.height']);
+        this.ctx.stroke();
+        var spaceHeight = 0;
+/*
+        for (var i in this.implements.price.options.x) {
+            this.drawHLine('#eeeeee', this.implements.price.options.x[i], 0, this.paintRegion['main.height'], 1, 'solid');
+            this.ctx.stroke();
+        }
+*/
+        var v_c = Math.round((this.implements.date.options.y.length)/this.implements.date.options.horizontalLineCount);
+        for (var i = 0 ; i < this.implements.date.options.y.length ; i+= v_c) {
+            var diff = this.implements.date.options.y.length - i;
+            if (diff < v_c) v_c = diff;
+            this.drawVLine('#eeeeee', 0, this.implements.date.options.y[i],this.paintRegion['main.width'], 1, 'solid');
+            this.ctx.stroke();
+        }
+        this.drawVLine('#eeeeee', 0, 0,0, 1, 'solid');
+        this.ctx.stroke();
+        this.ctx.restore();
+        
+        this.ctx.save();
+    }
+    
+    painterKline.prototype.start = function () {
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = 'gray';
+        this.ctx.save();
+        this.ctx.translate(this.paintRegion['main.x']
+                       , this.paintRegion['main.y']);
+
+        this.ctx.rect(0, 0
+                       , this.paintRegion['main.width']
+                       , this.paintRegion['main.height']);
+        this.ctx.stroke();
+        var spaceHeight = 0;
+
+        for (var i in this.implements.date.options.y) {
+            this.drawHLine('#eeeeee', 0, this.implements.date.options.y[i], this.paintRegion['main.width'], 1, 'solid');
+            this.ctx.stroke();
+        }
+
+        var v_c = Math.round((this.implements.price.options.x.length)/this.implements.price.options.verticalLineCount);
+        for (var i = 0 ; i < this.implements.price.options.x.length ; i+= v_c) {
+            var diff = this.implements.price.options.x.length - i;
+            if (diff < v_c) v_c = diff;
+            this.drawVLine('#eeeeee', this.implements.price.options.x[i], 0,this.paintRegion['main.height'], 1, 'solid');
+            this.ctx.stroke();
+        }
+        this.drawVLine('#eeeeee', 0, 0,0, 1, 'solid');
+        this.ctx.stroke();
+        this.ctx.restore();
+        
+        this.ctx.save();
+    }
+    
+{
+    var fline = new line({
+                yAxisName: 'date',
+                xAxisName: 'price',
+                xAxisFocus: true,
+                strokeStyle: 'cyan',
+                lineWidth: 1
+            });
+    var tline = new line({
+                yAxisName: 'date',
+                xAxisName: 'price',
+                xAxisFocus: true,
+                strokeStyle: 'limegreen',
+                lineWidth: 1
+            });
+    var sline = new line({
+                yAxisName: 'date',
+                xAxisName: 'price',
+                xAxisFocus: true,
+                strokeStyle: 'magenta',
+                lineWidth: 1
+            });
+    
+    var paintStream = [
+        {
+            'date':{
+                region: { x: 'padding.left', y: 'padding.top', width: 'f:0000-00-00', height: '80%' },
+                'date':new yAxis({
+                    font: '11px Arial',
+                    color: 'black',
+                    align: 'left',
+                    textBaseline: 'top',
+                    dataType: 'date',
+                    dataRange: 'seq'
+                })
+            }
+        },
+        {
+            'main':{
+                region: {
+                    x: {'$and':['date.x', 'date.width', 3]}, y: {'$and':['date.y', (determineFontHeight('11px Arial')/2)]}
+                    , width: {'$sub':['100%','date.width','padding.right','padding.left']}, height: '80%',
+                    riseColor: 'red',
+                    fallColor: 'green',
+                    normalColor: 'black',
+                    chartMargin:{left:45.5,top:20.5,right:20.5},
+                    barWidth: 5, spaceWidth: 2, lineStyle: 'solid', borderColor: 'gray', splitLineColor: '#eeeeee', lineWidth: 1
+                },
+                'kline':new kLine({
+                    lineStyle: 'solid',
+                    yAxisName: 'date',
+                    xAxisName: 'price',
+                    axial: 'hor'
+                })
+            }
+        },
+        {
+            'price':{
+                region: { x: 'main.x', y: {'$and':['main.height', 'main.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: 'f:00.00' },
+                'price':new xAxis({
+                    font: '11px Arial',
+                    color: 'black',
+                    align: 'right',
+                    textBaseline: 'top',
+                    dataType: 'money',
+                    dataRange: 'range'
+                })
+            }
+        }/*,
+        {
+            'volume':{
+                region: { x: 'price.x', y: {'$and':['price.height', 'price.y', {'$mul':['date.height',2]}]}, width: 'f:0000', height: '18%' },
+                'volumeY':new yAxis({
+                    font: '11px Arial',
+                    color: 'black',
+                    align: 'right',
+                    textBaseline: 'top',
+                    dataType: 'number',
+                    dataRange: 'range'
+                })
+            }
+        },
+        {
+            'volmain':{
+                region: { x: 'main.x', y: {'$and':['volume.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: '18%' },
+                'volKline':new kLine({
+                    lineWidth: 1,
+                    lineStyle: 'solid',
+                    yAxisName: 'volumeY',
+                    xAxisName: 'date'
+                }),
+                'mCross': new cross({
+                    xAxisName: 'kline'
+                })
+            }
+        },
+        {
+            'yHistory':{
+                region: { x: 'price.x', y: {'$and':['volume.height', 'volmain.y', determineFontHeight('11px Arial')/2]}, width: 'f:00.00', height: '12%' },
+                'yHistory':new yAxis({
+                    font: '11px Arial',
+                    color: 'black',
+                    align: 'right',
+                    textBaseline: 'top',
+                    dataType: 'money',
+                    dataRange: 'range'
+                })
+            }
+        },
+        {
+            'history':{
+                region: { x: 'main.x', y: {'$and':['yHistory.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: '12%' },
+                'hline':new line({
+                    yAxisName: 'yHistory',
+                    strokeStyle: 'magenta',
+                    lineWidth: 1
+                }),
+                'hisbar': cb
+            }
+        }*/
+    ];
+}
+    
+{
+    var fline = new line({
+                yAxisName: 'price',
+                xAxisName: 'date',
+                xAxisFocus: true,
+                strokeStyle: 'cyan',
+                lineWidth: 1
+            });
+    var tline = new line({
+                yAxisName: 'price',
+                xAxisName: 'date',
+                xAxisFocus: true,
+                strokeStyle: 'limegreen',
+                lineWidth: 1
+            });
+    var sline = new line({
+                yAxisName: 'price',
+                xAxisName: 'date',
+                xAxisFocus: true,
+                strokeStyle: 'magenta',
+                lineWidth: 1
+            });
+    
+    var paintStream = [
+        {
+            'price':{
+                region: { x: 'padding.left', y: 'padding.top', width: 'f:00.00', height: '55%' },
+                'price':new yAxis({
+                    font: '11px Arial',
+                    color: 'black',
+                    align: 'right',
+                    textBaseline: 'top',
+                    dataType: 'money',
+                    dataRange: 'range'
+                })
+            }
+        },
+        {
+            'main':{
+                region: {
+                    x: {'$and':['price.x', 'price.width', 3]}, y: {'$and':['price.y', (determineFontHeight('11px Arial')/2)]}
+                    , width: {'$sub':['100%','price.width','padding.right','padding.left']}, height: '55%',
+                    riseColor: 'red',
+                    fallColor: 'green',
+                    normalColor: 'black',
+                    chartMargin:{left:45.5,top:20.5,right:20.5},
+                    barWidth: 5, spaceWidth: 2, lineStyle: 'solid', borderColor: 'gray', splitLineColor: '#eeeeee', lineWidth: 1
+                },
+                'kline':new kLine({
+                    lineStyle: 'solid',
+                    yAxisName: 'price',
+                    xAxisName: 'date'
+                }),
+                'fline': fline,
+                'tline': tline,
+                'sline': sline,
+                'kCross': new cross({
+                    xAxisName: 'kline'
+                })
+            }
+        },
+        {
+            'date':{
+                region: { x: 'main.x', y: {'$and':['main.height', 'main.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: 'f:00-00-00' },
+                'date':new xAxis({
+                    font: '11px Arial',
+                    color: 'black',
+                    align: 'right',
+                    textBaseline: 'top',
+                    dataType: 'date',
+                    dataRange: 'seq'
+                })
+            }
+        },
+        {
+            'volume':{
+                region: { x: 'price.x', y: {'$and':['price.height', 'price.y', {'$mul':['date.height',2]}]}, width: 'f:0000', height: '18%' },
+                'volumeY':new yAxis({
+                    font: '11px Arial',
+                    color: 'black',
+                    align: 'right',
+                    textBaseline: 'top',
+                    dataType: 'number',
+                    dataRange: 'range'
+                })
+            }
+        },
+        {
+            'volmain':{
+                region: { x: 'main.x', y: {'$and':['volume.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: '18%' },
+                'volKline':new kLine({
+                    lineWidth: 1,
+                    lineStyle: 'solid',
+                    yAxisName: 'volumeY',
+                    xAxisName: 'date'
+                }),
+                'mCross': new cross({
+                    xAxisName: 'kline'
+                })
+            }
+        },
+        {
+            'yHistory':{
+                region: { x: 'price.x', y: {'$and':['volume.height', 'volmain.y', determineFontHeight('11px Arial')/2]}, width: 'f:00.00', height: '12%' },
+                'yHistory':new yAxis({
+                    font: '11px Arial',
+                    color: 'black',
+                    align: 'right',
+                    textBaseline: 'top',
+                    dataType: 'money',
+                    dataRange: 'range'
+                })
+            }
+        },
+        {
+            'history':{
+                region: { x: 'main.x', y: {'$and':['yHistory.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: '12%' },
+                'hline':new line({
+                    yAxisName: 'yHistory',
+                    strokeStyle: 'magenta',
+                    lineWidth: 1
+                }),
+                'hisbar': cb
+            }
+        }
+    ];
+}

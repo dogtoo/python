@@ -15,8 +15,7 @@
     <script src="js/controlbar.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/line.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/cross.js" type="text/javascript" charset="UTF8"></script>
-    <script src="js/k-data.js" type="text/javascript" charset="UTF8"></script>
-    <script src="js/painterKline.js" type="text/javascript" charset="UTF8"></script>
+    <script src="js/painterTrend.js" type="text/javascript" charset="UTF8"></script>
 </head>
 <body>
     <h1 id="h1"><%=msg%></h1>
@@ -25,37 +24,8 @@
 </body>
 <script type="text/javascript">
     var c = new control({
-        begin: 0,
-        range: 50});
-    
-    var cb = 
-        new controlbar(c.options);
-    cb.options.datasource = 'hline';
-    cb.options.order = 'desc';
-
+        begin: 0});
 {
-    var fline = new line({
-                yAxisName: 'price',
-                xAxisName: 'date',
-                xAxisFocus: true,
-                strokeStyle: 'cyan',
-                lineWidth: 1
-            });
-    var tline = new line({
-                yAxisName: 'price',
-                xAxisName: 'date',
-                xAxisFocus: true,
-                strokeStyle: 'limegreen',
-                lineWidth: 1
-            });
-    var sline = new line({
-                yAxisName: 'price',
-                xAxisName: 'date',
-                xAxisFocus: true,
-                strokeStyle: 'magenta',
-                lineWidth: 1
-            });
-    
     var paintStream = [
         {
             'price':{
@@ -81,35 +51,34 @@
                     chartMargin:{left:45.5,top:20.5,right:20.5},
                     barWidth: 5, spaceWidth: 2, lineStyle: 'solid', borderColor: 'gray', splitLineColor: '#eeeeee', lineWidth: 1
                 },
-                'kline':new kLine({
-                    lineStyle: 'solid',
+                'Tline':new line({
                     yAxisName: 'price',
-                    xAxisName: 'date'
+                    xAxisName: 'time',
+                    xAxisFocus: true,
+                    strokeStyle: 'cyan',
+                    lineWidth: 1
                 }),
-                'fline': fline,
-                'tline': tline,
-                'sline': sline,
                 'kCross': new cross({
-                    xAxisName: 'kline'
+                    xAxisName: 'Tline'
                 })
             }
         },
         {
-            'date':{
+            'time':{
                 region: { x: 'main.x', y: {'$and':['main.height', 'main.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: 'f:00-00-00' },
-                'date':new xAxis({
+                'time':new xAxis({
                     font: '11px Arial',
                     color: 'black',
                     align: 'right',
                     textBaseline: 'top',
-                    dataType: 'date',
+                    dataType: 'time',
                     dataRange: 'seq'
                 })
             }
         },
         {
             'volume':{
-                region: { x: 'price.x', y: {'$and':['price.height', 'price.y', {'$mul':['date.height',2]}]}, width: 'f:0000', height: '18%' },
+                region: { x: 'price.x', y: {'$and':['price.height', 'price.y', {'$mul':['time.height',2]}]}, width: 'f:0000', height: '18%' },
                 'volumeY':new yAxis({
                     font: '11px Arial',
                     color: 'black',
@@ -127,41 +96,43 @@
                     lineWidth: 1,
                     lineStyle: 'solid',
                     yAxisName: 'volumeY',
-                    xAxisName: 'date'
+                    xAxisName: 'time'
                 }),
                 'mCross': new cross({
                     xAxisName: 'kline'
                 })
             }
-        },
-        {
-            'yHistory':{
-                region: { x: 'price.x', y: {'$and':['volume.height', 'volmain.y', determineFontHeight('11px Arial')/2]}, width: 'f:00.00', height: '12%' },
-                'yHistory':new yAxis({
-                    font: '11px Arial',
-                    color: 'black',
-                    align: 'right',
-                    textBaseline: 'top',
-                    dataType: 'money',
-                    dataRange: 'range'
-                })
-            }
-        },
-        {
-            'history':{
-                region: { x: 'main.x', y: {'$and':['yHistory.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: '12%' },
-                'hline':new line({
-                    yAxisName: 'yHistory',
-                    strokeStyle: 'magenta',
-                    lineWidth: 1
-                }),
-                'hisbar': cb
-            }
         }
     ];
 }
-    var painter = new painterKline('kline',paintStream);
-    painter.load(cb, getKLData());
+    var painter = new painterTrend('kline',paintStream);
+    painter.load(c, [
+{
+    "time" : "09:00:06",
+    "price" : 41.85,
+    "vol" : 89
+},
+{
+    "time" : "09:00:26",
+    "price" : 41.85,
+    "vol" : 20
+},
+{
+    "time" : "09:01:01",
+    "price" : 41.95,
+    "vol" : 20
+},
+{
+    "time" : "09:01:06",
+    "price" : 41.9,
+    "vol" : 8
+},
+{
+    "time" : "09:01:11",
+    "price" : 41.95,
+    "vol" : 2
+}
+    ]);
     painter.padding.top = 10;
     painter.padding.left = 10;
     painter.padding.right = 20;

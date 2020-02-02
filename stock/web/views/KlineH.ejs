@@ -35,22 +35,22 @@
 
 {
     var fline = new line({
-                yAxisName: 'price',
-                xAxisName: 'date',
+                yAxisName: 'date',
+                xAxisName: 'price',
                 xAxisFocus: true,
                 strokeStyle: 'cyan',
                 lineWidth: 1
             });
     var tline = new line({
-                yAxisName: 'price',
-                xAxisName: 'date',
+                yAxisName: 'date',
+                xAxisName: 'price',
                 xAxisFocus: true,
                 strokeStyle: 'limegreen',
                 lineWidth: 1
             });
     var sline = new line({
-                yAxisName: 'price',
-                xAxisName: 'date',
+                yAxisName: 'date',
+                xAxisName: 'price',
                 xAxisFocus: true,
                 strokeStyle: 'magenta',
                 lineWidth: 1
@@ -58,23 +58,23 @@
     
     var paintStream = [
         {
-            'price':{
-                region: { x: 'padding.left', y: 'padding.top', width: 'f:00.00', height: '55%' },
-                'price':new yAxis({
+            'date':{
+                region: { x: 'padding.left', y: 'padding.top', width: 'f:0000-00-00', height: '80%' },
+                'date':new yAxis({
                     font: '11px Arial',
                     color: 'black',
-                    align: 'right',
+                    align: 'left',
                     textBaseline: 'top',
-                    dataType: 'money',
-                    dataRange: 'range'
+                    dataType: 'date',
+                    dataRange: 'seq'
                 })
             }
         },
         {
             'main':{
                 region: {
-                    x: {'$and':['price.x', 'price.width', 3]}, y: {'$and':['price.y', (determineFontHeight('11px Arial')/2)]}
-                    , width: {'$sub':['100%','price.width','padding.right','padding.left']}, height: '55%',
+                    x: {'$and':['date.x', 'date.width', 3]}, y: {'$and':['date.y', (determineFontHeight('11px Arial')/2)]}
+                    , width: {'$sub':['100%','date.width','padding.right','padding.left']}, height: '80%',
                     riseColor: 'red',
                     fallColor: 'green',
                     normalColor: 'black',
@@ -83,30 +83,25 @@
                 },
                 'kline':new kLine({
                     lineStyle: 'solid',
-                    yAxisName: 'price',
-                    xAxisName: 'date'
-                }),
-                'fline': fline,
-                'tline': tline,
-                'sline': sline,
-                'kCross': new cross({
-                    xAxisName: 'kline'
+                    yAxisName: 'date',
+                    xAxisName: 'price',
+                    axial: 'hor'
                 })
             }
         },
         {
-            'date':{
-                region: { x: 'main.x', y: {'$and':['main.height', 'main.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: 'f:00-00-00' },
-                'date':new xAxis({
+            'price':{
+                region: { x: 'main.x', y: {'$and':['main.height', 'main.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: 'f:00.00' },
+                'price':new xAxis({
                     font: '11px Arial',
                     color: 'black',
                     align: 'right',
                     textBaseline: 'top',
-                    dataType: 'date',
-                    dataRange: 'seq'
+                    dataType: 'money',
+                    dataRange: 'range'
                 })
             }
-        },
+        }/*,
         {
             'volume':{
                 region: { x: 'price.x', y: {'$and':['price.height', 'price.y', {'$mul':['date.height',2]}]}, width: 'f:0000', height: '18%' },
@@ -157,7 +152,7 @@
                 }),
                 'hisbar': cb
             }
-        }
+        }*/
     ];
 }
     var painter = new painterKline('kline',paintStream);

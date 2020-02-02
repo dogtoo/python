@@ -222,6 +222,8 @@ function format(val, type) {
 
         } else if (type === 'date') {
             return convertDate(val);
+        } else if (type === 'time') {
+            return val;
         } else if (type === 'number') {
             return bigNumberToText(val);
         }           
