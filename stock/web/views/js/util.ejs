@@ -176,7 +176,7 @@
             h = (typeof time[1] != 'undefined') ? time[1] : 0;
             m = (typeof time[2] != 'undefined') ? time[2] : 0;
             s = (typeof time[5] != 'undefined') ? time[5] : 0;
-            return h * 60 * 60 + m * 60 + s;
+            return h * 60 * 60 + m * 60 + s * 1;
         },
         calcRangeValues: function(high, low, count, type = 'number', format = 'undefined') {
             if (format == 'undefined') format = high;

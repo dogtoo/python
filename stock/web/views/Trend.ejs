@@ -54,9 +54,9 @@
                 'Tline':new line({
                     yAxisName: 'price',
                     xAxisName: 'time',
-                    xAxisFocus: true,
+                    xAxisFocus: false,
                     strokeStyle: 'cyan',
-                    lineWidth: 1
+                    lineWidth: 3
                 }),
                 'kCross': new cross({
                     xAxisName: 'Tline'
@@ -100,7 +100,7 @@
                     xAxisName: 'time'
                 }),
                 'mCross': new cross({
-                    xAxisName: 'kline'
+                    xAxisName: 'Tline'
                 })
             }
         }

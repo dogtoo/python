@@ -61,14 +61,28 @@ line.prototype = {
             if (this.options.xAxis.options.dataRange === 'seq') 
                 return i * this.options.xAxis.options.scale;
             else if (this.options.xAxis.options.dataRange === 'range') {
-                if (this.data[this.implName][i][1] < this.options.yAxis.options.first) this.options.yAxis.options.first = this.data[this.implName][i][1];
-                if (this.data[this.implName][i][1] > this.options.yAxis.options.last) this.options.yAxis.options.last = this.data[this.implName][i][1];
-                if (typeof this.data[this.options.xAxisName] != 'undefined')
+                if (this.data[this.implName][i][0] < this.options.yAxis.options.first) this.options.yAxis.options.first = this.data[this.implName][i][0];
+                if (this.data[this.implName][i][0] > this.options.yAxis.options.last) this.options.yAxis.options.last = this.data[this.implName][i][0];
+                if (typeof this.data[this.options.xAxisName] != 'undefined') {
                     this.data[this.options.xAxisName] = calcRangeValues(this.options.xAxis.options.last
                                     , this.options.xAxis.options.first
-                                    , this.options.xAxis.options.verticalLineCount);
+                                    , this.options.xAxis.options.verticalLineCount
+                                    , this.options.xAxis.options.dataType);
+                    if (this.options.xAxis.options.order == 'desc') {
+                        this.data[this.options.xAxisName].sort(function(a, b) {
+                            return a - b;
+                        });
+                    }
+                }
+                var diff = 0;
+                if (this.options.xAxis.options.order == 'desc')
+                    diff = convertFormat(this.options.xAxis.options.last, this.options.xAxis.options.dataType)
+                         - convertFormat(this.data[this.implName][i][0], this.options.xAxis.options.dataType);
+                else
+                    diff = convertFormat(this.data[this.implName][i][0], this.options.xAxis.options.dataType)
+                         - convertFormat(this.options.xAxis.options.first, this.options.xAxis.options.dataType);
                 return this.paintRegion[this.paintName + '.width']
-                    - (this.data[this.implName][i][1]- this.options.xAxis.options.first) * this.options.xAxis.options.scale;// + this.options.disX;
+                    - this.options.xAxis.options.scale * (diff);
             }
         }
         //return this.options.xAxis.getX.call(this, i);
@@ -84,12 +98,26 @@ line.prototype = {
             else if (this.options.yAxis.options.dataRange === 'range') {
                 if (this.data[this.implName][i][1] < this.options.yAxis.options.low) this.options.yAxis.options.low = this.data[this.implName][i][1];
                 if (this.data[this.implName][i][1] > this.options.yAxis.options.high) this.options.yAxis.options.high = this.data[this.implName][i][1];
-                if (typeof this.data[this.options.yAxisName] != 'undefined')
+                if (typeof this.data[this.options.yAxisName] != 'undefined') {
                     this.data[this.options.yAxisName] = calcRangeValues(this.options.yAxis.options.high
                                     , this.options.yAxis.options.low
-                                    , this.options.yAxis.options.horizontalLineCount);
+                                    , this.options.yAxis.options.horizontalLineCount
+                                    , this.options.yAxis.options.dataType);
+                    if (this.options.yAxis.options.order == 'desc') {
+                        this.data[this.options.yAxisName].sort(function(a, b) {
+                            return a - b;
+                        });
+                    }
+                }
+                var diff = 0;
+                if (this.options.yAxis.options.order == 'desc')
+                    diff = convertFormat(this.options.yAxis.options.high, this.options.yAxis.options.dataType)
+                         - convertFormat(this.data[this.implName][i][1], this.options.yAxis.options.dataType);
+                else
+                    diff = convertFormat(this.data[this.implName][i][1], this.options.yAxis.options.dataType)
+                         - convertFormat(this.options.yAxis.options.low, this.options.yAxis.options.dataType);
                 return this.paintRegion[this.paintName + '.height']
-                    - (this.data[this.implName][i][1]- this.options.yAxis.options.low) * this.options.yAxis.options.scale;//+ this.options.disY;
+                    - this.options.yAxis.options.scale * (diff);
             }
         }
         //return this.options.yAxis.getY.call(this, i);

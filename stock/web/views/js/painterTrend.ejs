@@ -73,11 +73,11 @@
                        , this.paintRegion['volmain.height']);
                        this.ctx.stroke();
         
-        
+        /*
         for (var i in this.implements.volumeY.options.y) {
             this.drawHLine('#eeeeee', 0, this.implements.volumeY.options.y[i], this.paintRegion['main.width'], 1, 'solid');
             this.ctx.stroke();
-        }
+        }*/
         
         var v_c = Math.round((this.implements.time.options.x.length)/this.implements.time.options.verticalLineCount);
         for (var i = 0 ; i < this.implements.time.options.x.length ; i+= v_c) {

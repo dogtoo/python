@@ -22,9 +22,8 @@ function xAxis(options){
     };
     xAxis.prototype.getX = function (i) {
         if (this.options.build) {
-            console.log(this.paintRegion[this.paintName + '.width'] / this.options.scale);
             if (this.paintRegion[this.paintName + '.width'] / this.options.scale > this.options.x.length) {
-                return this.options.x[x];
+                return this.options.x[i];
             } else {
                 var v_c = Math.round((this.options.x.length)/this.options.verticalLineCount);
                 var x = (i * v_c);
@@ -44,7 +43,6 @@ function xAxis(options){
                     diff = convertFormat(this.options.last, this.options.dataType) - convertFormat(this.data[this.implName][i], this.options.dataType);
                 else
                     diff = convertFormat(this.data[this.implName][i], this.options.dataType) - convertFormat(this.options.first, this.options.dataType);
-                console.log(this.paintRegion[this.paintName + '.width'] - this.options.scale * diff);
                 return this.paintRegion[this.paintName + '.width'] - this.options.scale * (diff);
             }
         }        

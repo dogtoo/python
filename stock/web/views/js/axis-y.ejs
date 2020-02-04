@@ -66,7 +66,7 @@ function yAxis(options) {
 
         this.options.horizontalLineCount = Math.round(this.paintRegion[this.paintName + '.height'] / this.options.fontHeight / 2);
         this.options.horizontalLineCount = (this.options.horizontalLineCount <= 1) ? 2 : this.options.horizontalLineCount;
-        if (data.length < this.options.horizontalLineCount) this.options.horizontalLineCount = data.length;
+        //if (data.length < this.options.horizontalLineCount) this.options.horizontalLineCount = data.length;
         if (this.options.dataRange === 'seq') {
             var yScalers = [];
             var stepLength = data.length / (this.options.horizontalLineCount - 1);
