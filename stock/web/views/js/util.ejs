@@ -143,12 +143,50 @@
         getEventTarget: function (e) {
             return e.srcElement || e.target || e.relatedTarget;
         },
-        calcRangeValues: function(high, low, count) {
+        convertFormat: function(val, type) {
+            if (type.match(/time/)) {
+                 return getSec(val);
+             } else if (type.match(/date/)) {
+             
+             } else if (type.match(/datetime/)) {
+             
+             } else
+                 return val;
+        },
+        reConvertFormat: function(val, type, format) {
+            if (type.match(/time/)) {
+                var s = val;
+                var h = Math.floor(s / (60 * 60));
+                hh = ((''+h).length == 1) ? '0' + h : h;
+                var m = Math.floor( (s - (h * (60 * 60))) / 60 );
+                mm = ((''+m).length == 1) ? '0' + m : m;
+                s = s - (h * 60 * 60 + m * 60);
+                ss = ((''+s).length == 1) ? '0' + s : s;
+                return (format.length <= 6) ? hh + '' + mm : hh + '' + mm + ss;
+             } else if (type.match(/date/)) {
+             
+             } else if (type.match(/datetime/)) {
+             
+             } else
+                 return val;
+        },
+        getSec: function(time) {
+            time = time.match(/(\d{1,2})\:{0,1}(\d{1,2})((\:{0,1}(\d{1,2})){0,1})/);
+            var h,m,s;
+            h = (typeof time[1] != 'undefined') ? time[1] : 0;
+            m = (typeof time[2] != 'undefined') ? time[2] : 0;
+            s = (typeof time[5] != 'undefined') ? time[5] : 0;
+            return h * 60 * 60 + m * 60 + s;
+        },
+        calcRangeValues: function(high, low, count, type = 'number', format = 'undefined') {
+            if (format == 'undefined') format = high;
+            high = this.convertFormat(high, type);
+            low = this.convertFormat(low, type);
             var diff = high - low;
             var space = diff / (count-1);
             var result = [];
             for (var i = 0; i < count; i++) {
-                result.push(high - i * space);
+                result.push(reConvertFormat(high - i * space, type, format));
             }
             return result;
         },
