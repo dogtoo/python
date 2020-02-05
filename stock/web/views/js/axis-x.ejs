@@ -22,16 +22,12 @@ function xAxis(options){
     };
     xAxis.prototype.getX = function (i) {
         if (this.options.build) {
-            if (this.paintRegion[this.paintName + '.width'] / this.options.scale > this.options.x.length) {
-                return this.options.x[i];
-            } else {
-                var v_c = Math.round((this.options.x.length)/this.options.verticalLineCount);
-                var x = (i * v_c);
-                var diff = this.options.x.length - x;
-                //if (diff < v_c || x >= this.options.x.length) x = this.options.x.length - 1;
-                return (this.options.x[x] + this.options.fontWidth/2 <= this.paintRegion[this.paintName + '.width']) ? 
-                    this.options.x[x] - this.options.fontWidth/2 : this.paintRegion[this.paintName + '.width'] - this.options.fontWidth/2;
-            }
+            var v_c = Math.round((this.options.x.length)/this.options.verticalLineCount);
+            var x = (i * v_c);
+            var diff = this.options.x.length - x;
+            //if (diff < v_c || x >= this.options.x.length) x = this.options.x.length - 1;
+            return (this.options.x[x] + this.options.fontWidth/2 <= this.paintRegion[this.paintName + '.width']) ? 
+                this.options.x[x] - this.options.fontWidth/2 : this.paintRegion[this.paintName + '.width'] - this.options.fontWidth/2;
         } else {
             if (i == this.data[this.implName].length-1) return this.paintRegion[this.paintName + '.width'] ;
             this.implement.getXScale.call(this, this.options, this.data[this.implName]);
@@ -73,9 +69,9 @@ function xAxis(options){
         this.options.fontWidth= determineFontWidth(this.options.font, data[0]);
         this.options.verticalLineCount = Math.round((this.paintRegion[this.paintName + '.width'] - this.options.fontWidth) / this.options.fontWidth /3 );
         this.options.verticalLineCount = (this.options.verticalLineCount <= 1) ? 2 : this.options.verticalLineCount;
-        if (data.length < this.options.verticalLineCount) this.options.verticalLineCount = data.length;
         if (this.options.dataRange === 'seq') {
             var xScalers = [];
+            if (data.length < this.options.verticalLineCount) this.options.verticalLineCount = data.length - 1;
             var stepLength = Math.round(data.length / this.options.verticalLineCount);
             if (stepLength < 1) {
                 this.options.verticalLineCount = data.length - 1;

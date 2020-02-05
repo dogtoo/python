@@ -13,6 +13,7 @@ function kLine(options) {
   this.options.moveAcc = 0;
   this.options.onMove = false;
   if (typeof this.options.control === 'undefined') this.options.control = new control({});
+  this.options.range_idx = 0;
 }
 
 kLine.prototype = {
@@ -43,6 +44,7 @@ kLine.prototype = {
         this.options.xAxis.options.y = [];
         this.options.x = [];
         this.options.y = [];
+        this.options.range_idx = 0;
     },
     end: function () { 
         this.ctx.restore();
@@ -57,22 +59,39 @@ kLine.prototype = {
             this.options.yAxis.getYScale.call(this, this.options.yAxis.options, this.data[this.implName])
             this.options.xAxis.getXScale.call(this, this.options.xAxis.options, this.data[this.implName])
         }
-        
+        var dataRange = 'seq';
+        var diff = 0;
         if (this.options.axial === 'ver') {
             if (this.options.xAxis.options.dataRange === 'seq') {
                 this.options.kLineWidth = (this.paintRegion[paintName + '.width'] / this.data[this.implName].length);
             } else if (this.options.xAxis.options.dataRange === 'range') {
-                this.options.kLineWidth = (this.paintRegion[paintName + '.width'] / (this.options.xAxis.options.last - this.options.xAxis.options.first));
+                if (this.options.xAxis.options.order == 'desc')
+                    diff = convertFormat(this.options.xAxis.options.last, this.options.xAxis.options.dataType)
+                         - convertFormat(this.data[this.implName][0][0], this.options.xAxis.options.dataType);
+                else
+                    diff = convertFormat(this.data[this.implName][0][0], this.options.xAxis.options.dataType)
+                         - convertFormat(this.options.xAxis.options.first, this.options.xAxis.options.dataType);
+                this.options.kLineWidth = (this.paintRegion[paintName + '.width'] / (diff));
+                dataRange = 'range';
             }
         } else if (this.options.axial === 'hor') {
             if (this.options.yAxis.options.dataRange === 'seq') {
                 this.options.kLineWidth = (this.paintRegion[paintName + '.height'] / this.data[this.implName].length);
             } else if (this.options.yAxis.options.dataRange === 'range') {
-                this.options.kLineWidth = (this.paintRegion[paintName + '.height'] / (this.options.yAxis.options.high - this.options.yAxis.options.low));
-
+                if (this.options.yAxis.options.order == 'desc')
+                    diff = convertFormat(this.options.yAxis.options.high, this.options.yAxis.options.dataType)
+                         - convertFormat(this.data[this.implName][0][1], this.options.yAxis.options.dataType);
+                else
+                    diff = convertFormat(this.data[this.implName][0][1], this.options.yAxis.options.dataType)
+                         - convertFormat(this.options.yAxis.options.low, this.options.yAxis.options.dataType);
+                this.options.kLineWidth = (this.paintRegion[paintName + '.height'] / (diff));
+                dataRange = 'range';
             }
         }
-        return (typeof this.data[this.implName] != 'undefined') ? this.data[this.implName].length : 0;
+        if (dataRange == 'seq')
+            return (typeof this.data[this.implName] != 'undefined') ? this.data[this.implName].length : 0;
+        else if (dataRange == 'range')
+            return diff;
     },
     getX: function (i) {
         return this.implements[this.implName].getXY.call(this, i, this.options.xAxis);
@@ -86,24 +105,73 @@ kLine.prototype = {
             return i * axis.options.scale;
         } else if ((this.options.axial === 'hor' && axis.toString() === 'xAxis')
                 || (this.options.axial === 'ver' && axis.toString() === 'yAxis') ) {
-            var open = this.data[this.implName][i][1];
-            var close = this.data[this.implName][i][2];
-            var last = this.data[this.implName][i][3];
-            var first = this.data[this.implName][i][4];
-            var low = this.data[this.implName][i][3];
-            var high = this.data[this.implName][i][3];
-            var low = this.data[this.implName][i][4];
-            //console.log('open:'+open+', close:'+close+', last:'+last+', first'+first);
-            if (axis.toString() === 'xAxis') {
-                return [(open - axis.options.first) * axis.options.scale
-                      , (close - axis.options.first) * axis.options.scale
-                      , (last - axis.options.first) * axis.options.scale
-                      , (first- axis.options.first) * axis.options.scale];
-            } else {
-                return [(open - axis.options.low) * axis.options.scale
-                      , (close - axis.options.low) * axis.options.scale
-                      , (high - axis.options.low) * axis.options.scale
-                      , (low - axis.options.low) * axis.options.scale];
+            var dataRange = 'seq';
+            if (this.options.axial === 'ver' && axis.toString() === 'yAxis')
+                dataRange = this.options.xAxis.options.dataRange;
+            else if (this.options.axial === 'hor' && axis.toString() === 'xAxis')
+                dataRange = this.options.yAxis.options.dataRange;
+            if (dataRange == 'seq') {
+                var open = this.data[this.implName][i][1];
+                var close = this.data[this.implName][i][2];
+                var last = this.data[this.implName][i][3];
+                var first = this.data[this.implName][i][4];
+                var low = this.data[this.implName][i][3];
+                var high = this.data[this.implName][i][3];
+                var low = this.data[this.implName][i][4];
+                //console.log('open:'+open+', close:'+close+', last:'+last+', first'+first);
+                if (axis.toString() === 'xAxis') {
+                    return [(open - axis.options.first) * axis.options.scale
+                          , (close - axis.options.first) * axis.options.scale
+                          , (last - axis.options.first) * axis.options.scale
+                          , (first- axis.options.first) * axis.options.scale];
+                } else {
+                    return [(open - axis.options.low) * axis.options.scale
+                          , (close - axis.options.low) * axis.options.scale
+                          , (high - axis.options.low) * axis.options.scale
+                          , (low - axis.options.low) * axis.options.scale];
+                }
+            } else if (dataRange == 'range') {
+                var idx = this.options.range_idx;
+                //可能要x軸的起始值才能算
+                var val = 0;
+                if (this.data[this.implName].length <= idx)
+                    return [0,0,0,0];
+                if (axis.toString() === 'xAxis') {
+                    
+                } else {
+                    if (this.options.xAxis.options.order == 'desc')
+                        val = convertFormat(this.data[this.implName][idx][0], this.options.xAxis.options.dataType) 
+                            - convertFormat(this.options.xAxis.options.first, this.options.xAxis.options.dataType);
+                    else
+                        val = convertFormat(this.data[this.implName][idx][0], this.options.xAxis.options.dataType) 
+                            - convertFormat(this.options.xAxis.options.last, this.options.xAxis.options.dataType);
+                }
+                if (val == i) {
+                    var open = this.data[this.implName][idx][1];
+                    var close = this.data[this.implName][idx][2];
+                    var last = this.data[this.implName][idx][3];
+                    var first = this.data[this.implName][idx][4];
+                    var low = this.data[this.implName][idx][3];
+                    var high = this.data[this.implName][idx][3];
+                    var low = this.data[this.implName][idx][4];
+                    this.options.range_idx += 1;
+                    if (axis.toString() === 'xAxis') {
+                        return [(open - axis.options.first) * axis.options.scale
+                              , (close - axis.options.first) * axis.options.scale
+                              , (last - axis.options.first) * axis.options.scale
+                              , (first- axis.options.first) * axis.options.scale];
+                    } else {
+                        return [(open - axis.options.low) * axis.options.scale
+                              , (close - axis.options.low) * axis.options.scale
+                              , (high - axis.options.low) * axis.options.scale
+                              , (low - axis.options.low) * axis.options.scale];
+                    }
+                } else {
+                    return [0
+                          , 0
+                          , 0
+                          , 0];
+                }
             }
         }
     },

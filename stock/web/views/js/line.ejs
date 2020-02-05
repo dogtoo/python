@@ -34,7 +34,7 @@ line.prototype = {
         var ctx = this.ctx;
         ctx.save();
         ctx.translate(this.paintRegion[paintName + '.x'], this.paintRegion[paintName + '.y']);
-
+        
         this.ctx.beginPath();
         this.ctx.strokeStyle = this.options.strokeStyle;
         this.ctx.lineWidth = this.options.lineWidth;
@@ -50,13 +50,26 @@ line.prototype = {
             this.options.yAxis.getYScale.call(this, this.options.yAxis.options, this.data[this.implName])
             this.options.xAxis.getXScale.call(this, this.options.xAxis.options, this.data[this.implName])
         }
+
         return (typeof this.data[this.implName] != 'undefined') ? this.data[this.implName].length : 0;
     },
     getX: function (i) {
         if (this.data[this.implName][i][0] === null) return null;
         if (this.options.xAxisFocus) {
             //console.log(i + ':' +this.options.xAxis.options.x[i]);
-            return this.options.xAxis.options.x[i];
+            if (this.options.xAxis.options.dataRange === 'seq') 
+                return this.options.xAxis.options.x[i];
+            } else if (this.options.xAxis.options.dataRange === 'range') {
+                var val = this.data[this.implName][i][0];
+                var diff = 0;
+                if (this.options.xAxis.options.order == 'desc')
+                    diff = convertFormat(val, this.options.xAxis.options.dataType) 
+                        - convertFormat(this.options.xAxis.options.first, this.options.xAxis.options.dataType);
+                else
+                    diff = convertFormat(val, this.options.xAxis.options.dataType) 
+                        - convertFormat(this.options.xAxis.options.last, this.options.xAxis.options.dataType);
+                return this.options.xAxis.options.x[diff];
+            }
         } else {
             if (this.options.xAxis.options.dataRange === 'seq') 
                 return i * this.options.xAxis.options.scale;
@@ -91,7 +104,19 @@ line.prototype = {
     getY: function (i) {
         if (this.data[this.implName][i][1] === null) return null;
         if (this.options.yAxisFocus){
-            return this.options.yAxis.options.y[i];
+            if (this.options.yAxis.options.dataRange === 'seq')
+                return this.options.yAxis.options.y[i];
+            else if (this.options.yAxis.options.dataRange === 'range') {
+                var val = this.data[this.implName][i][1];
+                var diff = 0;
+                if (this.options.yAxis.options.order == 'desc')
+                    diff = convertFormat(val, this.options.yAxis.options.dataType) 
+                        - convertFormat(this.options.yAxis.options.low, this.options.yAxis.options.dataType);
+                else
+                    diff = convertFormat(val, this.options.yAxis.options.dataType) 
+                        - convertFormat(this.options.yAxis.options.high, this.options.yAxis.options.dataType);
+                return this.options.yAxis.options.y[diff];
+            }
         } else {
             if (this.options.yAxis.options.dataRange === 'seq') 
                 return i * this.options.yAxis.options.scale;

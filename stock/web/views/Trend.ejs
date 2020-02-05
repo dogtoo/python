@@ -54,12 +54,12 @@
                 'Tline':new line({
                     yAxisName: 'price',
                     xAxisName: 'time',
-                    xAxisFocus: false,
-                    strokeStyle: 'cyan',
-                    lineWidth: 3
+                    xAxisFocus: true,
+                    strokeStyle: 'red',
+                    lineWidth: 1
                 }),
                 'kCross': new cross({
-                    xAxisName: 'Tline'
+                    xAxisName: 'volKline'
                 })
             }
         },
@@ -109,6 +109,11 @@
     var painter = new painterTrend('kline',paintStream);
     painter.load(c, [
 {
+    "time" : "09:00:00",
+    "price" : 40.0,
+    "vol" : 89
+},
+{
     "time" : "09:00:06",
     "price" : 41.85,
     "vol" : 89
@@ -116,6 +121,11 @@
 {
     "time" : "09:00:26",
     "price" : 41.85,
+    "vol" : 20
+},
+{
+    "time" : "09:01:00",
+    "price" : 42.21,
     "vol" : 20
 },
 {

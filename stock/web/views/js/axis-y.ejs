@@ -37,8 +37,14 @@ function yAxis(options) {
             this.implement.getYScale.call(this, this.options, this.data[this.implName]);
             if (this.options.dataRange === 'seq')
                 return i * this.options.scale;
-            if (this.options.dataRange === 'range')
-                return this.paintRegion[this.paintName + '.height'] - this.options.scale * (this.data[this.implName][i] - this.options.low);
+            if (this.options.dataRange === 'range') {
+                var diff = 0;
+                if (this.options.order == 'desc')
+                    diff = convertFormat(this.options.high, this.options.dataType) - convertFormat(this.data[this.implName][i], this.options.dataType);
+                else
+                    diff = convertFormat(this.data[this.implName][i], this.options.dataType) - convertFormat(this.options.low, this.options.dataType);
+                return this.paintRegion[this.paintName + '.height'] - this.options.scale * (diff);
+            }
         }
     };
     yAxis.prototype.getHeight = function(format) {
@@ -66,9 +72,9 @@ function yAxis(options) {
 
         this.options.horizontalLineCount = Math.round(this.paintRegion[this.paintName + '.height'] / this.options.fontHeight / 2);
         this.options.horizontalLineCount = (this.options.horizontalLineCount <= 1) ? 2 : this.options.horizontalLineCount;
-        //if (data.length < this.options.horizontalLineCount) this.options.horizontalLineCount = data.length;
         if (this.options.dataRange === 'seq') {
             var yScalers = [];
+            if (data.length < this.options.horizontalLineCount) this.options.horizontalLineCount = data.length;
             var stepLength = data.length / (this.options.horizontalLineCount - 1);
             if (stepLength < 1) {
                 this.options.horizontalLineCount = data.length;
