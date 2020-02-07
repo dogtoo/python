@@ -71,7 +71,8 @@ kLine.prototype = {
                 else
                     diff = convertFormat(this.data[this.implName][0][0], this.options.xAxis.options.dataType)
                          - convertFormat(this.options.xAxis.options.first, this.options.xAxis.options.dataType);
-                this.options.kLineWidth = (this.paintRegion[paintName + '.width'] / (diff));
+                diff += 1;
+                this.options.kLineWidth = (this.paintRegion[paintName + '.width'] / diff);
                 dataRange = 'range';
             }
         } else if (this.options.axial === 'hor') {
@@ -84,7 +85,8 @@ kLine.prototype = {
                 else
                     diff = convertFormat(this.data[this.implName][0][1], this.options.yAxis.options.dataType)
                          - convertFormat(this.options.yAxis.options.low, this.options.yAxis.options.dataType);
-                this.options.kLineWidth = (this.paintRegion[paintName + '.height'] / (diff));
+                diff += 1;
+                this.options.kLineWidth = (this.paintRegion[paintName + '.height'] / diff);
                 dataRange = 'range';
             }
         }
@@ -132,12 +134,16 @@ kLine.prototype = {
                 }
             } else if (dataRange == 'range') {
                 var idx = this.options.range_idx;
-                //可能要x軸的起始值才能算
                 var val = 0;
                 if (this.data[this.implName].length <= idx)
                     return [0,0,0,0];
                 if (axis.toString() === 'xAxis') {
-                    
+                    if (this.options.yAxis.options.order == 'desc')
+                        val = convertFormat(this.data[this.implName][idx][0], this.options.yAxis.options.dataType) 
+                            - convertFormat(this.options.yAxis.options.low, this.options.yAxis.options.dataType);
+                    else
+                        val = convertFormat(this.data[this.implName][idx][0], this.options.yAxis.options.dataType) 
+                            - convertFormat(this.options.yAxis.options.high, this.options.yAxis.options.dataType);
                 } else {
                     if (this.options.xAxis.options.order == 'desc')
                         val = convertFormat(this.data[this.implName][idx][0], this.options.xAxis.options.dataType) 
@@ -199,11 +205,13 @@ kLine.prototype = {
             }
             var kLineDrawWidth = w * .7;
             this.options.kLineDrawWidth = kLineDrawWidth;
-            this.ctx.rect(x + (w - kLineDrawWidth)/2
-                        , this.paintRegion[this.paintName + '.height'] - yScale
-                        , kLineDrawWidth
-                        , h);
-            this.ctx.fill();
+            if (h > 0) {
+                this.ctx.rect(x + (w - kLineDrawWidth)/2
+                            , this.paintRegion[this.paintName + '.height'] - yScale
+                            , kLineDrawWidth
+                            , h);
+                this.ctx.fill();
+            }
             var x_ = x + (w/2);
             this.options.xAxis.options.x.push(x_);
             this.options.x.push(x_);
@@ -230,11 +238,13 @@ kLine.prototype = {
             }
             var kLineDrawWidth = h * .7;
             this.options.kLineDrawWidth = kLineDrawWidth;
-            this.ctx.rect(this.paintRegion[this.paintName + '.width'] - xScale
-                        , y + (h - kLineDrawWidth)/2
-                        , w
-                        , kLineDrawWidth);
-            this.ctx.fill();
+            if (w > 0) {
+                this.ctx.rect(this.paintRegion[this.paintName + '.width'] - xScale
+                            , y + (h - kLineDrawWidth)/2
+                            , w
+                            , kLineDrawWidth);
+                this.ctx.fill();
+            }
             var y_ = y + (h/2);
             this.options.yAxis.options.y.push(y_);
             this.options.x.push(x);

@@ -7,18 +7,22 @@
         var Tline = [];
 
         //var priceL = [];
-        var open = 41.75;
+        var open = this.data[0]['price'];
         var up = Math.floor(open * 1.1 * 100) /100;
         var down = Math.floor(open * 0.9 * 100) /100;
         var price = [down, up];
-        var time = ['0900','0910'];
+        var time = ['0900','0930','1000','1030','1100','1130','1200','1230','1300','1330'];
         
         var volume = [0];
         var volKline = [];
-
+        var Distime = {};
         
         for (var i =　0; i < this.data.length; i++) {
             var rawData = this.data[i];
+            if (typeof Distime[rawData['time']] == 'undefined')
+                Distime[rawData['time']] = 1;
+            else
+                continue;
             Tline.push([rawData['time'],rawData['price']]);
                 
             volume.push(rawData['vol']);
@@ -28,8 +32,8 @@
         this.data.price = price;
         this.data.time = time;
 
-        volume.sort(function(a, b) {
-            return a - b;
+        volume.sort(function(b, a) {
+            return b - a;
         });
         this.data.volumeY = volume;
         

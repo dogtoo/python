@@ -74,10 +74,10 @@ function yAxis(options) {
         this.options.horizontalLineCount = (this.options.horizontalLineCount <= 1) ? 2 : this.options.horizontalLineCount;
         if (this.options.dataRange === 'seq') {
             var yScalers = [];
-            if (data.length < this.options.horizontalLineCount) this.options.horizontalLineCount = data.length;
+            if (data.length < this.options.horizontalLineCount) this.options.horizontalLineCount = data.length - 1;
             var stepLength = data.length / (this.options.horizontalLineCount - 1);
             if (stepLength < 1) {
-                this.options.horizontalLineCount = data.length;
+                this.options.horizontalLineCount = data.length - 1;
                 stepLength = 1;
             }
             yScalers.push(data[0]);
@@ -93,7 +93,8 @@ function yAxis(options) {
             this.options.high = data[data.length-1];
             this.data[this.implName] = calcRangeValues(this.options.high
                                 , this.options.low
-                                , this.options.horizontalLineCount, this.options.dataType)
+                                , this.options.horizontalLineCount, this.options.dataType);
+            this.options.horizontalLineCount -= 1;
             if (this.options.order == 'desc') {
                 this.data[this.implName].sort(function(a, b) {
                     return a - b;
