@@ -21,26 +21,30 @@
         var yHistory = {};
         var hline = [];
         
-        for (var i =　0; i < data.length; i++) {
-            var rawData = data[i];
-            yHistory[Number(rawData[3])] = 1;
-            yHistory[Number(rawData[4])] = 1;
-            hline.push([rawData[0], rawData[5]]);
+        for (var i =　0; i < this.data.length; i++) {
+            var rawData = this.data[i];
+            yHistory[Number(rawData['high'])] = 1;
+            yHistory[Number(rawData['low'])] = 1;
+            hline.push([rawData['quoteTime'], rawData['close']]);
             if (i >= cb.options.begin && i <= cb.options.end) {
-                price[Number(rawData[3])] = 1;
-                price[Number(rawData[4])] = 1;
-                date[rawData[0]] = 1;
-                kline.push([rawData[0], rawData[2], rawData[5], rawData[3], rawData[4] ]);
+                price[Number(rawData['high'])] = 1;
+                price[Number(rawData['low'])] = 1;
+                date[rawData['quoteTime']] = 1;
+                kline.push([rawData['quoteTime']
+                          , rawData['open']
+                          , rawData['close']
+                          , rawData['high']
+                          , rawData['low'] ]);
 
-                fline.push(MACount(5, i, data));
-                tline.push(MACount(10, i, data));
-                sline.push(MACount(20, i, data));
+                fline.push(MACount(5, i, this.data));
+                tline.push(MACount(10, i, this.data));
+                sline.push(MACount(20, i, this.data));
                 
-                volume.push(rawData[6]);
-                if (rawData[5] > rawData[2])
-                    volKline.push([rawData[0], 0, rawData[6], 0, rawData[6] ]);
+                volume.push(rawData['volume']);
+                if (rawData['close'] > rawData['open'])
+                    volKline.push([rawData['quoteTime'], 0, rawData['volume'], 0, rawData['volume'] ]);
                 else
-                    volKline.push([rawData[0], rawData[6], 0,  rawData[6], 0]);
+                    volKline.push([rawData['quoteTime'], rawData['volume'], 0,  rawData['volume'], 0]);
                     
             }
         }
@@ -141,11 +145,11 @@
     }
     
     painterKline.prototype.load = function(control, data) {
-        this.data = data;
+        this.data = data.kline;
         this.control.options = control.options;
         this.control.options.length = data.kline.length;
         control.setNext.call(this.control);
-        console.log(this.control.options.begin + ', ' + this.control.options.end);
+        //console.log(this.control.options.begin + ', ' + this.control.options.end);
     };
     painterKline.prototype.make = function() {
         this.init();
@@ -160,8 +164,8 @@
             console.log(maType + "date:" + date);
         if (date > maType) {
             for (var ma = date-maType-1; ma <= date-1; ma++)
-                MA = MA + data[ma][5];
-            return [data[ma][0], (MA / (maType+1))];
+                MA = MA + data[ma]['close'];
+            return [data[ma]['quoteTime'], (MA / (maType+1))];
         } else {
             return [null, null];
         }

@@ -15,19 +15,18 @@
     <script src="js/controlbar.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/line.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/cross.js" type="text/javascript" charset="UTF8"></script>
-    <script src="js/k-data.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/painterKline.js" type="text/javascript" charset="UTF8"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 </head>
 <body>
     <h1 id="h1"><%=msg%></h1>
     <canvas id="kline" width="900" height="500" style="z-index: 2; border: 1px solid #69c"></canvas>
-    <!--<canvas id="kline2" width="900" height="500" style="z-index: 2; border: 1px solid #69c"></canvas>-->
+    <canvas id="kline2" width="900" height="500" style="z-index: 2; border: 1px solid #69c"></canvas>
 </body>
 <script type="text/javascript">
     var c = new control({
         begin: 0,
-        range: 50});
+        range: 100});
     
     var cb = 
         new controlbar(c.options);
@@ -167,8 +166,28 @@
     painter.padding.right = 20;
     var res = {'code':'2105'};
     $.post('KlineData', res, function(req) {
-        painter.load(c, req);
+        painter.load(cb, req);
         painter.make();
+    });
+    
+    var c2 = new control({
+        begin: 0,
+        range: 100});
+    
+    var cb2 = 
+        new controlbar(c2.options);
+    cb2.options.datasource = 'hline';
+    cb2.options.order = 'desc';
+
+    paintStream[6]['history']['hisbar'] = cb2;
+    var painter2 = new painterKline('kline2',paintStream);
+    painter2.padding.top = 10;
+    painter2.padding.left = 10;
+    painter2.padding.right = 20;
+    var res = {'code':'1101'};
+    $.post('KlineData', res, function(req) {
+        painter2.load(cb2, req);
+        painter2.make();
     });
     
 </script>
