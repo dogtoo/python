@@ -4,6 +4,7 @@ const logger = require('koa-logger');
 const bodyParser = require('koa-bodyparser');
 const views = require('koa-views');
 const compose = require('koa-compose');
+const mongo = require('koa-mongo');
 /* 3. read html file test
 const fs = require('fs');
 const path = require('path');
@@ -20,6 +21,14 @@ app.use(views(__dirname + '/views/js', {
         extension: 'js'
     })
 );
+app.use(mongo({
+    host: '192.168.1.5',
+    port: 27017,
+    db: 'twStock',
+    user: 'twstock',
+    pass: 'twstock123',
+    authSource: 'twStock'
+}));
 
 /**
 Middleware組合 Star

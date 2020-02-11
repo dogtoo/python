@@ -94,7 +94,7 @@ function yAxis(options) {
             this.data[this.implName] = calcRangeValues(this.options.high
                                 , this.options.low
                                 , this.options.horizontalLineCount, this.options.dataType);
-            this.options.horizontalLineCount -= 1;
+            //this.options.horizontalLineCount -= 1;
             if (this.options.order == 'desc') {
                 this.data[this.implName].sort(function(a, b) {
                     return a - b;

@@ -148,9 +148,9 @@
         console.log(this.control.options.begin + ', ' + this.control.options.end);
     };
     painterKline.prototype.make = function() {
-        painter.init();
-        painter.build();
-        painter.build(true);
+        this.init();
+        this.build();
+        this.build(true);
     }
 
     function MACount(maType, date, data) {

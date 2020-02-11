@@ -142,7 +142,7 @@ line.prototype = {
                     diff = convertFormat(this.data[this.implName][i][1], this.options.yAxis.options.dataType)
                          - convertFormat(this.options.yAxis.options.low, this.options.yAxis.options.dataType);
                 return this.paintRegion[this.paintName + '.height']
-                    - this.options.yAxis.options.scale * (diff-1);
+                    - this.options.yAxis.options.scale * (diff);
             }
         }
         //return this.options.yAxis.getY.call(this, i);
