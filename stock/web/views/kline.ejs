@@ -5,6 +5,7 @@
     <meta http-equiv="content-type" content="text/html;charset=UTF8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title></title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="js/util.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/absPainter.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/axis.js" type="text/javascript" charset="UTF8"></script>
@@ -16,12 +17,12 @@
     <script src="js/line.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/cross.js" type="text/javascript" charset="UTF8"></script>
     <script src="js/painterKline.js" type="text/javascript" charset="UTF8"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    
 </head>
 <body>
     <h1 id="h1"><%=msg%></h1>
-    <canvas id="kline" width="900" height="500" style="z-index: 2; border: 1px solid #69c"></canvas>
-    <canvas id="kline2" width="900" height="500" style="z-index: 2; border: 1px solid #69c"></canvas>
+    <canvas id="kline" width="450" height="400" style="z-index: 2; border: 1px solid #69c"></canvas>
+    <canvas id="kline2" width="450" height="400" style="z-index: 2; border: 1px solid #69c"></canvas>
 </body>
 <script type="text/javascript">
     var c = new control({
@@ -155,7 +156,7 @@
                     strokeStyle: 'magenta',
                     lineWidth: 1
                 }),
-                'hisbar': cb
+                'hisbar': new controlbar({})
             }
         }
     ];
@@ -178,8 +179,7 @@
         new controlbar(c2.options);
     cb2.options.datasource = 'hline';
     cb2.options.order = 'desc';
-
-    paintStream[6]['history']['hisbar'] = cb2;
+    
     var painter2 = new painterKline('kline2',paintStream);
     painter2.padding.top = 10;
     painter2.padding.left = 10;

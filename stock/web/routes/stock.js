@@ -19,6 +19,7 @@ router.post('/KlineData', async(ctx) => {
             $match:{
                 $and:[
                     {code:{'$eq':code}}
+                   ,{date:{'$gte':'20170214'}}
                 ]            
             }
         }, {

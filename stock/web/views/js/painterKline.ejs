@@ -26,7 +26,7 @@
             yHistory[Number(rawData['high'])] = 1;
             yHistory[Number(rawData['low'])] = 1;
             hline.push([rawData['quoteTime'], rawData['close']]);
-            if (i >= cb.options.begin && i <= cb.options.end) {
+            if (i >= this.data['hisbar'].begin && i <= this.data['hisbar'].end) {
                 price[Number(rawData['high'])] = 1;
                 price[Number(rawData['low'])] = 1;
                 date[rawData['quoteTime']] = 1;
@@ -146,9 +146,12 @@
     
     painterKline.prototype.load = function(control, data) {
         this.data = data.kline;
-        this.control.options = control.options;
+        
+        this.control.options = $.extend(true, {}, control.options);
+        this.control.__proto__ = control.__proto__;
         this.control.options.length = data.kline.length;
-        control.setNext.call(this.control);
+        this.control.setNext.call(this.control);
+        this.data['hisbar'] = this.control.options;
         //console.log(this.control.options.begin + ', ' + this.control.options.end);
     };
     painterKline.prototype.make = function() {

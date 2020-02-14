@@ -18,15 +18,21 @@ function controlbar(options) {
 
 controlbar.prototype = {
     initialize : function () {
+        this.options = this.data[this.implName];
         if (!this.reBuild) {
             if (this.options.datasource != '') {
-                this.options.length = this.data[this.options.datasource].length;
+                this.options.length = this.data[this.data[this.implName].datasource].length;
             }
             this.implement.getScale.call(this, this.options, this.data[this.options.datasource]);
+            //this.implement.getScale.call(this, this.options, this.data[this.data[this.implName].datasource]);
         }
+        //this.data[this.implName] = $.extend(true, {}, this.options);
+        if (typeof this.implements[this.implName] != 'undefined')
+            this.implements[this.implName].options = this.data[this.implName];
     },
     start : function () {
         var ctx = this.ctx;
+        this.options = this.data[this.implName];
         ctx.save();
         if (typeof this.options.color == 'string') ctx.fillStyle = this.options.color;
         ctx.translate(this.paintRegion[paintName + '.x'], this.paintRegion[paintName + '.y']);
@@ -79,6 +85,7 @@ controlbar.prototype = {
         return 'controlbar';
     },
     mousedown: function(offset) {
+        this.options = this.data[this.implName];
         if (this.implement.isTouch.call(this, offset)) {
             //console.log(this.paintName + ' isTouch');
             this.options.onMove = true;
@@ -118,6 +125,7 @@ controlbar.prototype = {
         }
     },
     mousemove: function(offset) {
+        this.options = this.data[this.implName];
         if (this.options.onMove) {
             if (this.options.isButtonTouch) {
                 var b = '';
