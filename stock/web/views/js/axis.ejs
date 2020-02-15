@@ -36,7 +36,7 @@ axis.prototype = {
         (typeof this.options.x[i] === 'undefined') ? this.options.x.push(x) : this.options.x[i][x];
         (typeof this.options.y[i] === 'undefined') ? this.options.y.push(y) : this.options.y[i][y];
         text = format(this.data[this.implName][i], this.options.dataType);
-        (typeof this.options.text[i] === 'undefined') ? this.options.text.push(text) : this.options.text[i][text];
+        (typeof this.options.text[i] === 'undefined') ? this.options.text.push(text) : this.options.text[i] = text;
         this.ctx.fillText(text, x, y);
     },
     getDataLength : function() {

@@ -170,23 +170,15 @@
         painter.load(cb, req);
         painter.make();
     });
-    
-    var c2 = new control({
-        begin: 0,
-        range: 100});
-    
-    var cb2 = 
-        new controlbar(c2.options);
-    cb2.options.datasource = 'hline';
-    cb2.options.order = 'desc';
-    
-    var painter2 = new painterKline('kline2',paintStream);
+
+    var ps = $.extend(true, [], paintStream);
+    var painter2 = new painterKline('kline2', ps);
     painter2.padding.top = 10;
     painter2.padding.left = 10;
     painter2.padding.right = 20;
     var res = {'code':'1101'};
     $.post('KlineData', res, function(req) {
-        painter2.load(cb2, req);
+        painter2.load(cb, req);
         painter2.make();
     });
     
