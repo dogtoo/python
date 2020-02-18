@@ -75,6 +75,11 @@ router.post('/TrendData', async(ctx) => {
             }
         }
     ]).toArray();
+    
+    if (parseInt(data[0].time.substr(1, 2)) < 9) {
+        data.shift();
+    }
+    
     let fdata = await ctx.db.collection('realtime').aggregate([
         {
             $match:{

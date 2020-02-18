@@ -27,102 +27,22 @@
 <script type="text/javascript">
     var c = new control({
         begin: 0});
-{
-    var paintStream = [
-        {
-            'price':{
-                region: { x: 'padding.left', y: 'padding.top', width: 'f:00.00', height: '55%' },
-                'price':new yAxis({
-                    font: '11px Arial',
-                    color: 'black',
-                    align: 'right',
-                    textBaseline: 'top',
-                    dataType: 'money',
-                    dataRange: 'range'
-                })
-            }
-        },
-        {
-            'main':{
-                region: {
-                    x: {'$and':['price.x', 'price.width', 3]}, y: {'$and':['price.y', (determineFontHeight('11px Arial')/2)]}
-                    , width: {'$sub':['100%','price.width','padding.right','padding.left']}, height: '55%',
-                    riseColor: 'red',
-                    fallColor: 'green',
-                    normalColor: 'black',
-                    chartMargin:{left:45.5,top:20.5,right:20.5},
-                    barWidth: 5, spaceWidth: 2, lineStyle: 'solid', borderColor: 'gray', splitLineColor: '#eeeeee', lineWidth: 1
-                },
-                'Tline':new line({
-                    yAxisName: 'price',
-                    xAxisName: 'time',
-                    xAxisFocus: true,
-                    strokeStyle: 'red',
-                    lineWidth: 1
-                }),
-                'kCross': new cross({
-                    xAxisName: 'volKline'
-                })
-            }
-        },
-        {
-            'time':{
-                region: { x: 'main.x', y: {'$and':['main.height', 'main.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: 'f:00-00-00' },
-                'time':new xAxis({
-                    font: '11px Arial',
-                    color: 'black',
-                    align: 'right',
-                    textBaseline: 'top',
-                    dataType: 'time',
-                    order: 'desc',
-                    dataRange: 'range'
-                })
-            }
-        },
-        {
-            'volume':{
-                region: { x: 'price.x', y: {'$and':['price.height', 'price.y', {'$mul':['time.height',2]}]}, width: 'f:0000', height: '18%' },
-                'volumeY':new yAxis({
-                    font: '11px Arial',
-                    color: 'black',
-                    align: 'right',
-                    textBaseline: 'top',
-                    dataType: 'number',
-                    dataRange: 'range'
-                })
-            }
-        },
-        {
-            'volmain':{
-                region: { x: 'main.x', y: {'$and':['volume.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: '18%' },
-                'volKline':new kLine({
-                    lineWidth: 10,
-                    lineStyle: 'solid',
-                    yAxisName: 'volumeY',
-                    xAxisName: 'time'
-                }),
-                'mCross': new cross({
-                    xAxisName: 'Tline'
-                })
-            }
-        }
-    ];
-}
-    var painter = new painterTrend('trend',paintStream);
+
+    var painter = new painterTrend('trend');
     painter.padding.top = 10;
     painter.padding.left = 10;
     painter.padding.right = 20;
-    var res = {'code':'2105','date':'20200212'};
+    var res = {'code':'2105','date':'20200218'};
     $.post('TrendData', res, function(req) {
         painter.load(c, req);
         painter.make();
     });
     
-    var painter2 = new painterTrend('trend2',paintStream);
+    var painter2 = new painterTrend('trend2');
     painter2.padding.top = 10;
     painter2.padding.left = 10;
     painter2.padding.right = 20;
-    var res = {'code':'1101','date':'20200212'};
+    var res = {'code':'1101','date':'20200218'};
     $.post('TrendData', res, function(req) {
         painter2.load(c, req);
         painter2.make();
