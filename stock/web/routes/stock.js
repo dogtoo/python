@@ -116,14 +116,26 @@ router.get('/Trend', async(ctx) => {
     })
 });
 
+router.get('/funds', async(ctx) => {
+    await ctx.render('funds', {})
+});
 //取得上月外資可用資金
-router.get('/lastMonthUsedfunds', async(ctx) => {
-    var date = new Date();
-    var date_ = dateFormat(date, 'yyyy/mm/') + 01;
-    date = new Date(date_);
-    date.setDate(date.getDate() -1);
-    var edate = dateFormat(date, 'yyyymmdd');
-    var bdate = edate.substr(0, 6) + '01';
+router.post('/lastMonthUsedfunds', async(ctx) => {
+    var bdate = ctx.request.body.bdate;
+    var edate = ctx.request.body.edate;
+    if (typeof bdate === 'undefined' || typeof edate === 'undefined') {
+        var date = new Date();
+        var date_ = dateFormat(date, 'yyyy/mm/') + 01;
+        date = new Date(date_);
+        date.setDate(date.getDate() -1);
+        var edate = dateFormat(date, 'yyyymmdd');
+        /*
+        date.setYear(date.getFullYear() -1);
+        var m = date.getMonth() + 1;*/
+        var m = date.getMonth()
+        date.setMonth(m, 1);
+        var bdate = dateFormat(date, 'yyyymmdd');
+    }
     console.log(  bdate + ','+ edate);  
     
     ctx.response.type = 'json';
@@ -139,7 +151,7 @@ router.get('/lastMonthUsedfunds', async(ctx) => {
         {
             $group:{
                 _id: {
-                    date:{$substr:['$date', 0, 4]}
+                    date:{$substr:['$date', 0, 6]}
                   , groupCode:'$groupCode'
                 }
                ,'FII_I':{$sum:'$FII_I'}
@@ -158,29 +170,97 @@ router.get('/lastMonthUsedfunds', async(ctx) => {
             }
         },
         {
+            $lookup: {
+                from: 'TWSE',
+                let: {groupCode:'$_id.groupCode'},
+                pipeline:[
+                    { 
+                        $match: {
+                            $expr: {
+                                $eq: [ '$groupCode', '$$groupCode']
+                            }
+                        }
+                    },
+                    { $project: { group:1, _id:0}},
+                    { $limit:1}
+                ],
+                as:'groupName'
+            }
+        },
+        {
             $project: {
-                date: '$_id.date'
+                _id: 0
+               ,date: '$_id.date'
                ,groupCode: '$_id.groupCode'
-               ,'外資買進':{$divide:['$FII_I', 10000]}
-               ,'外資賣出':{$divide:['$FII_O', 10000]}
+               ,groupName: '$groupName.group'
+               ,'FII_I':'$FII_I'
+               ,'FII_O':'$FII_O'
+               ,'FII_diff':{$subtract:['$FII_I', '$FII_O']}
+               ,'SIT_I':'$SIT_I'
+               ,'SIT_O':'$SIT_O'
+               ,'SIT_diff':{$subtract:['$SIT_I', '$SIT_O']}
+               ,'DProp_I':'$DProp_I'
+               ,'DProp_O':'$DProp_O'
+               ,'DHedge_I':'$DHedge_I'
+               ,'DHedge_O':'$DHedge_O'
+               /*,'外資買進':'$FII_I'
+               ,'外資賣出':'$FII_O'
                ,'外資增減':{$subtract:['$FII_I', '$FII_O']}
-               ,'投信買進':{$divide:['$SIT_I', 10000]}
-               ,'投信賣出':{$divide:['$SIT_O', 10000]}
+               ,'投信買進':'$SIT_I'
+               ,'投信賣出':'$SIT_O'
                ,'投信增減':{$subtract:['$SIT_I', '$SIT_O']}
-               ,'自營商買進':{$divide:['$DProp_I', 10000]}
-               ,'自營商賣出':{$divide:['$DProp_O', 10000]}
-               ,'自營商買進避':{$divide:['$DHedge_I', 10000]}
-               ,'自營商賣出避':{$divide:['$DHedge_O', 10000]}
+               ,'自營商買進':'$DProp_I'
+               ,'自營商賣出':'$DProp_O'
+               ,'自營商買進避':'$DHedge_I'
+               ,'自營商賣出避':'$DHedge_O'*/
             }
         },
         {
             $sort:{
-                '外資增減':-1
+                'date':1
             }
         }
     ]).toArray();
-        
-    ctx.response.body = data;
+    var out = {};
+    var date_ = ' ';
+    var FII_I_T = 0, FII_O_T = 0;
+    for (var i in data) {
+        var row = data[i];
+        if (row.date != date_) {
+            if (date_ != ' ') {
+                out[date_]['FII_I_T'] = FII_I_T;
+                out[date_]['FII_O_T'] = FII_O_T;
+            }
+            FII_I_T = 0, FII_O_T = 0;
+            date_ = row.date;
+        }
+        FII_I_T += row.FII_I;
+        FII_O_T += row.FII_O;
+        if (typeof out[row.date] === 'undefined')
+            out[row.date] = {};
+        if (typeof out[row.date]['group'] === 'undefined')
+            out[row.date] = { 'group':[] };
+        out[row.date].group.push({
+            'group': row.groupCode + row.groupName[0],
+            'FII_I': row.FII_I,
+            'FII_O': row.FII_O
+        });
+    }
+    out[date_].FII_I_T = FII_I_T;
+    out[date_].FII_O_T = FII_O_T;
+    /*
+    var I_P = 0, O_P = 0;
+    for (var d in out) {
+        for (var i in out[d].group) {
+            var r = out[d].group[i];
+            r.FII_I_P = Math.floor((r.FII_I / out[d].FII_I_T) * 10000) / 100;
+            r.FII_O_P = Math.floor((r.FII_O / out[d].FII_O_T) * 10000) / 100;
+            I_P += r.FII_I_P;
+            O_P += r.FII_O_P;
+        }
+    }
+    console.log(I_P + ',' + O_P);*/
+    ctx.response.body = out;
 });
 
 
