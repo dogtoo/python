@@ -101,6 +101,14 @@ Painter.prototype = {
                     //console.log('mouseup(x:'+offset.offsetX+',y:'+offset.offsetY+')');
                     painter.moveEvent.call(painter, 'mouseup', offset);
                 });
+                addEvent(painter.canvas, 'touchcancel', function (e) {
+                    e = e || event;
+                    var touch = e.touches[0];
+                    var offset = getOffset(touch);
+                    //console.log('mouseup(x:'+offset.offsetX+',y:'+offset.offsetY+')');
+                    painter.moveEvent.call(painter, 'mouseup', offset);
+                });
+                
             } else {
                 addEvent(painter.canvas, 'mousedown', function (e) {
                     e = e || event;

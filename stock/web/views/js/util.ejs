@@ -83,6 +83,10 @@
             }
         },
         getOffset: function (e) {
+            if (typeof e.offsetX === 'undefined' || typeof e.offsetY === 'undefined') {
+                e.offsetX = '';
+                e.offsetY = '';
+            }
             if (!isNaN(e.offsetX) && !isNaN(e.offsetY)) return e;
             var target = e.target;
             if (target.offsetLeft == undefined) {
