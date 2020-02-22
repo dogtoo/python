@@ -85,5 +85,12 @@ cross.prototype = {
         this.implement.start.call(this);
         this.implement.paintItems.call(this, offset.offsetX, offset.offsetY);
         this.implement.end.call(this);
+    },
+    mousedown: function(offset) {
+        if (isTouchDevice()) {
+            this.implement.start.call(this);
+            this.implement.paintItems.call(this, offset.offsetX, offset.offsetY);
+            this.implement.end.call(this);
+        }
     }
 }
