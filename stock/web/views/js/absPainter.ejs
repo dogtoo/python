@@ -80,8 +80,23 @@ Painter.prototype = {
         //painter.ctx.clearRect(0, 0, painter.width, painter.height);
         if (!this.hadEvenBind) {
             if (isTouchDevice()) {
+                addEvent(canvas, 'touchstart', function (e) {
+                    e = e || event;
+                    var offset = getOffset(e);
+                    //console.log('mousedown(x:'+offset.offsetX+',y:'+offset.offsetY+')');
+                    painter.moveEvent.call(painter, 'mousedown', offset);
+                });
                 addEvent(painter.canvas, 'touchmove', function (e) {
-                    //console.log('touchmove:'+e);
+                    e = e || event;
+                    var offset = getOffset(e);
+                    //console.log('mousemove(x:'+offset.offsetX+',y:'+offset.offsetY+')');
+                    painter.moveEvent.call(painter, 'mousemove', offset);
+                });
+                addEvent(canvas, 'touchend', function (e) {
+                    e = e || event;
+                    var offset = getOffset(e);
+                    //console.log('mouseup(x:'+offset.offsetX+',y:'+offset.offsetY+')');
+                    painter.moveEvent.call(painter, 'mouseup', offset);
                 });
             } else {
                 addEvent(painter.canvas, 'mousedown', function (e) {
