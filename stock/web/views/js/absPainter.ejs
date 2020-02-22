@@ -84,29 +84,41 @@ Painter.prototype = {
                     e = e || event;
                     var touch = e.touches[0];
                     var offset = getOffset(touch);
+                    touch.offsetX = offset.offsetX;
+                    touch.offsetY = offset.offsetY;
                     //console.log('mousedown(x:'+offset.offsetX+',y:'+offset.offsetY+')');
-                    painter.moveEvent.call(painter, 'mousedown', offset);
+                    painter.moveEvent.call(painter, 'mousedown', touch);
                 });
                 addEvent(painter.canvas, 'touchmove', function (e) {
                     e = e || event;
                     var touch = e.touches[0];
                     var offset = getOffset(touch);
+                    touch.offsetX = offset.offsetX;
+                    touch.offsetY = offset.offsetY;
+                    var mouseX = (e.changedTouches ? e.changedTouches[0].pageX : e.pageX) - this.offsetLeft - offset.left,
+            			mouseY = (e.changedTouches ? e.changedTouches[0].pageY : e.pageY) - this.offsetTop - offset.top;
+                    touch.movementX = mouseX;
+                    touch.movementY = mouseY;
                     //console.log('mousemove(x:'+offset.offsetX+',y:'+offset.offsetY+')');
-                    painter.moveEvent.call(painter, 'mousemove', offset);
+                    painter.moveEvent.call(painter, 'mousemove', touch);
                 });
                 addEvent(painter.canvas, 'touchend', function (e) {
                     e = e || event;
-                    var touch = e.touches[0];
+                    var touch = e.changedTouches[0];
                     var offset = getOffset(touch);
+                    touch.offsetX = offset.offsetX;
+                    touch.offsetY = offset.offsetY;
                     //console.log('mouseup(x:'+offset.offsetX+',y:'+offset.offsetY+')');
-                    painter.moveEvent.call(painter, 'mouseup', offset);
+                    painter.moveEvent.call(painter, 'mouseup', touch);
                 });
                 addEvent(painter.canvas, 'touchcancel', function (e) {
                     e = e || event;
                     var touch = e.touches[0];
                     var offset = getOffset(touch);
+                    touch.offsetX = offset.offsetX;
+                    touch.offsetY = offset.offsetY;
                     //console.log('mouseup(x:'+offset.offsetX+',y:'+offset.offsetY+')');
-                    painter.moveEvent.call(painter, 'mouseup', offset);
+                    painter.moveEvent.call(painter, 'mouseup', touch);
                 });
                 
             } else {
