@@ -26,6 +26,8 @@ function Painter(canvasId, paintStream) {
     this.reBuild = false;
     this.hadEvenBind = false;//這個應該跟算畫面位置分開因為再拉動時不用再重bind event
     this.onBuild = false;
+    this.touchOffsetX = 0;
+    this.touchOffsetY = 0;
 }
 Painter.prototype = {
     init: function() {
@@ -82,7 +84,7 @@ Painter.prototype = {
             if (isTouchDevice()) {
                 addEvent(painter.canvas, 'touchstart', function (e) {
                     e = e || event;
-                    var touch = e.touches[0];
+                    var touch = e.changedTouches[0];
                     var offset = getOffset(touch);
                     touch.offsetX = offset.offsetX;
                     touch.offsetY = offset.offsetY;
@@ -91,15 +93,17 @@ Painter.prototype = {
                 });
                 addEvent(painter.canvas, 'touchmove', function (e) {
                     e = e || event;
-                    var touch = e.touches[0];
+                    var touch = e.changedTouches[0];
                     var offset = getOffset(touch);
+                    touch.movementX = offset.offsetX - this.touchOffsetX;
+                    touch.movementY = offset.offsetY - this.touchOffsetY;
                     touch.offsetX = offset.offsetX;
                     touch.offsetY = offset.offsetY;
-                    var mouseX = (e.changedTouches ? e.changedTouches[0].pageX : e.pageX) - this.offsetLeft - offset.left,
-            			mouseY = (e.changedTouches ? e.changedTouches[0].pageY : e.pageY) - this.offsetTop - offset.top;
-                    touch.movementX = mouseX;
-                    touch.movementY = mouseY;
-                    //console.log('mousemove(x:'+offset.offsetX+',y:'+offset.offsetY+')');
+                    this.touchOffsetX = offset.offsetX;
+                    this.touchOffsetY = offset.offsetY;
+                    //console.log('pageX:' + e.changedTouches[0].pageX + ',pageY:' + e.changedTouches[0].pageY);
+                    //console.log('offsetX:' + touch.offsetX + ',offsetY:' + touch.offsetY);
+                    //console.log('mousemove(x:'+touch.movementX+',y:'+touch.movementY+')');
                     painter.moveEvent.call(painter, 'mousemove', touch);
                 });
                 addEvent(painter.canvas, 'touchend', function (e) {
@@ -111,15 +115,16 @@ Painter.prototype = {
                     //console.log('mouseup(x:'+offset.offsetX+',y:'+offset.offsetY+')');
                     painter.moveEvent.call(painter, 'mouseup', touch);
                 });
+                /*
                 addEvent(painter.canvas, 'touchcancel', function (e) {
                     e = e || event;
-                    var touch = e.touches[0];
+                    var touch = e.changedTouches[0];
                     var offset = getOffset(touch);
                     touch.offsetX = offset.offsetX;
                     touch.offsetY = offset.offsetY;
                     //console.log('mouseup(x:'+offset.offsetX+',y:'+offset.offsetY+')');
                     painter.moveEvent.call(painter, 'mouseup', touch);
-                });
+                });*/
                 
             } else {
                 addEvent(painter.canvas, 'mousedown', function (e) {
