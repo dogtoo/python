@@ -82,19 +82,22 @@ Painter.prototype = {
             if (isTouchDevice()) {
                 addEvent(painter.canvas, 'touchstart', function (e) {
                     e = e || event;
-                    var offset = getOffset(e);
+                    var touch = e.touches[0];
+                    var offset = getOffset(touch);
                     //console.log('mousedown(x:'+offset.offsetX+',y:'+offset.offsetY+')');
                     painter.moveEvent.call(painter, 'mousedown', offset);
                 });
                 addEvent(painter.canvas, 'touchmove', function (e) {
                     e = e || event;
-                    var offset = getOffset(e);
+                    var touch = e.touches[0];
+                    var offset = getOffset(touch);
                     //console.log('mousemove(x:'+offset.offsetX+',y:'+offset.offsetY+')');
                     painter.moveEvent.call(painter, 'mousemove', offset);
                 });
                 addEvent(painter.canvas, 'touchend', function (e) {
                     e = e || event;
-                    var offset = getOffset(e);
+                    var touch = e.touches[0];
+                    var offset = getOffset(touch);
                     //console.log('mouseup(x:'+offset.offsetX+',y:'+offset.offsetY+')');
                     painter.moveEvent.call(painter, 'mouseup', offset);
                 });
