@@ -25,21 +25,34 @@
                     m_.push(m);
                 }
                 m_.reverse();
-                var ldata_ = [];
+                var ldata1_ = [];
+                var ldata2_ = [];
+                var lrowG_ = true;
+                var lrowG1 = [];
+                var lrowG2 = [];
                 m_.forEach(function(m) {
                     var title_ = m;
                     var data_ = [['group','funds']];
 
-                    var lrow = [new Date(m.substr(0,4), m.substr(4,2))];
+                    var lrow1 = [new Date(m.substr(0,4), m.substr(4,2))];
+                    var lrow2 = [new Date(m.substr(0,4), m.substr(4,2))];
                     for (var i in req[m].group) {
                         var row = [];
                         row.push(req[m].group[i].group);
                         row.push(req[m].group[i].FII_I);
                         data_.push(row);
                         
-                        lrow.push(Math.floor(req[m].group[i].FII_I/1000000)/100);
+                        if (req[m].group[i].group.match(/17|24|25|26|27|28|31|03|01|05|15|14|10|02/)) {
+                            if (lrowG_) lrowG1.push(req[m].group[i].group);
+                            lrow1.push(Math.floor(req[m].group[i].FII_I/1000000)/100);
+                        } else {
+                            if (lrowG_) lrowG2.push(req[m].group[i].group);
+                            lrow2.push(Math.floor(req[m].group[i].FII_I/1000000)/100);
+                        }
                     }
-                    ldata_.push(lrow);
+                    ldata1_.push(lrow1);
+                    ldata2_.push(lrow2);
+                    lrowG_ = false;
                     
                     var data = google.visualization.arrayToDataTable(data_);
                     
@@ -63,11 +76,11 @@
                 
                 var data = new google.visualization.DataTable();
                 data.addColumn('date', 'X');
-                for (var i in req[m_[0]].group) {
-                    data.addColumn('number', req[m_[0]].group[i].group);
+                for (var i in lrowG1) {
+                    data.addColumn('number', lrowG1[i]);
                 }
                 // ['202002', FII_I(01), FII_I(02) ...]
-                data.addRows(ldata_);
+                data.addRows(ldata1_);
 
                 var options = {
                     hAxis: {
@@ -78,9 +91,30 @@
                     }/*,
                     colors: ['#a52714', '#097138']*/
                 };
-                var line = $("#linechart");
-                var linechart = new google.visualization.LineChart(line[0]);
+                var line = $("#linechart1");
+                var linechart = new google.charts.Line(line[0]);
                 linechart.draw(data, options);
+                
+                data = new google.visualization.DataTable();
+                data.addColumn('date', 'X');
+                for (var i in lrowG2) {
+                    data.addColumn('number', lrowG2[i]);
+                }
+                // ['202002', FII_I(01), FII_I(02) ...]
+                data.addRows(ldata2_);
+
+                var options = {
+                    hAxis: {
+                      title: 'year/month'
+                    },
+                    vAxis: {
+                      title: 'Funds(億)'
+                    }/*,
+                    colors: ['#a52714', '#097138']*/
+                };
+                var line = $("#linechart2");
+                var linechart = new google.charts.Line(line[0]);
+                linechart.draw(data, google.charts.Line.convertOptions(options));
             });            
         }
 
@@ -88,13 +122,15 @@
     </script>
 </head>
 <body>
-    <div id="piechart" class="col-3" style="width: 400px; height: 300px; display:none"></div>
+    <div id="piechart" class="col-3 col-sm-6" style="width: 400px; height: 300px; display:none"></div>
     <div class="container-fluid">
         <div class="row line">
-            <div id="linechart" class="col" style="width: 800px; height: 400px"></div>
+            <div id="linechart1" class="col-6 col-sm-12" style="width: 800px; height: 400px"></div>
+            <div id="linechart2" class="col-6 col-sm-12" style="width: 800px; height: 400px"></div>
         </div>
         <div class="row pie">
         </div>
     </div>
 </body>
 </html>
+
