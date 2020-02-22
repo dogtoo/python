@@ -16,8 +16,8 @@ format = {'水泥工業'        :'01', '食品工業'        : '02', '塑膠工�
         , '農業科技業'      :'33', '電子商務'        : '34', '管理股票'     :'80'
         , 'OTHER':'00'}
 
-#client = pymongo.MongoClient("mongodb://172.18.0.2:27017")
-client = pymongo.MongoClient("mongodb://192.168.1.5:27017")
+client = pymongo.MongoClient("mongodb://172.18.0.2:27017")
+#client = pymongo.MongoClient("mongodb://192.168.1.5:27017")
 db = client["twStock"] 
 db.authenticate("twstock", "twstock123")
 collTPEX = db["TPEX"]
