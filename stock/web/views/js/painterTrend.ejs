@@ -90,8 +90,11 @@
 
         //var priceL = [];
         var open = this.data[0]['price'];
-        var up = Math.floor(open * 1.1 * 100) /100;
-        var down = Math.floor(open * 0.9 * 100) /100;
+        var pl = (Math.floor(open)+"").length;
+        if (pl > 3) pl = 3;
+        var point = Math.pow(10,  (3 - pl));
+        var up = Math.floor(open * 1.1 * point) /point;
+        var down = Math.round(open * 0.9 * point) /point;
         var price = [down, up];
         var time = ['0900','0930','1000','1030','1100','1130','1200','1230','1300','1330'];
         
@@ -138,6 +141,9 @@
             this.drawHLine('#eeeeee', 0, this.implements.price.options.y[i], this.paintRegion['main.width'], 1, 'solid');
             this.ctx.stroke();
         }
+        
+        this.drawHLine('#eeeeee', 0, (this.data[0]['price'] - this.implements.price.options.low) * this.implements.price.options.scale, this.paintRegion['main.width'], 1, 'solid');
+        this.ctx.stroke();
 
         var v_c = Math.round((this.implements.time.options.x.length)/this.implements.time.options.verticalLineCount);
         for (var i = 0 ; i < this.implements.time.options.x.length ; i+= v_c) {

@@ -85,20 +85,26 @@ router.post('/TrendData', async(ctx) => {
         data.shift();
     }
     
+    
     let fdata = await ctx.db.collection('realtime').aggregate([
         {
             $match:{
                 $and:[
                     {code:{'$eq':code}
-                   , date:{'$eq':date_}
+                   , date:{'$lt':date_}
                     }
                 ]            
+            }
+        }, {
+            $sort:{
+                'date':-1,
+                'final_time':-1
             }
         }, {
             $project:{
                 '_id':0,
                 'time':'09:00:00',
-                'price':'$open',
+                'price':'$latest_trade_price',
                 'vol':'0'
            }
         }, {$limit:1}
@@ -117,12 +123,28 @@ router.get('/Trend', async(ctx) => {
 });
 
 router.get('/funds', async(ctx) => {
-    await ctx.render('funds', {})
+    var date = new Date();
+    let edate = dateFormat(date, 'yyyy/mm/dd');
+    
+    var date_ = dateFormat(date, 'yyyy/mm/') + 01;
+    date = new Date(date_);
+    date.setDate(date.getDate() -1);
+    date.setYear(date.getFullYear() -1);
+    var m = date.getMonth() + 2;
+    date.setMonth(m, 1);
+    let bdate = dateFormat(date, 'yyyy/mm/dd');
+    console.log(  bdate + ','+ edate);  
+    await ctx.render('funds', {
+        bdate: bdate,
+        edate: edate
+    })
 });
 //取得上月外資可用資金
 router.post('/lastMonthUsedfunds', async(ctx) => {
     var bdate = ctx.request.body.bdate;
     var edate = ctx.request.body.edate;
+    var groupType = ctx.request.body.groupType;
+    var fundsType = ctx.request.body.fundsType;
     if (typeof bdate === 'undefined' || typeof edate === 'undefined') {
         var date = new Date();
         var date_ = dateFormat(date, 'yyyy/mm/') + 01;
@@ -223,31 +245,69 @@ router.post('/lastMonthUsedfunds', async(ctx) => {
     ]).toArray();
     var out = {};
     var date_ = ' ';
-    var FII_I_T = 0, FII_O_T = 0;
+    //var FII_I_T = 0, FII_O_T = 0;
+    
+    //var I_ = 0, O_ = 0, S_ = 0, fv_ = 0;
+    //var I_T = 0, O_T = 0, S_T = 0, fv_T = 0;
+    var fv_ = 0, fv_T = 0;
+    
     for (var i in data) {
         var row = data[i];
         if (row.date != date_) {
             if (date_ != ' ') {
-                out[date_]['FII_I_T'] = FII_I_T;
-                out[date_]['FII_O_T'] = FII_O_T;
+                //out[date_]['FII_I_T'] = FII_I_T;
+                //out[date_]['FII_O_T'] = FII_O_T;
+                out[date_]['FII_I_T'] = fv_T;
             }
-            FII_I_T = 0, FII_O_T = 0;
+            //FII_I_T = 0, FII_O_T = 0;
+            //I_T = 0, O_T = 0, S_T = 0;
+            fv_T = 0;
             date_ = row.date;
         }
-        FII_I_T += row.FII_I;
-        FII_O_T += row.FII_O;
+        //FII_I_T += row.FII_I;
+        //FII_O_T += row.FII_O;
+        if (fundsType === 'buy') {
+            if (groupType.match(/F/))
+                fv_ += row.FII_I;
+            if (groupType.match(/O/))
+                fv_ += row.SIT_I;
+            if (groupType.match(/S/))
+                fv_ += row.DProp_I + row.DHedge_I;
+        } else if (fundsType === 'sel') {
+            if (groupType.match(/F/))
+                fv_ += row.FII_O;
+            if (groupType.match(/O/))
+                fv_ += row.SIT_O;
+            if (groupType.match(/S/))
+                fv_ += row.DProp_O + row.DHedge_O;
+        } else if (fundsType === 'sum') {
+            if (groupType.match(/F/))
+                fv_ += row.FII_diff;
+            if (groupType.match(/O/))
+                fv_ += row.SIT_diff;
+        }
+        
+        //I_T += I_;
+        //O_T += O_;
+        //S_T += S_;
+        fv_T += fv_;
         if (typeof out[row.date] === 'undefined')
             out[row.date] = {};
         if (typeof out[row.date]['group'] === 'undefined')
             out[row.date] = { 'group':[] };
         out[row.date].group.push({
             'group': row.groupCode + row.groupName[0],
-            'FII_I': row.FII_I,
-            'FII_O': row.FII_O
+            //'FII_I': row.FII_I,
+            //'FII_O': row.FII_O
+            'FII_I': fv_
         });
+        //I_ = 0, O_ = 0, S_ = 0;
+        fv_ = 0;
     }
-    out[date_].FII_I_T = FII_I_T;
-    out[date_].FII_O_T = FII_O_T;
+    
+    //out[date_].FII_I_T = FII_I_T;
+    //out[date_].FII_O_T = FII_O_T;
+    out[date_].FII_I_T = fv_T;
     /*
     var I_P = 0, O_P = 0;
     for (var d in out) {

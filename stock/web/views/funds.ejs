@@ -6,52 +6,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title></title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.zh-TW.min.js"></script>
     <script type="text/javascript">
-        google.charts.load('current', {'packages':['corechart', 'line']});
-        google.charts.setOnLoadCallback(drawChart);
-    
-        function drawChart() {
-            var res = {'bdate':'20190301', 'edate':'20200228'};
+        $(document).ready(function() {
+            $('.input-daterange input').each(function() {
+                $(this).datepicker({
+                    format: 'yyyy/mm/dd'
+                });
+            });
+        });
+        
+        function search() {
+            var groupType = "";
+            if ($("#FII").prop("checked")) groupType += "F";
+            if ($("#SIT").prop("checked")) groupType += "S";
+            if ($("#DIT").prop("checked")) groupType += "D";
+            var fundsType = "";
+            $("input[name=fundsType]:checked").each(function () {
+                fundsType = this.id ;
+            });
+            
+            if (groupType === "") groupType = "F";
+            if (fundsType === "") fundsType = "buy";
+            
+            var bdate = $("#bdate").val();
+            var edate = $("#edate").val();
+            var res = {
+                'bdate':bdate.replace(/\//g,""),
+                'edate':edate.replace(/\//g,''),
+                'groupType':groupType,
+                'fundsType':fundsType
+            };
+            
+            drawChart(res);
+        };
+        
+        function drawChart(res) {
             $.post('lastMonthUsedfunds', res, function(req) {
                 var piechart = $("#piechart");
-                var linechart = $("#piechart");
+                $("#pie").empty();
                 var legend_ = 'true';
                 var m_ = [];
                 for (var m in req) {
                     m_.push(m);
                 }
                 m_.reverse();
-                var ldata1_ = [];
-                var ldata2_ = [];
+                var ldata_ = [[],[],[],[]];
                 var lrowG_ = true;
-                var lrowG1 = [];
-                var lrowG2 = [];
+                var lrowG = [[],[],[],[]];
                 m_.forEach(function(m) {
                     var title_ = m;
                     var data_ = [['group','funds']];
 
-                    var lrow1 = [new Date(m.substr(0,4), m.substr(4,2))];
-                    var lrow2 = [new Date(m.substr(0,4), m.substr(4,2))];
+                    var lrow = [[new Date(m.substr(0,4), m.substr(4,2)-1)], [new Date(m.substr(0,4), m.substr(4,2)-1)], [new Date(m.substr(0,4), m.substr(4,2)-1)], [new Date(m.substr(0,4), m.substr(4,2)-1)]];
+                    var otherV_ = 0;
                     for (var i in req[m].group) {
                         var row = [];
-                        row.push(req[m].group[i].group);
-                        row.push(req[m].group[i].FII_I);
-                        data_.push(row);
-                        
-                        if (req[m].group[i].group.match(/17|24|25|26|27|28|31|03|01|05|15|14|10|02/)) {
-                            if (lrowG_) lrowG1.push(req[m].group[i].group);
-                            lrow1.push(Math.floor(req[m].group[i].FII_I/1000000)/100);
+                        if (req[m].group[i].group.match(/17|24|25|26|27|28|31|03|01/)) {
+                            row.push(req[m].group[i].group);
+                            row.push(req[m].group[i].FII_I);
+                            data_.push(row);
                         } else {
-                            if (lrowG_) lrowG2.push(req[m].group[i].group);
-                            lrow2.push(Math.floor(req[m].group[i].FII_I/1000000)/100);
+                            otherV_ += req[m].group[i].FII_I;
+                        }
+                        
+                        if (req[m].group[i].group.match(/17|24|25|26|28|31|27/)) {
+                            if (lrowG_) lrowG[0].push(req[m].group[i].group);
+                            lrow[0].push(Math.floor(req[m].group[i].FII_I/1000000)/100);
+                        } else if (req[m].group[i].group.match(/03|01|05|15|10|02|20/)) {
+                            if (lrowG_) lrowG[1].push(req[m].group[i].group);
+                            lrow[1].push(Math.floor(req[m].group[i].FII_I/1000000)/100);
+                        } else if (req[m].group[i].group.match(/14|04|29|11|12|18|09/)){
+                            if (lrowG_) lrowG[2].push(req[m].group[i].group);
+                            lrow[2].push(Math.floor(req[m].group[i].FII_I/1000000)/100);
+                        } else {
+                            if (lrowG_) lrowG[3].push(req[m].group[i].group);
+                            lrow[3].push(Math.floor(req[m].group[i].FII_I/1000000)/100);
                         }
                     }
-                    ldata1_.push(lrow1);
-                    ldata2_.push(lrow2);
+                    var row = [];
+                    row.push('other');
+                    row.push(otherV_);
+                    data_.push(row);
+                    
+                    for (var i in [1, 2, 3, 4]) ldata_[i].push(lrow[i]);
                     lrowG_ = false;
                     
                     var data = google.visualization.arrayToDataTable(data_);
@@ -66,22 +110,13 @@
                     p = piechart.clone().appendTo('div.pie');
                     $(p).show();
                     if (legend_ === 'true') {
-                        $(p).removeClass('col-3').addClass('col-4');
+                        $(p).removeClass('col-lg-3').addClass('col-lg-4');
                         legend_ = 'none';
                     }
-                    //var chart = new google.visualization.PieChart(document.getElementById('piechart'));
                     var chart = new google.visualization.PieChart(p[0]);
                     chart.draw(data, options);
                 });
                 
-                var data = new google.visualization.DataTable();
-                data.addColumn('date', 'X');
-                for (var i in lrowG1) {
-                    data.addColumn('number', lrowG1[i]);
-                }
-                // ['202002', FII_I(01), FII_I(02) ...]
-                data.addRows(ldata1_);
-
                 var options = {
                     hAxis: {
                       title: 'year/month'
@@ -91,30 +126,22 @@
                     }/*,
                     colors: ['#a52714', '#097138']*/
                 };
-                var line = $("#linechart1");
-                var linechart = new google.charts.Line(line[0]);
-                linechart.draw(data, options);
-                
-                data = new google.visualization.DataTable();
-                data.addColumn('date', 'X');
-                for (var i in lrowG2) {
-                    data.addColumn('number', lrowG2[i]);
+                var lineChart = $("#linechart");
+                $("#line").empty();
+                for (var i in [1, 2, 3, 4]) {
+                    var data = new google.visualization.DataTable();
+                    data.addColumn('date', 'funds');
+                    for (var x in lrowG[i]) {
+                        data.addColumn('number', lrowG[i][x]);
+                    }
+                    // ['202002', FII_I(01), FII_I(02) ...]
+                    data.addRows(ldata_[i]);
+                    
+                    lc = lineChart.clone().appendTo('div.line');
+                    $(lc).show();
+                    var linechart = new google.charts.Line(lc[0]);
+                    linechart.draw(data, options);
                 }
-                // ['202002', FII_I(01), FII_I(02) ...]
-                data.addRows(ldata2_);
-
-                var options = {
-                    hAxis: {
-                      title: 'year/month'
-                    },
-                    vAxis: {
-                      title: 'Funds(億)'
-                    }/*,
-                    colors: ['#a52714', '#097138']*/
-                };
-                var line = $("#linechart2");
-                var linechart = new google.charts.Line(line[0]);
-                linechart.draw(data, google.charts.Line.convertOptions(options));
             });            
         }
 
@@ -122,15 +149,57 @@
     </script>
 </head>
 <body>
-    <div id="piechart" class="col-3 col-md-6" style="width: 400px; height: 300px; display:none"></div>
+    <div id="piechart" class="col-lg-3 col-md-6" style="width: 400px; height: 300px; display:none"></div>
+    <div id="linechart" class="col-lg-6 col-md-12" style="width: 800px; height: 400px; display:none"></div>
     <div class="container-fluid">
-        <div class="row line">
-            <div id="linechart1" class="col-6 col-md-12" style="width: 800px; height: 400px"></div>
-            <div id="linechart2" class="col-6 col-md-12" style="width: 800px; height: 400px"></div>
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="FII" checked="checked">
+                    <label class="custom-control-label" for="FII">外資</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="SIT">
+                    <label class="custom-control-label" for="SIT">投信</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="DIT">
+                    <label class="custom-control-label" for="DIT">自營</label>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="custom-control custom-radio">
+                    <input type="radio" class="custom-control-input" id="buy" name="fundsType" checked>
+                    <label class="custom-control-label" for="buy">買進</label>
+                </div>
+                <div class="custom-control custom-radio">
+                    <input type="radio" class="custom-control-input" id="sel" name="fundsType">
+                    <label class="custom-control-label" for="sel">賣出</label>
+                </div>
+                <div class="custom-control custom-radio">
+                    <input type="radio" class="custom-control-input" id="sum" name="fundsType">
+                    <label class="custom-control-label" for="sum">累計</label>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="input-group input-daterange">
+                    <input type="text" class="form-control" id="bdate" value="<%=bdate%>">
+                    <div class="input-group-addon">to</div>
+                    <input type="text" class="form-control" id="edate" value="<%=edate%>">
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <button type="button" class="btn btn-success" id="search" onclick="search()">查詢</button>
+            </div>
         </div>
-        <div class="row pie">
+        <div id="line" class="row line">
+        </div>
+        <div id="pie" class="row pie">
         </div>
     </div>
 </body>
 </html>
-
+<script type="text/javascript">
+    google.charts.load('current', {'packages':['corechart', 'line']});
+    google.charts.setOnLoadCallback(search());
+</script>
