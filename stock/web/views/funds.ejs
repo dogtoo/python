@@ -35,13 +35,27 @@
             if (groupType === "") groupType = "F";
             if (fundsType === "") fundsType = "buy";
             
+            let group = "";
+            $("input[name=group]:checked").each(function () {
+                group = this.id ;
+            });
+            
+            let stockCode = $("#stockCode").val();
+            let fundsGroup = "";
+            $("input[name=fundsGroup]:checked").each(function () {
+                fundsGroup = this.id ;
+            });
+            
             var bdate = $("#bdate").val();
             var edate = $("#edate").val();
             var res = {
                 'bdate':bdate.replace(/\//g,""),
                 'edate':edate.replace(/\//g,''),
                 'groupType':groupType,
-                'fundsType':fundsType
+                'fundsType':fundsType,
+                'group':group,
+                'stockCode':stockCode,
+                'fundsGroup':fundsGroup
             };
             
             drawChart(res);
@@ -64,31 +78,57 @@
                     var title_ = m;
                     var data_ = [['group','funds']];
 
-                    var lrow = [[new Date(m.substr(0,4), m.substr(4,2)-1)], [new Date(m.substr(0,4), m.substr(4,2)-1)], [new Date(m.substr(0,4), m.substr(4,2)-1)], [new Date(m.substr(0,4), m.substr(4,2)-1)]];
+                    var lrow = [[new Date(m.substr(0,4), m.substr(4,2)-1, m.substr(6,2))],
+                                [new Date(m.substr(0,4), m.substr(4,2)-1, m.substr(6,2))], 
+                                [new Date(m.substr(0,4), m.substr(4,2)-1, m.substr(6,2))], 
+                                [new Date(m.substr(0,4), m.substr(4,2)-1, m.substr(6,2))]];
                     var otherV_ = 0;
+                    
+                    let splcnt = 0;
+                    let splidx = 0;
+                    let gIdx = 0;
+                    splcnt = req[m].group.length / 4;
                     for (var i in req[m].group) {
                         var row = [];
-                        if (req[m].group[i].group.match(/17|24|25|26|27|28|31|03|01/)) {
+                        if (res.group === 'allGroup') {
+                            if (req[m].group[i].group.match(/17|24|25|26|27|28|31|03|01/)) {
+                                row.push(req[m].group[i].group);
+                                row.push(req[m].group[i].FII_I);
+                                data_.push(row);
+                            } else {
+                                otherV_ += req[m].group[i].FII_I;
+                            }
+                        } else {
                             row.push(req[m].group[i].group);
                             row.push(req[m].group[i].FII_I);
                             data_.push(row);
-                        } else {
-                            otherV_ += req[m].group[i].FII_I;
                         }
                         
-                        if (req[m].group[i].group.match(/17|24|25|26|28|31|27/)) {
-                            if (lrowG_) lrowG[0].push(req[m].group[i].group);
-                            lrow[0].push(Math.floor(req[m].group[i].FII_I/1000000)/100);
-                        } else if (req[m].group[i].group.match(/03|01|05|15|10|02|20/)) {
-                            if (lrowG_) lrowG[1].push(req[m].group[i].group);
-                            lrow[1].push(Math.floor(req[m].group[i].FII_I/1000000)/100);
-                        } else if (req[m].group[i].group.match(/14|04|29|11|12|18|09/)){
-                            if (lrowG_) lrowG[2].push(req[m].group[i].group);
-                            lrow[2].push(Math.floor(req[m].group[i].FII_I/1000000)/100);
+                        if (res.group === 'allGroup') {
+                            if (req[m].group[i].group.match(/17|24|25|26|28|31|27/)) {
+                                if (lrowG_) lrowG[0].push(req[m].group[i].group);
+                                lrow[0].push(Math.floor(req[m].group[i].FII_I/1000000)/100);
+                            } else if (req[m].group[i].group.match(/03|01|05|15|10|02|20/)) {
+                                if (lrowG_) lrowG[1].push(req[m].group[i].group);
+                                lrow[1].push(Math.floor(req[m].group[i].FII_I/1000000)/100);
+                            } else if (req[m].group[i].group.match(/14|04|29|11|12|18|09/)){
+                                if (lrowG_) lrowG[2].push(req[m].group[i].group);
+                                lrow[2].push(Math.floor(req[m].group[i].FII_I/1000000)/100);
+                            } else {
+                                if (lrowG_) lrowG[3].push(req[m].group[i].group);
+                                lrow[3].push(Math.floor(req[m].group[i].FII_I/1000000)/100);
+                            }
                         } else {
-                            if (lrowG_) lrowG[3].push(req[m].group[i].group);
-                            lrow[3].push(Math.floor(req[m].group[i].FII_I/1000000)/100);
-                        }
+                            if (splidx < splcnt) {
+                                splidx++;
+                            } else {
+                                splidx = 0;
+                                gIdx++;
+                            }
+                            if (lrowG_) lrowG[gIdx].push(req[m].group[i].group);
+                            lrow[gIdx].push(req[m].group[i].FII_I);
+                                
+                        }                        
                     }
                     var row = [];
                     row.push('other');
@@ -154,6 +194,21 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-3">
+                <div class="custom-control custom-radio">
+                    <input type="radio" class="custom-control-input" id="allGroup" name="group" checked>
+                    <label class="custom-control-label" for="allGroup">各大類股</label>
+                </div>
+                <div class="custom-control custom-radio">
+                    <input type="radio" class="custom-control-input" id="group" name="group">
+                    <label class="custom-control-label" for="group">類股</label>
+                </div>
+                <div class="custom-control custom-radio">
+                    <input type="radio" class="custom-control-input" id="stock" name="group">
+                    <label class="custom-control-label" for="stock">個股</label>
+                </div>
+                <input type="text" class="form-control" id="stockCode">
+            </div>
+            <div class="col-lg-3">
                 <div class="custom-control custom-checkbox">
                     <input type="checkbox" class="custom-control-input" id="FII" checked="checked">
                     <label class="custom-control-label" for="FII">外資</label>
@@ -179,6 +234,20 @@
                 <div class="custom-control custom-radio">
                     <input type="radio" class="custom-control-input" id="sum" name="fundsType">
                     <label class="custom-control-label" for="sum">累計</label>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="custom-control custom-radio">
+                    <input type="radio" class="custom-control-input" id="yearGroup" name="fundsGroup">
+                    <label class="custom-control-label" for="yearGroup">年</label>
+                </div>
+                <div class="custom-control custom-radio">
+                    <input type="radio" class="custom-control-input" id="monthGroup" name="fundsGroup" checked>
+                    <label class="custom-control-label" for="monthGroup">月</label>
+                </div>
+                <div class="custom-control custom-radio">
+                    <input type="radio" class="custom-control-input" id="dayGroup" name="fundsGroup">
+                    <label class="custom-control-label" for="dayGroup">日</label>
                 </div>
             </div>
             <div class="col-lg-3">

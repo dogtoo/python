@@ -141,41 +141,47 @@ router.get('/funds', async(ctx) => {
 });
 //取得上月外資可用資金
 router.post('/lastMonthUsedfunds', async(ctx) => {
-    var bdate = ctx.request.body.bdate;
-    var edate = ctx.request.body.edate;
-    var groupType = ctx.request.body.groupType;
-    var fundsType = ctx.request.body.fundsType;
+    let bdate = ctx.request.body.bdate;
+    let edate = ctx.request.body.edate;
+    let groupType = ctx.request.body.groupType;
+    let fundsType = ctx.request.body.fundsType;
+    
+    let group_ = ctx.request.body.group;
+    let stockCode_ = ctx.request.body.stockCode;
+    let fundsGroup_ = ctx.request.body.fundsGroup;
+    
     if (typeof bdate === 'undefined' || typeof edate === 'undefined') {
-        var date = new Date();
-        var date_ = dateFormat(date, 'yyyy/mm/') + 01;
+        let date = new Date();
+        let date_ = dateFormat(date, 'yyyy/mm/') + 01;
         date = new Date(date_);
         date.setDate(date.getDate() -1);
-        var edate = dateFormat(date, 'yyyymmdd');
+        edate = dateFormat(date, 'yyyymmdd');
         /*
         date.setYear(date.getFullYear() -1);
         var m = date.getMonth() + 1;*/
-        var m = date.getMonth()
+        let m = date.getMonth()
         date.setMonth(m, 1);
-        var bdate = dateFormat(date, 'yyyymmdd');
+        bdate = dateFormat(date, 'yyyymmdd');
     }
-    console.log(  bdate + ','+ edate);  
+    console.log(  bdate + ','+ edate + ',' + group_ + ',' + stockCode_ + ',' + fundsGroup_);  
     
-    ctx.response.type = 'json';
-    let data = await ctx.db.collection('t86').aggregate([
-        {
-            $match:{
-                $and:[
-                    {date:{'$gte':bdate, '$lte':edate}},
-                    {groupCode:{'$ne':'00'}}
-                ]
-            }
-        },
-        {
+    ctx.response.type = 'json';    
+    
+    let match = {$match:{}};
+    let matchAnd = [
+            {date:{'$gte':bdate, '$lte':edate}},
+            {groupCode:{'$ne':'00'}}
+        ];
+    if (typeof group_ != 'undefined' && group_ === 'group') matchAnd.push({groupCode:{'$in':stockCode_.match(/\d{2}/g)}});
+    if (typeof group_ != 'undefined' && group_ === 'stock') matchAnd.push({code:{'$in':stockCode_.match(/\d{4}/g)}});
+    match.$match = {'$and':matchAnd};
+
+    let groupDateCnt = 4; //年
+    if (typeof fundsGroup_ != 'undefined' && fundsGroup_ === 'monthGroup') groupDateCnt = 6;
+    if (typeof fundsGroup_ != 'undefined' && fundsGroup_ === 'dayGroup') groupDateCnt = 8;
+    let group = {
             $group:{
-                _id: {
-                    date:{$substr:['$date', 0, 6]}
-                  , groupCode:'$groupCode'
-                }
+                _id:{date:{$substr:['$date', 0, groupDateCnt]}}
                ,'FII_I':{$sum:'$FII_I'}
                ,'FII_O':{$sum:'$FII_O'}
                ,'SIT_I':{$sum:'$SIT_I'}
@@ -185,32 +191,39 @@ router.post('/lastMonthUsedfunds', async(ctx) => {
                ,'DHedge_I':{$sum:'$DHedge_I'}
                ,'DHedge_O':{$sum:'$DHedge_O'}
             }
-        },
-        {
-            $sort:{
-                '_id':1
-            }
-        },
-        {
-            $lookup: {
-                from: 'TWSE',
-                let: {groupCode:'$_id.groupCode'},
-                pipeline:[
-                    { 
-                        $match: {
-                            $expr: {
-                                $eq: [ '$groupCode', '$$groupCode']
-                            }
-                        }
-                    },
-                    { $project: { group:1, _id:0}},
-                    { $limit:1}
-                ],
-                as:'groupName'
-            }
-        },
-        {
-            $project: {
+        };
+    
+    if (typeof group_ != 'undefined' && group_ === 'allGroup') group.$group._id['groupCode'] = '$groupCode';
+    if (typeof group_ != 'undefined' && group_.match(/group|stock/)) {
+        group.$group._id['groupCode'] = '$groupCode';
+        group.$group._id['code'] = '$code';
+    }
+    //if (typeof group_ != 'undefined' && group_ = 'stock') group.$group._id['groupCode'] = '$groupCode';
+    
+    let lookup = {$lookup:{
+        from: 'TWSE',
+        let: {groupCode:'$_id.groupCode'},
+        pipeline:[
+            { 
+                $match: {
+                    $expr: {
+                        $eq: [ '$groupCode', '$$groupCode']
+                    }
+                }
+            },
+            { $project: { group:1, _id:0}},
+            { $limit:1}
+        ],
+        as:'groupName'
+    }};
+    
+    if (typeof group_ != 'undefined' && group_.match(/group|stock/)) {
+        lookup.$lookup.let = {code:'$_id.code'};
+        lookup.$lookup.pipeline[0].$match.$expr.$eq = ['$code', '$$code'];
+        lookup.$lookup.pipeline[1].$project['name'] = 1;
+    }
+    
+    let project = {$project: {
                 _id: 0
                ,date: '$_id.date'
                ,groupCode: '$_id.groupCode'
@@ -236,23 +249,35 @@ router.post('/lastMonthUsedfunds', async(ctx) => {
                ,'自營商買進避':'$DHedge_I'
                ,'自營商賣出避':'$DHedge_O'*/
             }
-        },
-        {
+        };
+    if (typeof group_ != 'undefined' && group_.match(/group|stock/)) {
+        project.$project.groupCode = '$_id.code';
+        project.$project.groupName = '$groupName.name';
+    }
+        
+    let sort = {
             $sort:{
                 'date':1
             }
-        }
-    ]).toArray();
-    var out = {};
-    var date_ = ' ';
+        };
+    
+    let args = [match, group, {
+            $sort:{
+                '_id':1
+            }
+        }, lookup, project, sort];
+    console.log(args);
+    let data = await ctx.db.collection('t86').aggregate(args).toArray();
+    let out = {};
+    let date_ = ' ';
     //var FII_I_T = 0, FII_O_T = 0;
     
     //var I_ = 0, O_ = 0, S_ = 0, fv_ = 0;
     //var I_T = 0, O_T = 0, S_T = 0, fv_T = 0;
-    var fv_ = 0, fv_T = 0;
+    let fv_ = 0, fv_T = 0;
     
-    for (var i in data) {
-        var row = data[i];
+    for (let i in data) {
+        let row = data[i];
         if (row.date != date_) {
             if (date_ != ' ') {
                 //out[date_]['FII_I_T'] = FII_I_T;
