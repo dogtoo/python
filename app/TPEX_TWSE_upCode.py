@@ -47,15 +47,15 @@ for k,v in twstock.tpex.items():
         groupN = v.group
     
     data = {
-            v.code : {
-                'type'   : v.type
-               ,'groupCode' : format[groupN]
-               ,'name'   : v.name
-               ,'ISIN'   : v.ISIN
-               ,'start'  : v.start
-               ,'market' : v.market
-               ,'CFI'    : v.CFI
-            }
+             'group'  : groupN
+            ,'code'   : v.code
+            ,'type'   : v.type
+            ,'groupCode' : format[groupN]
+            ,'name'   : v.name
+            ,'ISIN'   : v.ISIN
+            ,'start'  : v.start
+            ,'market' : v.market
+            ,'CFI'    : v.CFI            
         }
     
     if groupN in tpexG:
