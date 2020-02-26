@@ -129,8 +129,9 @@ router.get('/funds', async(ctx) => {
     var date_ = dateFormat(date, 'yyyy/mm/') + 01;
     date = new Date(date_);
     date.setDate(date.getDate() -1);
-    date.setYear(date.getFullYear() -1);
-    var m = date.getMonth() + 2;
+    //date.setYear(date.getFullYear() -1);
+    //var m = date.getMonth() + 2;
+    var m = date.getMonth()-3;
     date.setMonth(m, 1);
     let bdate = dateFormat(date, 'yyyy/mm/dd');
     console.log(  bdate + ','+ edate);  
@@ -193,8 +194,8 @@ router.post('/lastMonthUsedfunds', async(ctx) => {
             }
         };
     
-    if (typeof group_ != 'undefined' && group_ === 'allGroup') group.$group._id['groupCode'] = '$groupCode';
-    if (typeof group_ != 'undefined' && group_.match(/group|stock/)) {
+    if (typeof group_ != 'undefined' && group_.match(/group|allGroup/) ) group.$group._id['groupCode'] = '$groupCode';
+    if (typeof group_ != 'undefined' && group_.match(/stock/)) {
         group.$group._id['groupCode'] = '$groupCode';
         group.$group._id['code'] = '$code';
     }
@@ -217,7 +218,7 @@ router.post('/lastMonthUsedfunds', async(ctx) => {
         as:'groupName'
     }};
     
-    if (typeof group_ != 'undefined' && group_.match(/group|stock/)) {
+    if (typeof group_ != 'undefined' && group_.match(/stock/)) {
         lookup.$lookup.let = {code:'$_id.code'};
         lookup.$lookup.pipeline[0].$match.$expr.$eq = ['$code', '$$code'];
         lookup.$lookup.pipeline[1].$project['name'] = 1;
@@ -250,7 +251,7 @@ router.post('/lastMonthUsedfunds', async(ctx) => {
                ,'自營商賣出避':'$DHedge_O'*/
             }
         };
-    if (typeof group_ != 'undefined' && group_.match(/group|stock/)) {
+    if (typeof group_ != 'undefined' && group_.match(/stock/)) {
         project.$project.groupCode = '$_id.code';
         project.$project.groupName = '$groupName.name';
     }
@@ -266,7 +267,7 @@ router.post('/lastMonthUsedfunds', async(ctx) => {
                 '_id':1
             }
         }, lookup, project, sort];
-    console.log(args);
+    console.log(JSON.stringify(args, null, 4));
     let data = await ctx.db.collection('t86').aggregate(args).toArray();
     let out = {};
     let date_ = ' ';

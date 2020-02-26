@@ -77,17 +77,27 @@
                 m_.forEach(function(m) {
                     var title_ = m;
                     var data_ = [['group','funds']];
-
-                    var lrow = [[new Date(m.substr(0,4), m.substr(4,2)-1, m.substr(6,2))],
-                                [new Date(m.substr(0,4), m.substr(4,2)-1, m.substr(6,2))], 
-                                [new Date(m.substr(0,4), m.substr(4,2)-1, m.substr(6,2))], 
-                                [new Date(m.substr(0,4), m.substr(4,2)-1, m.substr(6,2))]];
+                    let fm_ = m;
+                    if (m.length == 6) fm_ += '01';
+                    let fmd_ = {};
+                    if (res.fundsGroup === 'dayGroup')
+                        fmd_ = {v:new Date(fm_.substr(0,4), fm_.substr(4,2)-1, fm_.substr(6,2)), f:fm_.substr(2,2) + '/' + fm_.substr(4,2) + '/' + fm_.substr(6,2)};
+                    else
+                        fmd_ = {v:new Date(fm_.substr(0,4), fm_.substr(4,2)-1, fm_.substr(6,2)), f:fm_.substr(2,2) + '/' + fm_.substr(4,2)};
+                    var lrow = [[fmd_],
+                                [fmd_], 
+                                [fmd_], 
+                                [fmd_]];
+                    /*var lrow = [[m],[m],[m],[m]];*/
                     var otherV_ = 0;
                     
                     let splcnt = 0;
                     let splidx = 0;
                     let gIdx = 0;
-                    splcnt = req[m].group.length / 4;
+                    if (req[m].group.length < 8)
+                        splcnt = req[m].group.length;
+                    else
+                        splcnt = req[m].group.length / 4;
                     for (var i in req[m].group) {
                         var row = [];
                         if (res.group === 'allGroup') {
@@ -122,7 +132,7 @@
                             if (splidx < splcnt) {
                                 splidx++;
                             } else {
-                                splidx = 0;
+                                splidx = 1;
                                 gIdx++;
                             }
                             if (lrowG_) lrowG[gIdx].push(req[m].group[i].group);
@@ -160,12 +170,36 @@
                 var options = {
                     hAxis: {
                       title: 'year/month'
+                     ,format: 'yy/MM'
+                     ,gridlines: {
+                        units: {
+                            months: { format:['yy/MM']}
+                           ,days: { format:['yy/MM/dd']}
+                        }
+                      }
                     },
                     vAxis: {
                       title: 'Funds(億)'
                     }/*,
                     colors: ['#a52714', '#097138']*/
+                    ,crosshair: {
+                      color: '#000',
+                      trigger: 'selection'
+                    }
+                    //,axisTitlesPosition: 'in'
+                    ,chartArea: {
+                        left:50,
+                        width:'70%',height:'80%'
+                    }
+                    //,titlePosition:'in'
+                    ,tooltip: {
+                        showColorCode: true
+                    }
                 };
+                if (res.fundsGroup === 'dayGroup') {
+                    options.hAxis.title = 'yy/MM/dd';
+                    options.hAxis.format = 'yy/MM/dd';
+                }
                 var lineChart = $("#linechart");
                 $("#line").empty();
                 for (var i in [1, 2, 3, 4]) {
@@ -175,13 +209,17 @@
                         data.addColumn('number', lrowG[i][x]);
                     }
                     // ['202002', FII_I(01), FII_I(02) ...]
-                    data.addRows(ldata_[i]);
+                    data.addRows(ldata_[i].reverse());
                     
                     lc = lineChart.clone().appendTo('div.line');
                     $(lc).show();
-                    var linechart = new google.charts.Line(lc[0]);
+                    /*var linechart = new google.charts.Line(lc[0]);
+                    linechart.draw(data, google.charts.Line.convertOptions(options));*/
+                    var linechart = new google.visualization.LineChart(lc[0]);
                     linechart.draw(data, options);
+                    
                 }
+                var t = linechart.getSelection();
             });            
         }
 
