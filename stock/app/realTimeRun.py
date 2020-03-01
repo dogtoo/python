@@ -24,6 +24,15 @@ def runCom(L):
     
 p = list( map(runCom, stockList)) 
 
+stockListTPEX = ["02","03","04","05","06","10","11","14","15","16","17","18","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34"]
+#stockListTPEX = ["02"]
+cmdTPEX = 'python ./stock.py TPEX "{}"'
+
+def runComTPEX(L):
+    return subprocess.Popen(cmdTPEX.format(L), shell=True)
+    
+p.extend( list( map(runComTPEX, stockListTPEX)) )
+
 def logW(L):
     return open("/python/log/stock{}.log".format(L.replace("|","_"),"a+"))
 #fp = list( map(logW, stockList))
