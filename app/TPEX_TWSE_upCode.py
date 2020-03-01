@@ -38,7 +38,7 @@ $group : {
 }
 """
 #取得TPEX
-tpexG = {}
+#tpexG = {}
 for k,v in twstock.tpex.items():
     groupN = ""
     if v.group == "":
@@ -57,12 +57,13 @@ for k,v in twstock.tpex.items():
             ,'market' : v.market
             ,'CFI'    : v.CFI            
         }
-    
+    collTPEX.insert_one(data)
+    """
     if groupN in tpexG:
         tpexG[groupN].update(data)
     else:
         tpexG[groupN] = data
-collTPEX.insert_one(tpexG)
+    """
 
 #取得TWSE
 #twseG = {}
