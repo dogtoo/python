@@ -74,7 +74,7 @@
                 var ldata_ = [];
                 var lrowG_ = true;
                 
-                //var lrowG = [[],[],[],[]]; //改成
+                //var lrowG = [[],[],[],[]]; //改成db回傳的group
                 m_.forEach(function(m) {
                     var title_ = m;
                     var data_ = [['group','funds']];
@@ -149,7 +149,7 @@
                     row.push(otherV_);
                     data_.push(row);
                     
-                    for (var i in [1, 2, 3, 4]) ldata_[i].push(lrow[i]);
+                    for (var i in lrow.length) ldata_[i].push(lrow[i]);
                     lrowG_ = false;
                     
                     var data = google.visualization.arrayToDataTable(data_);
@@ -206,7 +206,7 @@
                 }
                 var lineChart = $("#linechart");
                 $("#line").empty();
-                for (var i in [1, 2, 3, 4]) {
+                for (var i in lrowG.length) {
                     var data = new google.visualization.DataTable();
                     data.addColumn('date', 'funds');
                     for (var x in lrowG[i]) {

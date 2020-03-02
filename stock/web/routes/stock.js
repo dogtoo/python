@@ -194,8 +194,8 @@ router.post('/lastMonthUsedfunds', async(ctx) => {
             }
         };
     
-    if (typeof group_ != 'undefined' && group_.match(/group|allGroup/) ) group.$group._id['groupCode'] = '$groupCode';
-    if (typeof group_ != 'undefined' && group_.match(/stock/)) {
+    if (typeof group_ != 'undefined' && group_.match(/allGroup/) ) group.$group._id['groupCode'] = '$groupCode';
+    if (typeof group_ != 'undefined' && group_.match(/group|stock/)) {
         group.$group._id['groupCode'] = '$groupCode';
         group.$group._id['code'] = '$code';
     }
@@ -218,7 +218,7 @@ router.post('/lastMonthUsedfunds', async(ctx) => {
         as:'groupName'
     }};
     
-    if (typeof group_ != 'undefined' && group_.match(/stock/)) {
+    if (typeof group_ != 'undefined' && group_.match(/group|stock/)) {
         lookup.$lookup.let = {code:'$_id.code'};
         lookup.$lookup.pipeline[0].$match.$expr.$eq = ['$code', '$$code'];
         lookup.$lookup.pipeline[1].$project['name'] = 1;
@@ -251,7 +251,7 @@ router.post('/lastMonthUsedfunds', async(ctx) => {
                ,'自營商賣出避':'$DHedge_O'*/
             }
         };
-    if (typeof group_ != 'undefined' && group_.match(/stock/)) {
+    if (typeof group_ != 'undefined' && group_.match(/group|stock/)) {
         project.$project.groupCode = '$_id.code';
         project.$project.groupName = '$groupName.name';
     }
