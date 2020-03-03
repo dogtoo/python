@@ -276,8 +276,11 @@ router.post('/lastMonthUsedfunds', async(ctx) => {
     //var I_ = 0, O_ = 0, S_ = 0, fv_ = 0;
     //var I_T = 0, O_T = 0, S_T = 0, fv_T = 0;
     let fv_ = 0, fv_T = 0;
-    
+    let codeL_ = [];
+    let groupH_ = {};
+        
     for (let i in data) {
+        groupH_[data[i].groupCode] = data[i].groupName;
         let row = data[i];
         if (row.date != date_) {
             if (date_ != ' ') {
@@ -334,6 +337,22 @@ router.post('/lastMonthUsedfunds', async(ctx) => {
     //out[date_].FII_I_T = FII_I_T;
     //out[date_].FII_O_T = FII_O_T;
     out[date_].FII_I_T = fv_T;
+    
+    Object.keys(groupH_).sort().forEach(function(key) {
+        codeL_.push(key + groupH_[key]);
+    });
+    Object.keys(out).sort().forEach(function(key) {
+        let l_ = out[key].group;
+        //console.log(l_);
+        for (let i in codeL_) {
+            if (i >= l_.length)
+                l_.splice(i, 0, {group:codeL_[i], FII_I: 0});
+            else if ((codeL_[i].match(/^\d+/))[0] != (l_[i].group.match(/^\d+/))[0]) {
+                l_.splice(i, 0, {group:codeL_[i], FII_I: 0});
+            }
+        }
+    });
+    out['lrowG'] = codeL_;
     /*
     var I_P = 0, O_P = 0;
     for (var d in out) {

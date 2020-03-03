@@ -67,15 +67,25 @@
                 $("#pie").empty();
                 var legend_ = 'true';
                 var m_ = [];
+                var lrowGL_ = [];
                 for (var m in req) {
+                    if (m == 'lrowG') {
+                        lrowGL_ = req[m];
+                        continue;
+                    }
                     m_.push(m);
                 }
                 m_.reverse();
                 var ldata_ = [];
                 var lrowG_ = true;
-                
+                var lrowG = [];
+                if (res.group === 'allGroup') {
+                    lrowG = [[],[],[],[]];
+                    ldata_ = [[],[],[],[]];
+                }
                 //var lrowG = [[],[],[],[]]; //改成db回傳的group
                 m_.forEach(function(m) {
+                    
                     var title_ = m;
                     var data_ = [['group','funds']];
                     let fm_ = m;
@@ -90,7 +100,7 @@
                     //            [fmd_], 
                     //            [fmd_]];
                     let lrow = [];
-                    if (res.group === 'allGroup') lrow = [[m],[m],[m],[m]];
+                    if (res.group === 'allGroup') lrow = [[fmd_],[fmd_],[fmd_],[fmd_]];
                     /*var lrow = [[m],[m],[m],[m]];*/
                     var otherV_ = 0;
                     
@@ -99,8 +109,13 @@
                     let gIdx = 0;
                     if (req[m].group.length < 8)
                         splcnt = req[m].group.length;
-                    else
-                        splcnt = req[m].group.length / 4;
+                    else {
+                        let page = 0;
+                        while (splcnt == 0 || splcnt > 8) {
+                            page++;
+                            splcnt = req[m].group.length / page;
+                        }
+                    }
                     for (var i in req[m].group) {
                         var row = [];
                         if (res.group === 'allGroup') {
@@ -119,16 +134,16 @@
                         
                         if (res.group === 'allGroup') {
                             if (req[m].group[i].group.match(/17|24|25|26|28|31|27/)) {
-                                //if (lrowG_) lrowG[0].push(req[m].group[i].group);
+                                if (lrowG_) lrowG[0].push(req[m].group[i].group);
                                 lrow[0].push(Math.floor(req[m].group[i].FII_I/1000000)/100);
                             } else if (req[m].group[i].group.match(/03|01|05|15|10|02|20/)) {
-                                //if (lrowG_) lrowG[1].push(req[m].group[i].group);
+                                if (lrowG_) lrowG[1].push(req[m].group[i].group);
                                 lrow[1].push(Math.floor(req[m].group[i].FII_I/1000000)/100);
                             } else if (req[m].group[i].group.match(/14|04|29|11|12|18|09/)){
-                                //if (lrowG_) lrowG[2].push(req[m].group[i].group);
+                                if (lrowG_) lrowG[2].push(req[m].group[i].group);
                                 lrow[2].push(Math.floor(req[m].group[i].FII_I/1000000)/100);
                             } else {
-                                //if (lrowG_) lrowG[3].push(req[m].group[i].group);
+                                if (lrowG_) lrowG[3].push(req[m].group[i].group);
                                 lrow[3].push(Math.floor(req[m].group[i].FII_I/1000000)/100);
                             }
                         } else {
@@ -140,7 +155,10 @@
                                 splidx = 1;
                                 gIdx++;
                             }
-                            //if (lrowG_) lrowG[gIdx].push(req[m].group[i].group);
+                            if (lrowG_) {
+                                if (lrowG.length < gIdx+1) lrowG.push([]);
+                                lrowG[gIdx].push(req[m].group[i].group);
+                            }
                             lrow[gIdx].push(req[m].group[i].FII_I);
                         }                        
                     }
@@ -149,7 +167,10 @@
                     row.push(otherV_);
                     data_.push(row);
                     
-                    for (var i in lrow.length) ldata_[i].push(lrow[i]);
+                    for (var i in lrow) {
+                        if (ldata_.length < i+1) ldata_.push([]);
+                        ldata_[i].push(lrow[i]);
+                    }
                     lrowG_ = false;
                     
                     var data = google.visualization.arrayToDataTable(data_);
@@ -206,7 +227,7 @@
                 }
                 var lineChart = $("#linechart");
                 $("#line").empty();
-                for (var i in lrowG.length) {
+                for (var i in lrowG) {
                     var data = new google.visualization.DataTable();
                     data.addColumn('date', 'funds');
                     for (var x in lrowG[i]) {
@@ -223,7 +244,7 @@
                     linechart.draw(data, options);
                     
                 }
-                var t = linechart.getSelection();
+                //var t = linechart.getSelection();
             });            
         }
 
