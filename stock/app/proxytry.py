@@ -14,7 +14,7 @@ import asyncio
 from proxybroker import Broker
 
 SESSION_URL = 'https://mis.twse.com.tw/stock/api/getStockInfo.jsp'
-handlers = [logging.FileHandler('../../log/proxytry.log', 'w', 'utf-8')]
+handlers = [logging.FileHandler('/python/log/proxytry.log', 'w', 'utf-8')]
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s : %(message)s',
                     datefmt='%Y-%m-%dT %H:%M:%S',
