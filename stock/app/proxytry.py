@@ -14,7 +14,7 @@ import asyncio
 from proxybroker import Broker
 
 SESSION_URL = 'https://mis.twse.com.tw/stock/api/getStockInfo.jsp'
-handlers = [logging.FileHandler('/python/log/proxytry.log', 'w', 'utf-8')]
+handlers = [logging.FileHandler('../../log/proxytry.log', 'w', 'utf-8')]
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s : %(message)s',
                     datefmt='%Y-%m-%dT %H:%M:%S',
@@ -31,47 +31,37 @@ class SSLContextAdapter(HTTPAdapter):
 
 async def show(proxies):
     while True:
-        logging.info('6')
         proxy = await proxies.get()
-        logging.info('7')
         if proxy is None: break
-        logging.info('8')
-        print('Found proxy: %s' % proxy)  
+        #print('Found proxy: %s' % proxy)  
         #logging.info(str(proxy.types) + ' ' + str(proxy.host) + ':' + str(proxy.port))
         #httpType = ''
         #if 'HTTP' in proxy.types:
         #    httpType = 'http' 
         #else:
         #    httpType = 'https' 
-        #p={};
-        #p[httpType] = str(proxy.host) + ':' + str(proxy.port)
+        httpType = 'http' 
+        p={};
+        p[httpType] = str(proxy.host) + ':' + str(proxy.port)
         #logging.info(p)
-        #try:
-        #    req = requests.Session()
-        #    adapter = SSLContextAdapter()
-        #    req.mount(SESSION_URL, adapter)
-        #    req.get(SESSION_URL, proxies=p, timeout=(5, 5), verify=True)
-        #    logging.debug("proxy ok :" + str(p['http']))
-        #    stockCodeL = ['1101']
-        #    stock = twstock.realtime.get(stockCodeL, req, p, logging)
-        #    logging.debug("proxy stock:" + str(stock))        
-        #except BaseException as e:
-        #    logging.error("proxy fal :" + str(e))
+        try:
+            req = requests.Session()
+            adapter = SSLContextAdapter()
+            req.mount(SESSION_URL, adapter)
+            req.get(SESSION_URL, proxies=p, timeout=(5, 5), verify=True)
+            logging.info("proxy ok :" + str(p['http']))
+            stockCodeL = ['1101']
+            stock = twstock.realtime.get(stockCodeL, req, p, logging)
+        except BaseException as e:
+            logging.error("proxy fal :" + str(p['http']))
+            logging.error("proxy fal :" + str(e))
 
-try:
-    logging.info('1')
-    proxies = asyncio.Queue()
-    logging.info('2')
-    broker = Broker(proxies)
-    logging.info('3')
-    tasks = asyncio.gather(
-        broker.find(types=['HTTP', 'HTTPS'], limit=10),
-        show(proxies))
+proxies = asyncio.Queue()
+broker = Broker(proxies)
+tasks = asyncio.gather(
+    broker.grab(countries=['US', 'GB', 'DE', 'FR', 'ID', 'ZA', 'TH', 'CN', 'AR', 'CA', 'IT', 'JP', 'TW', 'HK', 'KR']),
+    show(proxies))
 
-    logging.info('4')
-    loop = asyncio.get_event_loop()
-    logging.info('5')
-    loop.run_until_complete(tasks)
-    logging.info('6')
-except BaseException as e:
-    logging.error("Broker :" + str(e))
+loop = asyncio.get_event_loop()
+loop.run_until_complete(tasks)
+
