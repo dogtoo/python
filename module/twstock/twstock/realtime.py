@@ -97,7 +97,7 @@ def _join_stock_id(stocks) -> str:
         'tse' if stocks in twstock.twse else 'otc', stock_id=stocks)
 
 
-def get_raw(stocks) -> dict:
+def get_raw(stocks, req) -> dict:
     try:
         #req = requests.Session()
         #req.get(SESSION_URL)
@@ -127,8 +127,8 @@ def get_raw(stocks) -> dict:
 def get(stocks, request, proxies, logging, retry=0):
     # Prepare data
     prox = proxies
-    req = request
-    data = get_raw(stocks) if not mock else twstock.mock.get(stocks)
+    #req = request
+    data = get_raw(stocks, request) if not mock else twstock.mock.get(stocks)
 
     # Set success
     data['success'] = False
