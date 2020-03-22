@@ -30,6 +30,7 @@ class SSLContextAdapter(HTTPAdapter):
         return super(SSLContextAdapter, self).init_poolmanager(*args, **kwargs)
 
 async def show(proxies):
+    run = 0
     while True:
         proxy = await proxies.get()
         if proxy is None: break
@@ -55,6 +56,10 @@ async def show(proxies):
         except BaseException as e:
             logging.error("proxy fal :" + str(p['http']))
             logging.error("proxy fal :" + str(e))
+        run = run + 1
+        if run == 10:
+            time.sleep(5)
+            run = 0
 
 proxies = asyncio.Queue()
 broker = Broker(proxies)

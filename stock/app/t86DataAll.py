@@ -34,12 +34,20 @@ collname = ""
 if model:
     if type == 't86':
         collname = "t86_bak"
-    else:
+    elif type === 'stockDay':
+        collname = "stockDay_bak"
+    elif type === 'tpex86':
+        collname = "t86_bak"
+    elif type === 'tpexDay':
         collname = "stockDay_bak"
 else:
     if type == 't86':
         collname = "t86"
-    else:
+    elif type === 'stockDay':
+        collname = "stockDay"
+    elif type === 'tpex86':
+        collname = "t86"
+    elif type === 'tpexDay':
         collname = "stockDay"
 collT86 = db[collname]
 
@@ -142,8 +150,12 @@ try:
             
             if type == 't86':
                 r = twstock.t86.get('ALL', date, 'json', proxies, logging)
-            else:
+            elif type === 'stockDay':
                 r = twstock.t86.STOCK_DAY('ALLBUT0999', date, 'json', proxies, logging)
+            elif type === 'tpex86':
+                r = twstock.t86.TPEX_86('ALL', date, 'json', proxies, logging)
+            elif type === 'tpexDay':
+                r = twstock.t86.TPEX_DAY('ALL', date, 'json', proxies, logging)
             
             if 'data' in r:
                 data = r['data']

@@ -6,7 +6,7 @@ from datetime import timedelta, date, datetime
 import os
 import logging
 
-logging.basicConfig(level=logging.ERROR,
+logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s : %(message)s',
                     datefmt='%Y-%m-%dT %H:%M:%S',
                     filename='../../log/realTime_{:%Y-%m-%d}.log'.format(datetime.now()))

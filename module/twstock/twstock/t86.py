@@ -10,21 +10,23 @@ import logging
 #https://www.twse.com.tw/fund/TWT47U?response=json&date=20030101&selectType=01&_=1574739645853 月報 101/5/2前改用月報 date 放每月1日
 #https://godoc.org/github.com/toomore/gogrs/twse go的方式取股票
 #https://www.twse.com.tw/exchangeReport/MI_INDEX?response=json&date=20191127&type=ALLBUT0999&_=1574859382270 個股 data9
+#https://www.tpex.org.tw/web/stock/aftertrading/daily_close_quotes/stk_quote_result.php?l=zh-tw&d=109/03/19&_=1584706711888 stockDay
+#https://www.tpex.org.tw/web/stock/3insti/daily_trade/3itrade_hedge_result.php?l=zh-tw&se=02&t=D&d=109/03/20&_=1584706885077 t86
 global date_v
 date_v = datetime.datetime.now().strftime("%Y%m%d")
 log = logging
 def _format_stock_info(data) -> dict:
     result = {
-        'code': ''
-      , 'date': ''
-      , 'FII_I': 0 #外資買進
-      , 'FII_O': 0 #外資賣出
-      , 'SIT_I': 0 #投信買進
-      , 'SIT_O': 0 #投信賣出
-      , 'DProp_I': 0 #自營商(自行買賣)
-      , 'DProp_O': 0 #自營商(自行買賣)
-      , 'DHedge_I': 0 #自營商(避險)
-      , 'DHedge_O': 0 #自營商(避險)
+        'code': '' # 0
+      , 'date': '' # reportDate
+      , 'FII_I': 0 #外資買進 2
+      , 'FII_O': 0 #外資賣出 3
+      , 'SIT_I': 0 #投信買進 11
+      , 'SIT_O': 0 #投信賣出 12
+      , 'DProp_I': 0 #自營商(自行買賣) 17
+      , 'DProp_O': 0 #自營商(自行買賣) 18
+      , 'DHedge_I': 0 #自營商(避險) 20
+      , 'DHedge_O': 0 #自營商(避險) 21
     }
     
     result['code'] = data[0]
@@ -63,17 +65,17 @@ def _format_stock_day_info(data) -> dict:
     result = {
         'code': ''
       , 'date': ''
-      , 'Trade_Volume': 0 #成交股數
-      , 'Transaction': 0 #成交筆數
-      , 'Trade_Value': 0 #成交金額
-      , 'Opening_Price': 0 #開盤價
-      , 'Highest_Price': 0 #最高價
-      , 'Lowest_Price': 0 #最低價
-      , 'Closing_Price': 0 #收盤價
-      , 'Change': 0 #漲跌差價
-      , 'Last_Best_Bid_Price': 0#最後揭示買價
-      , 'Last_Best_Bid_Volume': 0#最後揭示買量
-      , 'Last_Best_Ask_Price': 0#最後揭示賣價
+      , 'Trade_Volume': 0 #成交股數 8
+      , 'Transaction': 0 #成交筆數 10
+      , 'Trade_Value': 0 #成交金額 9
+      , 'Opening_Price': 0 #開盤價 4
+      , 'Highest_Price': 0 #最高價 5
+      , 'Lowest_Price': 0 #最低價 6
+      , 'Closing_Price': 0 #收盤價 2
+      , 'Change': 0 #漲跌差價 3
+      , 'Last_Best_Bid_Price': 0#最後揭示買價 11
+      , 'Last_Best_Bid_Volume': 0#最後揭示買量 
+      , 'Last_Best_Ask_Price': 0#最後揭示賣價 12
       , 'Last_Best_Ask_Volume': 0#最後揭示賣量
       , 'Price_Earning_Ratio': 0#本益比
     }
