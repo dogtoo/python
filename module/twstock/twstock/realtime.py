@@ -110,13 +110,13 @@ def get_raw(stocks, req) -> dict:
                 time=int(time.time()) * 1000), proxies=prox)
         if sys.version_info < (3, 5):
             try:
-                logging.debug(r.json())
+                #logging.debug(r.json())
                 return r.json()
             except ValueError:
                 return {'rtmessage': 'json decode error', 'rtcode': '5000'}
         else:
             try:
-                logging.debug(r.json())
+                #logging.debug(r.json())
                 return r.json()
             except json.decoder.JSONDecodeError:
                 return {'rtmessage': 'json decode error', 'rtcode': '5000'}
