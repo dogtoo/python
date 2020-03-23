@@ -39,7 +39,10 @@ client = pymongo.MongoClient(config['stock']['dbConn'])
 db = client["twStock"]
 db.authenticate(config['stock']['dbuser'],config['stock']['dbpass'])
 
-collRT = db["TWSE"]
+if type == 't86' or type == 'stockDay':
+    collRT = db["TWSE"]
+elif type == 'tpex86' or type == 'tpexDay':
+    collRT = db["TPEX"]
 collname = ""
 
 if model:

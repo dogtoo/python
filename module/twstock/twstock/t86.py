@@ -21,19 +21,20 @@ def _format_stock_info(data) -> dict:
     result = {
         'code': '' # 0
       , 'date': '' # reportDate
-      , 'FII_I': 0 #外資買進 2
-      , 'FII_O': 0 #外資賣出 3
-      , 'SIT_I': 0 #投信買進 11
-      , 'SIT_O': 0 #投信賣出 12
-      , 'DProp_I': 0 #自營商(自行買賣) 17
-      , 'DProp_O': 0 #自營商(自行買賣) 18
-      , 'DHedge_I': 0 #自營商(避險) 20
-      , 'DHedge_O': 0 #自營商(避險) 21
+      , 'FII_I': 0 #外資買進
+      , 'FII_O': 0 #外資賣出
+      , 'SIT_I': 0 #投信買進
+      , 'SIT_O': 0 #投信賣出
+      , 'DProp_I': 0 #自營商(自行買賣)
+      , 'DProp_O': 0 #自營商(自行買賣)
+      , 'DHedge_I': 0 #自營商(避險)
+      , 'DHedge_O': 0 #自營商(避險)
       , 'Stock_Type': ''
     }
     
     result['code'] = data[0]
     result['date'] = ''
+    result['Stock_Type'] = 'tes'
     if len(data) == 12:
         result['FII_I'] = int(data[2].replace(',',''))
         result['FII_O'] = int(data[3].replace(',',''))
@@ -81,6 +82,7 @@ def _format_stock_info_tpex(data) -> dict:
     
     result['code'] = data[0]
     result['date'] = ''
+    result['Stock_Type'] = 'otc'
     if len(data) == 11:
         result['FII_I'] = int(data[2].replace(',',''))
         result['FII_O'] = int(data[3].replace(',',''))
@@ -90,7 +92,7 @@ def _format_stock_info_tpex(data) -> dict:
         result['DProp_O'] = int(data[9].replace(',',''))
         result['DHedge_I'] = 0
         result['DHedge_O'] = 0
-    elif len(data) == 24:
+    elif len(data) == 25:
         result['FII_I'] = int(data[2].replace(',',''))
         result['FII_O'] = int(data[3].replace(',',''))
         result['SIT_I'] = int(data[11].replace(',',''))
