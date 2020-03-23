@@ -7,11 +7,21 @@ import pandas as pd
 import logging
 from datetime import datetime
 
-logging.basicConfig(level=logging.ERROR,
+import configparser
+config = configparser.ConfigParser()
+config.read("../config.ini")
+
+if config['stock']['logginglevel'] == 'DEBUG':
+    level = logging.DEBUG
+elif config['stock']['logginglevel'] == 'INFO':
+    level = logging.INFO
+elif config['stock']['logginglevel'] == 'ERROR':
+    level = logging.ERROR
+
+logging.basicConfig(level=level,
                     format='%(asctime)s - %(levelname)s : %(message)s',
                     datefmt='%Y-%m-%dT %H:%M:%S',
-                    filename='../../log/t86_{:%Y-%m-%d}.log'.format(datetime.now()))
-                    #filename='/python/log/t86_{:%Y-%m-%d}.log'.format(datetime.now()))
+                    filename=config['stock']['logfilelink'] + 't86_{:%Y-%m-%d}.log'.format(datetime.now()))
 
 bDate = sys.argv[1]
 eDate = sys.argv[2]
@@ -24,30 +34,31 @@ if len(sys.argv) >= 5:
 
 if model:
     print("model = true")
-client = pymongo.MongoClient("mongodb://172.18.0.2:27017")
-#client = pymongo.MongoClient("mongodb://192.168.1.5:27017")
+
+client = pymongo.MongoClient(config['stock']['dbConn'])
 db = client["twStock"]
-db.authenticate("twstock", "twstock123")
+db.authenticate(config['stock']['dbuser'],config['stock']['dbpass'])
+
 collRT = db["TWSE"]
 collname = ""
 
 if model:
     if type == 't86':
         collname = "t86_bak"
-    elif type === 'stockDay':
+    elif type == 'stockDay':
         collname = "stockDay_bak"
-    elif type === 'tpex86':
+    elif type == 'tpex86':
         collname = "t86_bak"
-    elif type === 'tpexDay':
+    elif type == 'tpexDay':
         collname = "stockDay_bak"
 else:
     if type == 't86':
         collname = "t86"
-    elif type === 'stockDay':
+    elif type == 'stockDay':
         collname = "stockDay"
-    elif type === 'tpex86':
+    elif type == 'tpex86':
         collname = "t86"
-    elif type === 'tpexDay':
+    elif type == 'tpexDay':
         collname = "stockDay"
 collT86 = db[collname]
 
@@ -149,13 +160,15 @@ try:
             logging.debug("    prox server = " + proxList[proxidx] + ", cnt = " + str(proxidx))
             
             if type == 't86':
-                r = twstock.t86.get('ALL', date, 'json', proxies, logging)
-            elif type === 'stockDay':
-                r = twstock.t86.STOCK_DAY('ALLBUT0999', date, 'json', proxies, logging)
-            elif type === 'tpex86':
-                r = twstock.t86.TPEX_86('ALL', date, 'json', proxies, logging)
-            elif type === 'tpexDay':
-                r = twstock.t86.TPEX_DAY('ALL', date, 'json', proxies, logging)
+                #r = twstock.t86.get('ALL', date, 'json', proxies, logging)
+                r = twstock.t86.get('ALL', date, 'json', proxies, type, logging)
+            elif type == 'stockDay':
+                #r = twstock.t86.STOCK_DAY('ALLBUT0999', date, 'json', proxies, logging)
+                r = twstock.t86.get('ALLBUT0999', date, 'json', proxies, type, logging)
+            elif type == 'tpex86':
+                r = twstock.t86.get('EW', date, 'json', proxies, type, logging)
+            elif type == 'tpexDay':
+                r = twstock.t86.get('ALL', date, 'json', proxies, type, logging)
             
             if 'data' in r:
                 data = r['data']

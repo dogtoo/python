@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#test: {'scl':['1316','1708'],'scg':{'1316':'21','1708':'21'},'level':'A1'} false
 import twstock
 import pymongo
 import sys
