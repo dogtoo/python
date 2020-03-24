@@ -110,4 +110,4 @@ CMD ["python3"]
 WORKDIR /python/stock/app
 #CMD ["sh", "-c", "python3 /python/stock/app/realTimeRun.py"]
 
-CMD ["sh", "-c", "python3 realTimeRun.py"]
+CMD ["sh", "-c", "python3 realTimeRun2.py"]
