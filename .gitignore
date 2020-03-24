@@ -4,3 +4,4 @@
 node_modules
 config.ini
 *.ini
+stock/config.ini
