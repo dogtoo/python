@@ -40,7 +40,7 @@ def get(scg, level, db, logging, debug):
         scl = list(scg.keys())
         stock = twstock.realtime.get(scl, req, {}, logging)
         if stock["success"]:
-            logging.info("get success:" + str(len(stock)))
+            logging.info("    get success:" + str(len(stock)))
             #轉換格式
             for code, v in stock.items():
                 logging.debug(str(code) + ' ' + str(v))
@@ -76,12 +76,13 @@ def get(scg, level, db, logging, debug):
                     if str(code) != 'success':
                         logging.error("    code :" + str(code) + " get false " + str(v))
         else:
-            logging.error("get error" + stock['rtmessage'])
+            logging.error("    get error:" + str(len(scl)))
+            logging.error("    get error:" + stock['rtmessage'])
         
     except BaseException as e:
         logging.error("stock fal :" + str(e))
         
-    sys.exit(0)
+    
 
 if __name__ == '__main__':
     args_ = sys.argv[1]
@@ -116,4 +117,5 @@ if __name__ == '__main__':
     db.authenticate(config['stock']['dbuser'],config['stock']['dbpass'])
     
     get(stockCodeGroup, stockCodeLevel, db, logging, debug)
+    sys.exit(0)
     

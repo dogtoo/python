@@ -52,17 +52,22 @@ max = config['rtgroup']['Max']
 idx = 0
 logging.debug('Max:'+str(max))
 stock = collSD.find(q1, {'_id':0, 'code':1, 'groupCode':1}).sort('Transaction',-1);
+urlLen_ = 0
 for code in stock:
-    if len(sp[idx]) == int(max):
+    urlLen_ = urlLen_ + len(code['code']) + 8
+    if len(sp[idx]) == int(max) or urlLen_ > 2000:
         idx = idx + 1
         sp.append({})
+        urlLen_ = 0
     sp[idx][code['code']] = code['groupCode']
     
 stock = collSD.find(q2, {'_id':0, 'code':1, 'groupCode':1}).sort('Transaction',-1);
 for code in stock:
-    if len(sp[idx]) == int(max):
+    urlLen_ = urlLen_ + len(code['code']) + 8
+    if len(sp[idx]) == int(max) or urlLen_ > 1900:
         idx = idx + 1
         sp.append({})
+        urlLen_ = 0
     sp[idx][code['code']] = code['groupCode']
     
 logging.debug('perLine:' + str(len(sp)))
@@ -70,7 +75,7 @@ for lineCode in sp:
     logging.debug(str(lineCode))
 
 gcount = 0
-collRL.remove({})
+collRL.delete_many({})
 for g in range(6):
     group = config['rtgroup']['G'+str(g+1)]
     print(group)

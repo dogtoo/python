@@ -11,8 +11,11 @@ config.read("../config.ini")
 
 from stock2 import get
 
+debug = False
+
 if config['stock']['logginglevel'] == 'DEBUG':
     level = logging.DEBUG
+    debug = True
 elif config['stock']['logginglevel'] == 'INFO':
     level = logging.INFO
 elif config['stock']['logginglevel'] == 'ERROR':
@@ -34,37 +37,69 @@ r = collRL.aggregate([
     {'$sort':{'_id':1}},
     {'$project':{'_id':0,'group':'$_id'}}
 ])
-#for r_ in r:
-#    logging.debug(str(r_['group']))
+runnum = []
+for r_ in r:
+    runnum.append(r_['group'])
 
 realTimeLine = {}
+runtime = 0
+
+def chkRun():
+    sysTime = int( '{:%d%H%M}'.format(datetime.now()) )
+    # 9:00 起
+    strTime = int( '{:%d}'.format(datetime.now()) + '0859' )
+    # 13:40 結束
+    endTime = int( '{:%d}'.format(datetime.now()) + '1340' )
+    # 15:00 零股結算
+    secBTime = int( '{:%d}'.format(datetime.now()) + '1459' )
+    secETime = int( '{:%d}'.format(datetime.now()) + '1510' )
+    logging.debug("sysTime = " + str(sysTime) + ", strTime = " + str(strTime) + ", endTime = " + str(endTime) + ", secBTime = " + str(secBTime) + ", secETime = " + str(secETime))
+    if sysTime > strTime and sysTime < endTime:
+        return True
+    elif sysTime > secBTime and sysTime < secETime:
+        return True
+    else:
+        return False
 
 while True:
-    for r_ in r:
-        g = 'G'+str(r_['group'])
+    for r_ in runnum:
+        g = 'G'+str(r_)
+        
+        if g not in realTimeLine:
+            realTimeLine[g] = {}
+            groupData = collRL.find({'group':r_},{'_id':0,'code':1,'line':1})
+            realTimeLine[g]['code'] = []
+            realTimeLine[g]['line'] = []
+            for gd_ in groupData:
+                realTimeLine[g]['code'].append(gd_['code'])
+                realTimeLine[g]['line'].append(gd_['line'])
+            realTimeLine[g]['run'] = 1
+            
+        logging.info('Line:' + g)
+        run = realTimeLine[g]['run'] - 1
+        logging.info('    run Group Line: ' + realTimeLine[g]['line'][run])
+        scg = realTimeLine[g]['code'][run]
+        
         try:
-            if g not in realTimeLine:
-                realTimeLine[g] = {}
-                groupData = collRL.find({'group':r_['group']},{'_id':0,'code':1,'line':1})
-                realTimeLine[g]['code'] = []
-                realTimeLine[g]['line'] = []
-                for gd_ in groupData:
-                    realTimeLine[g]['code'].append(gd_['code'])
-                    realTimeLine[g]['line'].append(gd_['line'])
-                realTimeLine[g]['run'] = 1
-                
-            logging.debug('Line:' + g)
-            run = realTimeLine[g]['run'] - 1
-            logging.debug('    run Group Line: ' + realTimeLine[g]['line'][run])
-            scg = realTimeLine[g]['code'][run]
-            get(scg, g, db, logging, 'true')
-            run = run+1
-            if len(realTimeLine[g]['line']) == run:
-                run = 1
-            else
-                run = run + 1
-            realTimeLine[g]['run'] = run
+            get(scg, g, db, logging, debug)
         except BaseException as e:
-            logging.error("proxy fal :" + str(e))
-    #time.sleep(3)
-    break
+            logging.error("    proxy fal :" + str(e))        
+        
+        run = run+1
+        logging.debug('    line = ' + str(len(realTimeLine[g]['line'])) + ', ' + str(run))
+        if len(realTimeLine[g]['line']) == run:
+            run = 1
+        else:
+            run = run + 1
+        realTimeLine[g]['run'] = run
+        logging.debug('    next run ' + str(run))
+        
+    time.sleep(3)
+    if debug:
+        runtime = runtime + 1
+        if runtime == 10:
+            break
+    elif not chkRun():
+        logging.info('stock close')
+        break
+        
