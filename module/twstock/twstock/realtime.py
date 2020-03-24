@@ -101,7 +101,7 @@ def get_raw(stocks, req) -> dict:
     try:
         #req = requests.Session()
         #req.get(SESSION_URL)
-        logging.DEBUG(STOCKINFO_URL.format(
+        logging.debug(STOCKINFO_URL.format(
                 stock_id=_join_stock_id(stocks),
                 time=int(time.time()) * 1000))
         r = req.get(
