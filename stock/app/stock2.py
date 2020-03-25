@@ -71,13 +71,12 @@ def get(scg, level, db, logging, debug):
                             value = {"$set":v}
                             collRT.update_one(query, value, upsert=True)
                     except BaseException as e:
-                        logging.error("    BaseException :" + str(e))
+                        logging.error("    " + level + " BaseException :" + str(e))
                 else:
                     if str(code) != 'success':
-                        logging.error("    code :" + str(code) + " get false " + str(v))
+                        logging.error("    " + level + " code :" + str(code) + " get false " + str(v))
         else:
-            logging.error("    get error:" + str(len(scl)))
-            logging.error("    get error:" + stock['rtmessage'])
+            logging.error("    get " + level + " error:" + stock['rtmessage'])
         
     except BaseException as e:
         logging.error("stock fal :" + str(e))

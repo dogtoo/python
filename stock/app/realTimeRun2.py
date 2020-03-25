@@ -65,6 +65,8 @@ def chkRun():
 
 threads = []
 while True:
+    stime = 5
+    b = time.time()
     for r_ in runnum:
         g = 'G'+str(r_)
         
@@ -110,11 +112,13 @@ while True:
     
     #for i in range(r_):
     #    threads[i].join()
-    
-    time.sleep(1)
+    e = time.time()
+    stime = stime - (e-b) #間隔時間含有執行時間
+    if stime > 0:
+        time.sleep(stime)
     if debug:
         runtime = runtime + 1
-        if runtime == 500:
+        if runtime == 1100:
             break
     elif not chkRun():
         logging.info('stock close')

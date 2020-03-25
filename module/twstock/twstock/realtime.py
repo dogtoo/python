@@ -132,13 +132,13 @@ def get_raw(stocks, req) -> dict:
                 #logging.debug(r.json())
                 return r.json()
             except ValueError:
-                return {'rtmessage': 'json decode error', 'rtcode': '5000'}
+                return {'rtmessage': 'json decode error ' + r, 'rtcode': '5000'}
         else:
             try:
                 #logging.debug(r.json())
                 return r.json()
             except json.decoder.JSONDecodeError:
-                return {'rtmessage': 'json decode error', 'rtcode': '5000'}
+                return {'rtmessage': 'json decode error ' + r, 'rtcode': '5000'}
     except requests.ConnectionError as e:
         return {'rtmessage': 'ConnectionError:'  + str(e), 'rtcode': '5000'}
     except requests.exceptions.RequestException as e:
