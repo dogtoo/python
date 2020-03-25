@@ -55,19 +55,20 @@ def _format_stock_info(data) -> dict:
 
         # Process best result
         def _split_best(d):
-            if d and re.search('\d+_\d+_\d+_\d+_\d+_', d):
-                return list(map(float, d.strip('_').split('_')))
+            if d and not re.search('-', d):
+                #return list(map(float, d.strip('_').split('_')))
+                return list(map(float, re.findall("(\d+[\.\d+]*)_", txt)))
             else:
                 return [0,0,0,0,0]
             return d
 
         # Realtime information
         if 'z' in data:
-            result['realtime']['latest_trade_price'] = float(data.get('z', None)) if re.search('^\d+', data.get('z', None)) else 0 #最後成交價
+            result['realtime']['latest_trade_price'] = 0 if data.get('z', None) == '-' else float(data.get('z', None)) #最後成交價
         if 'tv' in data:
-            result['realtime']['trade_volume'] = int(data.get('tv', None)) if re.search('^\d+', data.get('tv', None)) else 0 #當盤成交量
+            result['realtime']['trade_volume'] = 0 if data.get('tv', None) == '-' else int(data.get('tv', None)) #當盤成交量
         if 'v' in data:    
-            result['realtime']['accumulate_trade_volume'] = int(data.get('v', None)) if re.search('^\d+', data.get('v', None)) else 0 #累積成交量
+            result['realtime']['accumulate_trade_volume'] = 0 if data.get('v', None) == '-' else int(data.get('v', None)) #累積成交量
         #最佳五檔
         if 'b' in data:
             result['realtime']['best_bid_price'] = _split_best(data.get('b', None)) #買進價格
@@ -79,11 +80,11 @@ def _format_stock_info(data) -> dict:
             result['realtime']['best_ask_volume'] = _split_best(data.get('f', None)) #賣出數量
         
         if 'o' in data:
-            result['realtime']['open'] = float(data.get('o', None)) if re.search('^\d+', data.get('o', None)) else 0 #開盤
+            result['realtime']['open'] = 0 if data.get('o', None) == '-' else float(data.get('o', None))  #開盤
         if 'h' in data:
-            result['realtime']['high'] = float(data.get('h', None)) if re.search('^\d+', data.get('h', None)) else 0 #最高
+            result['realtime']['high'] = 0 if data.get('h', None) == '-' else float(data.get('h', None))  #最高
         if 'l' in data:
-            result['realtime']['low'] = float(data.get('l', None)) if re.search('^\d+', data.get('l', None)) else 0 #最低
+            result['realtime']['low'] = 0 if data.get('l', None) == '-' else float(data.get('l', None)) #最低
 
         # Success fetching
         result['success'] = True
