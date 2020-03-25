@@ -90,6 +90,7 @@ def _format_stock_info(data) -> dict:
         result['success'] = True
     except:
         result['success'] = False
+        result['org'] = data
         
     return result
     
