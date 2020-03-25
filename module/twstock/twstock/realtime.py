@@ -25,17 +25,20 @@ def _format_stock_info(data) -> dict:
         'info': {},
         'realtime': {}
     }
-        
+    errorFlag = ''    
     result['code'] = data['c'] #股票代碼
     result['date'] = data['d'] #交易日期
     result['time'] = data['t'] #揭示時間
     try:
         if 'ot' in data:
             result['final_time'] = data['ot'] #最後交易時間
+            errorFlag = 'ot'
         else:
             result['final_time'] = data['t']
+            errorFlag = 't'
         if 'fv' in data:
             result['final_trade_volume'] = int(data['fv']) #盤後交易量
+            errorFlag = 'fv'
         result['stock_type'] = data['ex'] #上市(tes) / 上櫃(otc)
 
         # Information
@@ -55,9 +58,10 @@ def _format_stock_info(data) -> dict:
 
         # Process best result
         def _split_best(d):
+            
             if d and not re.search('-', d):
-                #return list(map(float, d.strip('_').split('_')))
-                return list(map(float, re.findall("(\d+[\.\d+]*)_", txt)))
+                return list(map(float, d.strip('_').split('_')))
+                #return list(map(float, re.findall("(\d+[\.\d+]*)_", txt)))
             else:
                 return [0,0,0,0,0]
             return d
@@ -65,33 +69,43 @@ def _format_stock_info(data) -> dict:
         # Realtime information
         if 'z' in data:
             result['realtime']['latest_trade_price'] = 0 if data.get('z', None) == '-' else float(data.get('z', None)) #最後成交價
+            errorFlag = 'z'
         if 'tv' in data:
             result['realtime']['trade_volume'] = 0 if data.get('tv', None) == '-' else int(data.get('tv', None)) #當盤成交量
+            errorFlag = 'tv'
         if 'v' in data:    
             result['realtime']['accumulate_trade_volume'] = 0 if data.get('v', None) == '-' else int(data.get('v', None)) #累積成交量
+            errorFlag = 'v'
         #最佳五檔
         if 'b' in data:
             result['realtime']['best_bid_price'] = _split_best(data.get('b', None)) #買進價格
+            errorFlag = 'b'
         if 'g' in data:    
             result['realtime']['best_bid_volume'] = _split_best(data.get('g', None)) #買進數量
+            errorFlag = 'g'
         if 'a' in data:
             result['realtime']['best_ask_price'] = _split_best(data.get('a', None)) #賣出價格
+            errorFlag = 'a'
         if 'f' in data:
             result['realtime']['best_ask_volume'] = _split_best(data.get('f', None)) #賣出數量
+            errorFlag = 'f'
         
         if 'o' in data:
             result['realtime']['open'] = 0 if data.get('o', None) == '-' else float(data.get('o', None))  #開盤
+            errorFlag = 'o'
         if 'h' in data:
             result['realtime']['high'] = 0 if data.get('h', None) == '-' else float(data.get('h', None))  #最高
+            errorFlag = 'h'
         if 'l' in data:
             result['realtime']['low'] = 0 if data.get('l', None) == '-' else float(data.get('l', None)) #最低
+            errorFlag = 'l'
 
         # Success fetching
         result['success'] = True
     except:
         result['success'] = False
         result['org'] = data
-        
+        result['errorFlag'] = errorFlag
     return result
     
 def _join_stock_id(stocks) -> str:

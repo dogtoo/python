@@ -43,7 +43,7 @@ def get(scg, level, db, logging, debug):
             logging.info("    get success:" + str(len(stock)))
             #轉換格式
             for code, v in stock.items():
-                logging.debug(str(code) + ' ' + str(v))
+                #logging.debug(str(code) + ' ' + str(v))
                 if isinstance(v, dict) and v['success']:
                     try:
                         del v['info']
@@ -59,7 +59,7 @@ def get(scg, level, db, logging, debug):
                         #logging.debug("    last:" + str(l[0]))
                         
                         if "final_trade_volume" not in v:
-                            logging.debug("    " + str({"accumulate_trade_volume":v['accumulate_trade_volume'] , "trade_volume":v['trade_volume']} ))
+                            #logging.debug("    " + str({"accumulate_trade_volume":v['accumulate_trade_volume'] , "trade_volume":v['trade_volume']} ))
                             if v['trade_volume'] > v['accumulate_trade_volume']:
                                 logging.error("    t_v > a_t_v : " + str(v))
                                 #lquery = {"code":v['code'],"date":v['date']}
@@ -67,7 +67,7 @@ def get(scg, level, db, logging, debug):
                             collRT.update_one(query, value, upsert=True)
                         else:
                             query = {"code":v['code'],"date":v['date'],"final_trade_volume":v['final_trade_volume']}
-                            logging.debug("    " + str({"final_trade_volume":v['final_trade_volume'] , "trade_volume":v['trade_volume']}))
+                            #logging.debug("    " + str({"final_trade_volume":v['final_trade_volume'] , "trade_volume":v['trade_volume']}))
                             value = {"$set":v}
                             collRT.update_one(query, value, upsert=True)
                     except BaseException as e:

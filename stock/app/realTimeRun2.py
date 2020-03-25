@@ -9,6 +9,8 @@ import configparser
 config = configparser.ConfigParser()
 config.read("../config.ini")
 
+import threading
+
 from stock2 import get
 
 debug = False
@@ -61,6 +63,7 @@ def chkRun():
     else:
         return False
 
+threads = []
 while True:
     for r_ in runnum:
         g = 'G'+str(r_)
@@ -79,25 +82,39 @@ while True:
         run = realTimeLine[g]['run'] - 1
         logging.info('    run Group Line: ' + realTimeLine[g]['line'][run])
         scg = realTimeLine[g]['code'][run]
-        
+        stop = True
         try:
-            get(scg, g, db, logging, debug)
+            #get(scg, g, db, logging, debug)
+            if len(threads) < r_ or not threads[(r_-1)].isAlive():
+                logging.info('    Start Thread:' + g)
+                if len(threads) < r_:
+                    threads.append(threading.Thread(target = get, args = (scg, g, db, logging, debug)))
+                else:
+                    threads[(r_-1)] = threading.Thread(target = get, args = (scg, g, db, logging, debug))
+                threads[(r_-1)].start()
+                stop = False
+            else:
+                logging.info('    ' + g + ' Thread is run:')
         except BaseException as e:
-            logging.error("    proxy fal :" + str(e))        
+            logging.error("    get stock fall :" + str(e))        
         
-        run = run+1
-        logging.debug('    line = ' + str(len(realTimeLine[g]['line'])) + ', ' + str(run))
-        if len(realTimeLine[g]['line']) == run:
-            run = 1
-        else:
-            run = run + 1
-        realTimeLine[g]['run'] = run
-        logging.debug('    next run ' + str(run))
-        
-    time.sleep(3)
+        if not stop:
+            run = run+1
+            logging.debug('    line = ' + str(len(realTimeLine[g]['line'])) + ', ' + str(run))
+            if len(realTimeLine[g]['line']) == run:
+                run = 1
+            else:
+                run = run + 1
+            realTimeLine[g]['run'] = run
+            logging.debug('    next run ' + str(run))
+    
+    #for i in range(r_):
+    #    threads[i].join()
+    
+    time.sleep(1)
     if debug:
         runtime = runtime + 1
-        if runtime == 10:
+        if runtime == 500:
             break
     elif not chkRun():
         logging.info('stock close')

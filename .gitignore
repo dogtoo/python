@@ -6,3 +6,4 @@ config.ini
 *.ini
 stock/config.ini
 *.ini
+*.pyc
