@@ -47,13 +47,16 @@ def get(scg, level, db, logging, debug):
                 if isinstance(v, dict) and v['success']:
                     try:
                         del v['info']
+                        del v['org']
                         rlTime = v['realtime']
                         del v['realtime']
                         v.update(rlTime)
                         v.update({'group':scg[code]})
                         #存入db
                         #新的訊息有可能沒有交易，新增一筆的方式是要張數有增加
-                        query = {"code":v['code'],"date":v['date'],"accumulate_trade_volume":{"$gte":v['accumulate_trade_volume']}}
+                        #因為是快照5秒，資料會亂跳，改用看time時間的方式
+                        #query = {"code":v['code'],"date":v['date'],"accumulate_trade_volume":{"$gte":v['accumulate_trade_volume']}}
+                        query = {"code":v['code'],"date":v['date'],"final_time":{"$eq":v['final_time']}}
                         value = { "$set": v}
                         #l = collRT.find({"code":v['code'],"date":v['date']}).sort('final_time', 1).limit(1)
                         #logging.debug("    last:" + str(l[0]))

@@ -26,6 +26,7 @@ def _format_stock_info(data) -> dict:
         'realtime': {}
     }
     errorFlag = ''    
+    result['org'] = data
     result['code'] = data['c'] #股票代碼
     result['date'] = data['d'] #交易日期
     result['time'] = data['t'] #揭示時間
