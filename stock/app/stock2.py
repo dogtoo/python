@@ -55,8 +55,10 @@ def get(scg, level, db, logging, debug):
                         #存入db
                         #新的訊息有可能沒有交易，新增一筆的方式是要張數有增加
                         #因為是快照5秒，資料會亂跳，改用看time時間的方式
+                        #看time 會留太多不必要的資料，改成交易量等於不是大於
                         #query = {"code":v['code'],"date":v['date'],"accumulate_trade_volume":{"$gte":v['accumulate_trade_volume']}}
-                        query = {"code":v['code'],"date":v['date'],"final_time":{"$eq":v['final_time']}}
+                        #query = {"code":v['code'],"date":v['date'],"final_time":{"$eq":v['final_time']}}
+                        query = {"code":v['code'],"date":v['date'],"accumulate_trade_volume":{"$eq":v['accumulate_trade_volume']}}
                         value = { "$set": v}
                         #l = collRT.find({"code":v['code'],"date":v['date']}).sort('final_time', 1).limit(1)
                         #logging.debug("    last:" + str(l[0]))

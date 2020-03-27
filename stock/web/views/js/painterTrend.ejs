@@ -90,28 +90,83 @@
 
         //var priceL = [];
         var open = this.data[0]['price'];
-        var pl = (Math.floor(open)+"").length;
-        if (pl > 3) pl = 3;
-        var point = Math.pow(10,  (3 - pl));
-        var up = Math.floor(open * 1.1 * point) /point;
-        var down = Math.round(open * 0.9 * point) /point;
+        //var pl = (Math.floor(open)+"").length;
+        //if (pl > 3) pl = 3;
+        //var point = Math.pow(10,  (3 - pl));
+        //var up = Math.floor(open * 1.1 * point) /point;
+        //var down = Math.round(open * 0.9 * point) /point;
+        var type = ((this.options.info.type).match('.*權證.*')) ? 'warrant':'stock';
+        var price_range = {
+            'stock':{
+                '0010':{'dp':2, 'b':1, 'v':0.01},
+                '0050':{'dp':2, 'b':5, 'v':0.05},
+                '0100':{'dp':1, 'b':1, 'v':0.1},
+                '0500':{'dp':1, 'b':5, 'v':0.5},
+                '1000':{'dp':0, 'b':1, 'v':1},
+                'o':{'dp':0, 'b':5, 'v':5}
+            },
+            'warrant':{
+                '0005':{'dp':2, 'b':1, 'v':0.01},
+                '0010':{'dp':2, 'b':5, 'v':0.05},
+                '0050':{'dp':1, 'b':1, 'v':0.1},
+                '0100':{'dp':1, 'b':5, 'v':0.5},
+                '0500':{'dp':0, 'b':1, 'v':1},
+                'o':{'dp':0, 'b':5, 'v':5}
+            },
+        }
+        let point = {'dp':2, 'b':1, 'v':0.01};
+        let pr = Object.keys(price_range[type]).sort();
+        let updown = [open * 1.1, open * 0.9];
+        for (v in updown) {
+            console.log(updown[v]);
+            let hdprice = updown[v];
+            for (p_ in pr) {
+                if (pr[p_] === 'o' || hdprice < parseInt(pr[p_])) {
+                    point = price_range[type][pr[p_]];
+                    break;
+                }
+            }
+            console.log(point);
+            //let hl = Math.floor((open * 0.1) * 100) / 100;
+            //console.log(open + ',' + hl);
+            hdprice = Math.floor(hdprice * Math.pow(10, point.dp)) / Math.pow(10, point.dp);
+            
+            if (point.b == 5) {
+                l_ = parseInt(hdprice.toString().substr(hdprice.toString().length-1));
+                if (l_ < 5)
+                    hdprice = hdprice.toString().substr(0,hdprice.toString().length-1);
+                else 
+                    hdprice = hdprice.toString().substr(0,hdprice.toString().length-1) + '5';
+            }
+            updown[v] = hdprice;
+        }
+        up = updown[0];
+        down = updown[1];
+                
+        console.log('down:'+down+',up:'+up);
         var price = [down, up];
         var time = ['0900','0930','1000','1030','1100','1130','1200','1230','1300','1330'];
         
         var volume = [0];
         var volKline = [];
         var Distime = {};
-        
+        var rawData_;
         for (var i =　0; i < this.data.length; i++) {
             var rawData = this.data[i];
             if (typeof Distime[rawData['time']] == 'undefined')
                 Distime[rawData['time']] = 1;
             else
                 continue;
+            
+            if (rawData['vol'] == 0 && typeof rawData_ != 'undefined') {
+                rawData['vol'] = rawData['acc_vol'] - rawData_['acc_vol']
+                rawData['price'] = rawData['best_bid_price']
+            }
             Tline.push([rawData['time'],rawData['price']]);
                 
             volume.push(rawData['vol']);
             volKline.push([rawData['time'], 0, rawData['vol'], 0, rawData['vol'] ]);
+            rawData_ = rawData;
         }
         this.data.Tline = Tline;
         this.data.price = price;
@@ -182,7 +237,8 @@
     }
     
     painterTrend.prototype.load = function(control, data) {
-        this.data = data;
+        this.data = data['trand'];
+        this.options.info = data['info'];
         this.control.options = control.options;
         this.control.options.length = data.length;
         control.setNext.call(this.control);

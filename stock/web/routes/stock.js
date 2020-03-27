@@ -49,19 +49,28 @@ router.post('/KlineData', async(ctx) => {
 
 router.post('/TrendData', async(ctx) => {
     let code = ctx.request.body.code;
-    var date = new Date();
-    var date_ = dateFormat(date, 'yyyymmdd');
-    console.log('code:'+code+',date:'+date_);
+    let date;
+    let stock_market = ctx.request.body.stockMarket;
+    if (typeof ctx.request.body.date === 'undefined') {
+        date = new Date();
+        date = dateFormat(date, 'yyyymmdd');
+    }
+    else {
+        date = ctx.request.body.date;
+    }
+    
+    console.log('code:'+code+',date:'+date+',mark:'+stock_market);
     if (code === undefined) code = '1101';
-    if (date_ === undefined) date_ = '20200211';
+    if (date === undefined) date = '20200211';
     
     ctx.response.type = 'json';
-    let data = await ctx.db.collection('realtime').aggregate([
+    let trand = await ctx.db.collection('realtime').aggregate([
         {
             $match:{
                 $and:[
                     {code:{'$eq':code}
-                   , date:{'$eq':date_}
+                   , date:{'$eq':date}
+                   , time:{'$gte':'09:00:00'}
                     }
                 ]
             }
@@ -72,6 +81,8 @@ router.post('/TrendData', async(ctx) => {
                 //'date':1,
                 'time':'$final_time',
                 'price':'$latest_trade_price',
+                'best_bid_price':{$arrayElemAt:['$best_bid_price', 0]},
+                'acc_vol':'$accumulate_trade_volume',
                 'vol':'$trade_volume'
            }
         }, {
@@ -81,17 +92,17 @@ router.post('/TrendData', async(ctx) => {
         }
     ]).toArray();
     
-    if (parseInt(data[0].time.substr(1, 2)) < 9) {
-        data.shift();
+    if (parseInt(trand[0].time.substr(1, 2)) < 9) {
+        trand.shift();
     }
     
     
-    let fdata = await ctx.db.collection('realtime').aggregate([
+    let ftrand = await ctx.db.collection('realtime').aggregate([
         {
             $match:{
                 $and:[
                     {code:{'$eq':code}
-                   , date:{'$lt':date_}
+                   , date:{'$lt':date}
                     }
                 ]            
             }
@@ -110,8 +121,10 @@ router.post('/TrendData', async(ctx) => {
         }, {$limit:1}
     ]).toArray();
     
-    data.unshift(fdata[0]);
+    trand.unshift(ftrand[0]);
     
+    let info = await ctx.db.collection(stock_market).find({'code':code},{'_id':0,'type':1}).toArray();
+    data = {'trand':trand, 'info':info[0]}
     ctx.response.body = data;
 });
 
