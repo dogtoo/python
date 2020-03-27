@@ -180,15 +180,50 @@
             return h * 60 * 60 + m * 60 + s * 1;
         },
         calcRangeValues: function(high, low, count, type = 'number', format = 'undefined') {
-            if (format == 'undefined') format = high;
-            high = this.convertFormat(high, type);
-            low = this.convertFormat(low, type);
-            var diff = high - low;
-            var space = diff / (count-1);
-            var result = [];
-            for (var i = 0; i < count; i++) {
-                result.push(reConvertFormat(high - i * space, type, format));
+            return calcRangeValues([high, low], count, type = 'number', format = 'undefined');
+        },
+        calcRangeValues: function(range, count, type = 'number', format = 'undefined') {
+            for (let i in range) {
+                range[i] = this.convertFormat(range[i], type);
             }
+            high = range[0];
+            low = range[range.length-1];
+            if (format == 'undefined') format = high;
+            //high = this.convertFormat(high, type);
+            //low = this.convertFormat(low, type);
+            let n = 1;
+            let new_count = 0;
+            let c_ = 0;
+            if (range.length == 2 || range.length > count) {
+                new_count = count;
+                c_ = count - 1;
+            }
+            else {
+                let n_ = n;
+                while( n > 0) {
+                    if (count >= range.length + ( (range.length-1) * n ))
+                        n++;
+                    else {
+                        new_count = range.length + ( (range.length-1) * (n-1) )
+                        n_ = n-1;
+                        n = 0;
+                    }
+                }
+                c_ = (new_count - range.length) / n_;
+            }
+            var result = [];
+            
+            for (let r in range) {
+                if (r == 0) continue;
+                //result.push(range[r-1])
+                var diff = range[r-1] - range[r];
+                var space = diff / c_;
+                
+                for (var i = 0; i <= c_; i++) {
+                    result.push(reConvertFormat(range[r-1] - i * space, type, format));
+                }
+            }
+            result.push(range[range.length-1]);
             return result;
         },
         $id: function (id) { return document.getElementById(id); }

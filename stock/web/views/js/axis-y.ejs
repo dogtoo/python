@@ -91,9 +91,11 @@ function yAxis(options) {
         } else if (this.options.dataRange === 'range') {
             this.options.low = data[0];
             this.options.high = data[data.length-1];
-            this.data[this.implName] = calcRangeValues(this.options.high
-                                , this.options.low
+            //this.data[this.implName] = calcRangeValues(this.options.high
+            //                    , this.options.low
+            this.data[this.implName] = calcRangeValues(data.reverse()
                                 , this.options.horizontalLineCount, this.options.dataType);
+            this.options.horizontalLineCount = this.data[this.implName].length;
             //this.options.horizontalLineCount -= 1;
             if (this.options.order == 'desc') {
                 this.data[this.implName].sort(function(a, b) {

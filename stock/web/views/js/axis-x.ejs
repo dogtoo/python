@@ -92,9 +92,11 @@ function xAxis(options){
             this.options.first = data[0];
             this.options.last = data[data.length-1];
             this.options.verticalLineCount -= 1;
-            this.data[this.implName] = calcRangeValues(this.options.last
-                                , this.options.first
+            //this.data[this.implName] = calcRangeValues(this.options.last
+            //                    , this.options.first
+            this.data[this.implName] = calcRangeValues(data.reverse()
                                 , this.options.verticalLineCount, this.options.dataType);
+            this.options.verticalLineCount = this.data[this.implName].length;
             this.options.verticalLineCount -= 1;
             if (this.options.order == 'desc') {
                 this.data[this.implName].sort(function(a, b) {
