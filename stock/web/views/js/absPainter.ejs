@@ -196,7 +196,8 @@ Painter.prototype = {
         //painter.ctx.clearRect(0, 0, painter.width, painter.height);
         if (painter.onBuild) return;
         //var d1 = new Date();
-        painter.ctx.putImageData(painter.imgData, 0, 0);
+        if (typeof painter.imgData.data != 'undefined')
+            painter.ctx.putImageData(painter.imgData, 0, 0);
         painter.paintStream.forEach(function(item, index, array){
             paintName = Object.keys(item)[0];
             for (var p in item[paintName]) {

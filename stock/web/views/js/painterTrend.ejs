@@ -47,6 +47,7 @@
                             align: 'right',
                             textBaseline: 'top',
                             dataType: 'time',
+                            dataFormat: '00:00',
                             order: 'desc',
                             dataRange: 'range'
                         })
@@ -198,8 +199,8 @@
             this.ctx.stroke();
         }
         
-        this.drawHLine('#eeeeee', 0, (this.data[0]['price'] - this.implements.price.options.low) * this.implements.price.options.scale, this.paintRegion['main.width'], 1, 'solid');
-        this.ctx.stroke();
+        //this.drawHLine('#eeeeee', 0, (this.data[0]['price'] - this.implements.price.options.low) * this.implements.price.options.scale, this.paintRegion['main.width'], 1, 'solid');
+        //this.ctx.stroke();
 
         var v_c = Math.round((this.implements.time.options.x.length)/this.implements.time.options.verticalLineCount);
         for (var i = 0 ; i < this.implements.time.options.x.length ; i+= v_c) {

@@ -94,7 +94,7 @@ function yAxis(options) {
             //this.data[this.implName] = calcRangeValues(this.options.high
             //                    , this.options.low
             this.data[this.implName] = calcRangeValues(data.reverse()
-                                , this.options.horizontalLineCount, this.options.dataType);
+                                , this.options.horizontalLineCount, this.options.dataType, this.options.dataFormat);
             this.options.horizontalLineCount = this.data[this.implName].length;
             //this.options.horizontalLineCount -= 1;
             if (this.options.order == 'desc') {

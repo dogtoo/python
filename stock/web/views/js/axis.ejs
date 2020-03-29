@@ -2,6 +2,7 @@ function axis(options) {
   this.options = options;
   if (typeof this.options.font === 'undefined') this.options.font = '12px Arial';
   if (typeof this.options.dataType === 'undefined') this.options.dataType = 'undefined';
+  if (typeof this.options.dataFormat === 'undefined') this.options.dataFormat = 'undefined';
   if (typeof this.options.dataRange === 'undefined') this.options.dataRange = 'seq';
   if (typeof this.options.dataRange === 'undefined') this.options.order = 'asc';
   this.options.x = [];

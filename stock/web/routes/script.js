@@ -1,10 +1,5 @@
 const router = require('koa-router')();
 
-router.get('/crossline', async(ctx) => {
-    let code = ctx.request.query.code;
-    await ctx.render('crossline')
-});
-
 router.get('/js/painterKline.js', async(ctx) => {
     await ctx.render('js/painterKline')
 });

@@ -163,7 +163,7 @@
                 mm = ((''+m).length == 1) ? '0' + m : m;
                 s = s - (h * 60 * 60 + m * 60);
                 ss = ((''+s).length == 1) ? '0' + s : s;
-                return (format.length <= 6) ? hh + '' + mm : hh + '' + mm + ss;
+                return (format.length <= 6) ? hh + ':' + mm : hh + ':' + mm + ':' + ss;
              } else if (type.match(/date/)) {
              
              } else if (type.match(/datetime/)) {
@@ -179,9 +179,9 @@
             s = (typeof time[5] != 'undefined') ? time[5] : 0;
             return h * 60 * 60 + m * 60 + s * 1;
         },
-        calcRangeValues: function(high, low, count, type = 'number', format = 'undefined') {
-            return calcRangeValues([high, low], count, type = 'number', format = 'undefined');
-        },
+        //calcRangeValues: function(high, low, count, type = 'number', format = 'undefined') {
+        //    return calcRangeValues([high, low], count, type = 'number', format = 'undefined');
+        //},
         calcRangeValues: function(range, count, type = 'number', format = 'undefined') {
             for (let i in range) {
                 range[i] = this.convertFormat(range[i], type);
@@ -194,36 +194,45 @@
             let n = 1;
             let new_count = 0;
             let c_ = 0;
-            if (range.length == 2 || range.length > count) {
-                new_count = count;
-                c_ = count - 1;
+            var result = [];
+            if (range.length > count) {
+                var diff = high - low;
+                var space = diff / (count-1);
+                for (var i = 0; i < count; i++) {
+                    result.push(reConvertFormat(high - i * space, type, format));
+                }
             }
             else {
-                let n_ = n;
-                while( n > 0) {
-                    if (count >= range.length + ( (range.length-1) * n ))
-                        n++;
-                    else {
-                        new_count = range.length + ( (range.length-1) * (n-1) )
-                        n_ = n-1;
-                        n = 0;
+                if (range.length == 2) {
+                    new_count = count;
+                    c_ = count - 1;
+                }
+                else {
+                    let n_ = n;
+                    while( n > 0) {
+                        if (count >= range.length + ( (range.length-1) * n ))
+                            n++;
+                        else {
+                            new_count = range.length + ( (range.length-1) * (n-1) )
+                            n_ = n-1;
+                            n = 0;
+                        }
+                    }
+                    c_ = (new_count - range.length) / n_;
+                }
+                
+                for (let r in range) {
+                    if (r == 0) continue;
+                    //result.push(range[r-1])
+                    var diff = range[r-1] - range[r];
+                    var space = diff / (c_+1);
+                    
+                    for (var i = 0; i <= c_; i++) {
+                        result.push(reConvertFormat(range[r-1] - i * space, type, format));
                     }
                 }
-                c_ = (new_count - range.length) / n_;
+                result.push(range[range.length-1]);
             }
-            var result = [];
-            
-            for (let r in range) {
-                if (r == 0) continue;
-                //result.push(range[r-1])
-                var diff = range[r-1] - range[r];
-                var space = diff / c_;
-                
-                for (var i = 0; i <= c_; i++) {
-                    result.push(reConvertFormat(range[r-1] - i * space, type, format));
-                }
-            }
-            result.push(range[range.length-1]);
             return result;
         },
         $id: function (id) { return document.getElementById(id); }

@@ -32,7 +32,7 @@
     painter.padding.top = 10;
     painter.padding.left = 10;
     painter.padding.right = 20;
-    var res = {'code':'2301','stockMarket':'TWSE'};
+    var res = {'code':'2301','stockMarket':'TWSE','date':'20200327'};
     $.post('TrendData', res, function(req) {
         painter.load(c, req);
         painter.make();
@@ -42,7 +42,7 @@
     painter2.padding.top = 10;
     painter2.padding.left = 10;
     painter2.padding.right = 20;
-    var res = {'code':'2327','stockMarket':'TWSE'};
+    var res = {'code':'2327','stockMarket':'TWSE','date':'20200327'};
     $.post('TrendData', res, function(req) {
         painter2.load(c, req);
         painter2.make();
