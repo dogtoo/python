@@ -8,6 +8,7 @@ function cross(options) {
   this.options.xAxis = new xAxis({});
   this.options.isRun = false;
   if (typeof this.options.strokeStyle === 'undefined') this.options.strokeStyle = "#000000";
+  if (typeof this.options.lineWidth === 'undefined') this.options.lineWidth = 1;
 }
 
 cross.prototype = {
@@ -77,19 +78,23 @@ cross.prototype = {
         this.options.isRun = false;
         this.ctx.beginPath();
         this.ctx.strokeStyle = this.options.strokeStyle;
+        this.ctx.lineWidth = this.options.lineWidth;
         //if (x > this.options.width) x = this.options.width;
         // 直線
         if (x < this.options.width) {
             this.ctx.moveTo(x, 0);
             this.ctx.lineTo(x, this.options.height);
             this.ctx.stroke();
-        }
+        } else x = this.options.width
         //if (y > this.options.height) y = this.options.height;
         if (y < this.options.height) {;
             this.ctx.moveTo(0, y);
             this.ctx.lineTo(this.options.width, y);
             this.ctx.stroke()
-        };
+        } else y = this.options.height
+        
+        this.data['flabel'] = [x,y];
+        
     },
     reBuild: function() {
         

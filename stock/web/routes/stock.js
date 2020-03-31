@@ -103,7 +103,7 @@ router.post('/TrendData', async(ctx) => {
     }
     
     
-    let ftrand = await ctx.db.collection('realtime').aggregate([
+    let ftrand = await ctx.db.collection('stockDay').aggregate([
         {
             $match:{
                 $and:[
@@ -113,15 +113,10 @@ router.post('/TrendData', async(ctx) => {
                 ]            
             }
         }, {
-            $sort:{
-                'date':-1,
-                'final_time':-1
-            }
-        }, {
             $project:{
                 '_id':0,
                 'time':'09:00:00',
-                'price':'$latest_trade_price',
+                'price':'$Closing_Price',
                 'vol':'0'
            }
         }, {$limit:1}

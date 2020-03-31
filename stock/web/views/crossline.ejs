@@ -12,9 +12,10 @@
     <script src="../script/js/axis-x.js" type="text/javascript" charset="UTF8"></script>
     <script src="../script/js/axis-y.js" type="text/javascript" charset="UTF8"></script>
     <script src="../script/js/cross.js" type="text/javascript" charset="UTF8"></script>
+    <script src="../script/js/label.js" type="text/javascript" charset="UTF8"></script>
 </head>
 <body>
-    <canvas id="crossline" width="900" height="500" style="z-index: 2; border: 1px solid #69c"></canvas>
+    <canvas id="crossline" width="500" height="200" style="z-index: 2; border: 1px solid #69c"></canvas>
 </body>
 <script type="text/javascript">
 
@@ -29,9 +30,10 @@
             'main':{
                 region: {
                     x: 'padding.left', y: 'padding.top'
-                    , width: {'$sub':['100%','padding.right','padding.left']}, height: '100%'
+                    , width: {'$sub':['100%','padding.right','padding.left']}, height: {'$sub':['100%','padding.top','padding.bottom']}
                 },
-                'kCross': new cross({})
+                'kCross': new cross({lineWidth:0.5}),
+                'flabel': new label({})
             }
         }
     ];
@@ -56,12 +58,11 @@
     painter.padding.top = 10;
     painter.padding.left = 10;
     painter.padding.right = 20;
+    painter.padding.bottom = 10;
     painter.init();
 
-
-
     painter.build();
-
+    painter.build(true);
 
     //painter.implements.priceY.isTouch.call(painter, 1, 1);
 </script>

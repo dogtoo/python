@@ -28,6 +28,8 @@ function Painter(canvasId, paintStream) {
     this.onBuild = false;
     this.touchOffsetX = 0;
     this.touchOffsetY = 0;
+    
+    this.drawPainter = false;
 }
 Painter.prototype = {
     init: function() {
@@ -149,8 +151,10 @@ Painter.prototype = {
             this.hadEvenBind = true;
         }
     },
-    build: function(isImage = false) {
+    //build: function(isImage = false) {
+    build: function(drawPainter) {
         var painter = this;
+        painter.drawPainter = drawPainter;
         if (painter.onBuild) return;
         painter.onBuild = true;
         painter.ctx.clearRect(0, 0, painter.width, painter.height);
@@ -166,7 +170,8 @@ Painter.prototype = {
                 painter.paint();
             }
         });
-        if (isImage)
+        //if (isImage)
+        if (drawPainter)
             painter.imgData = painter.ctx.getImageData(0, 0, painter.width, painter.height);
         painter.onBuild = false;
     },
