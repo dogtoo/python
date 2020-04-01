@@ -9,6 +9,8 @@ function cross(options) {
   this.options.isRun = false;
   if (typeof this.options.strokeStyle === 'undefined') this.options.strokeStyle = "#000000";
   if (typeof this.options.lineWidth === 'undefined') this.options.lineWidth = 1;
+  //測試用
+  //if (typeof this.options.label === 'undefined') this.options.label = new label({});
 }
 
 cross.prototype = {
@@ -39,12 +41,14 @@ cross.prototype = {
         x = x - this.paintRegion[paintName + '.x'];
         y = y - this.paintRegion[paintName + '.y'];
         
-        if (Object.prototype.toString.call(this.options.xAxis.options.x) === '[object Array]') {
-            for (var i in this.options.xAxis.options.x) {
-                var xx = this.options.xAxis.options.x[i];
-                var x1 = xx - ((typeof this.options.xAxis.options.kLineWidth === 'undefined') ? 0 : this.options.xAxis.options.kLineWidth/2);
-                var x2 = xx + ((typeof this.options.xAxis.options.kLineWidth === 'undefined') ? 0 : this.options.xAxis.options.kLineWidth/2);
-                if (x >= x1 && x <= x2) {
+        if (Object.prototype.toString.call(this.options.xAxis.options.x) === '[object Array]' && this.options.xAxis.options.x.length > 0) {
+            i = Math.round(x / this.options.xAxis.options.kLineWidth) - 1;
+            x = this.options.xAxis.options.x[i];
+            //for (var i in this.options.xAxis.options.x) {
+            //    var xx = this.options.xAxis.options.x[i];
+            //    var x1 = xx - ((typeof this.options.xAxis.options.kLineWidth === 'undefined') ? 0 : this.options.xAxis.options.kLineWidth/2);
+            //    var x2 = xx + ((typeof this.options.xAxis.options.kLineWidth === 'undefined') ? 0 : this.options.xAxis.options.kLineWidth/2);
+            //    if (x >= x1 && x <= x2) {
                     /*
                     var time = reConvertFormat((32400+parseInt(i)), 'time', '00:00:00');
                     for (var i in this.data['Tline']) {
@@ -58,21 +62,23 @@ cross.prototype = {
                             break;
                         }
                     }*/                
-                    x = xx;
-                }
-            }
+            //        x = xx;
+            //    }
+            //}
         }
         
-        if (Object.prototype.toString.call(this.options.yAxis.options.y) === '[object Array]') {
-            for (var i in this.options.yAxis.options.y) {
-                var yy = this.options.yAxis.options.y[i];
-                var y1 = yy - ((typeof this.options.yAxis.options.kLineWidth === 'undefined') ? 0 : this.options.yAxis.options.kLineWidth/2);
-                var y2 = yy + ((typeof this.options.yAxis.options.kLineWidth === 'undefined') ? 0 : this.options.yAxis.options.kLineWidth/2);
-                if (y >= y1 && y <= y2) {
-                    console.log(yy);
-                    y = yy;
-                }
-            }
+        if (Object.prototype.toString.call(this.options.yAxis.options.y) === '[object Array]' && this.options.yAxis.options.y.length > 0) {
+            i = Math.round(y / this.options.yAxis.options.kLineWidth) - 1;
+            y = this.options.yAxis.options.y[i];
+            //for (var i in this.options.yAxis.options.y) {
+            //    var yy = this.options.yAxis.options.y[i];
+            //    var y1 = yy - ((typeof this.options.yAxis.options.kLineWidth === 'undefined') ? 0 : this.options.yAxis.options.kLineWidth/2);
+            //    var y2 = yy + ((typeof this.options.yAxis.options.kLineWidth === 'undefined') ? 0 : this.options.yAxis.options.kLineWidth/2);
+            //    if (y >= y1 && y <= y2) {
+            //        console.log(yy);
+            //        y = yy;
+            //    }
+            //}
         }
         
         this.options.isRun = false;
@@ -93,7 +99,8 @@ cross.prototype = {
             this.ctx.stroke()
         } else y = this.options.height
         
-        this.data['flabel'] = [x,y];
+        //測試用的
+        //this.data['flabel'] = [x,y];
         
     },
     reBuild: function() {
@@ -105,17 +112,17 @@ cross.prototype = {
         this.implement.end.call(this);
     },
     mousedown: function(offset) {
-        if (isTouchDevice()) {
+        //if (isTouchDevice()) {
             this.implement.start.call(this);
             this.implement.paintItems.call(this, offset.offsetX, offset.offsetY);
             this.implement.end.call(this);
-        }
+        //}
     },
     mouseup: function(offset) {
-        if (isTouchDevice()) {
+        //if (isTouchDevice()) {
             this.implement.start.call(this);
             this.implement.paintItems.call(this, offset.offsetX, offset.offsetY);
             this.implement.end.call(this);
-        }
+        //}
     }
 }

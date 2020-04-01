@@ -17,12 +17,12 @@
     <script src="../script/js/line.js" type="text/javascript" charset="UTF8"></script>
     <script src="../script/js/cross.js" type="text/javascript" charset="UTF8"></script>
     <script src="../script/js/painterKline.js" type="text/javascript" charset="UTF8"></script>
-    
+    <script src="../script/js/label.js" type="text/javascript" charset="UTF8"></script>
 </head>
 <body>
     <h1 id="h1"><%=msg%></h1>
     <canvas id="kline" width="500" height="450" style="z-index: 2; border: 1px solid #69c"></canvas>
-    <canvas id="kline2" width="500" height="450" style="z-index: 2; border: 1px solid #69c"></canvas>
+    <!--<canvas id="kline2" width="500" height="450" style="z-index: 2; border: 1px solid #69c"></canvas>-->
 </body>
 <script type="text/javascript">
     var c = new control({
@@ -45,15 +45,15 @@
         painter.make();
     });
 
-    var painter2 = new painterKline('kline2');
-    painter2.padding.top = 10;
-    painter2.padding.left = 10;
-    painter2.padding.right = 20;
-    var res = {'code':'1101'};
-    $.post('KlineData', res, function(req) {
-        painter2.load(cb, req);
-        painter2.make();
-    });
+    //var painter2 = new painterKline('kline2');
+    //painter2.padding.top = 10;
+    //painter2.padding.left = 10;
+    //painter2.padding.right = 20;
+    //var res = {'code':'1101'};
+    //$.post('KlineData', res, function(req) {
+    //    painter2.load(cb, req);
+    //    painter2.make();
+    //});
     
 </script>
 </html>

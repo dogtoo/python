@@ -54,9 +54,11 @@ router.post('/KlineData', async(ctx) => {
 });
 
 router.post('/TrendData', async(ctx) => {
+    let trendCodeList = ctx.request.body.trendCodeList;
     let code = ctx.request.body.code;
-    let date;
     let stock_market = ctx.request.body.stockMarket;
+    
+    let date;
     if (typeof ctx.request.body.date === 'undefined') {
         date = new Date();
         date = dateFormat(date, 'yyyymmdd');
@@ -65,67 +67,86 @@ router.post('/TrendData', async(ctx) => {
         date = ctx.request.body.date;
     }
     
-    console.log('code:'+code+',date:'+date+',mark:'+stock_market);
-    if (code === undefined) code = '1101';
-    if (date === undefined) date = '20200211';
-    
-    ctx.response.type = 'json';
-    let trand = await ctx.db.collection('realtime').aggregate([
-        {
-            $match:{
-                $and:[
-                    {code:{'$eq':code}
-                   , date:{'$eq':date}
-                   , time:{'$gte':'09:00:00'}
-                    }
-                ]
-            }
-        }, {
-            $project:{
-                '_id':0,
-                //'code':1,
-                //'date':1,
-                'time':'$final_time',
-                'price':'$latest_trade_price',
-                'best_bid_price':{$arrayElemAt:['$best_bid_price', 0]},
-                'acc_vol':'$accumulate_trade_volume',
-                'vol':'$trade_volume'
-           }
-        }, {
-            $sort:{
-                'time':1
-            }
+    let codeList = [];
+    if (typeof trendCodeList != 'undefined') {
+        for (let i in trendCodeList) {
+            let code_ = trendCodeList[i]['code'];
+            let market_ = trendCodeList[i]['market'];
+            codeList.append({'code':code_, 'mark':market_});
         }
-    ]).toArray();
-    
-    if (parseInt(trand[0].time.substr(1, 2)) < 9) {
-        trand.shift();
+    }
+    else 
+    {
+        codeList.append({'code':code, 'market':stock_market});
     }
     
-    
-    let ftrand = await ctx.db.collection('stockDay').aggregate([
-        {
-            $match:{
-                $and:[
-                    {code:{'$eq':code}
-                   , date:{'$lt':date}
-                    }
-                ]            
+    for (let i in codeList) {
+        console.log('code:'+code+',date:'+date+',market:'+stock_market);
+        //if (code === undefined) code = '1101';
+        //if (date === undefined) date = '20200211';
+        
+        ctx.response.type = 'json';
+        let trand = await ctx.db.collection('realtime').aggregate([
+            {
+                $match:{
+                    $and:[
+                        {code:{'$eq':code}
+                       , date:{'$eq':date}
+                       , time:{'$gte':'09:00:00'}
+                        }
+                    ]
+                }
+            }, {
+                $project:{
+                    '_id':0,
+                    //'code':1,
+                    //'date':1,
+                    'time':'$final_time',
+                    'price':'$latest_trade_price',
+                    'best_bid_price':{$arrayElemAt:['$best_bid_price', 0]},
+                    'acc_vol':'$accumulate_trade_volume',
+                    'vol':'$trade_volume'
+               }
+            }, {
+                $sort:{
+                    'time':1
+                }
             }
-        }, {
-            $project:{
-                '_id':0,
-                'time':'09:00:00',
-                'price':'$Closing_Price',
-                'vol':'0'
-           }
-        }, {$limit:1}
-    ]).toArray();
-    
-    trand.unshift(ftrand[0]);
-    
-    let info = await ctx.db.collection(stock_market).find({'code':code},{'_id':0,'type':1}).toArray();
-    data = {'trand':trand, 'info':info[0]}
+        ]).toArray();
+        
+        if (parseInt(trand[0].time.substr(1, 2)) < 9) {
+            trand.shift();
+        }
+        
+        
+        let ftrand = await ctx.db.collection('stockDay').aggregate([
+            {
+                $match:{
+                    $and:[
+                        {code:{'$eq':code}
+                       , date:{'$lt':date}
+                        }
+                    ]            
+                }
+            }, {
+                $sort: {
+                    'date':-1
+                }
+            }, {
+                $project:{
+                    '_id':0,
+                    'time':'09:00:00',
+                    'price':'$Closing_Price',
+                    'vol':'0'
+               }
+            }, {$limit:1}
+        ]).toArray();
+        
+        trand.unshift(ftrand[0]);
+        
+        let info = await ctx.db.collection(stock_market).find({'code':code},{'_id':0,'type':1}).toArray();
+        data = {'trand':trand, 'info':info[0]}
+    }
     ctx.response.body = data;
 });
 

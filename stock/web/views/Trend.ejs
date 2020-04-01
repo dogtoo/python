@@ -20,35 +20,41 @@
 </head>
 <body>
     <h1 id="h1"><%=msg%></h1>
-    <canvas id="trend" width="450" height="400" style="z-index: 2; border: 1px solid #69c"></canvas>
-    <canvas id="trend2" width="450" height="400" style="z-index: 2; border: 1px solid #69c"></canvas>
+    <input type="text" id="stocklist">
+    <button  type="button" id="send" onclick="getTrendData()">search</button >
+    <canvas id="trend_" width="450" height="400" style="border: 1px solid #69c; display:none"></canvas>
+    <!--<canvas id="trend" width="450" height="400" style="z-index: 2; border: 1px solid #69c"></canvas>
+    <canvas id="trend2" width="450" height="400" style="z-index: 2; border: 1px solid #69c"></canvas>-->
     <!--<canvas id="kline2" width="900" height="500" style="z-index: 2; border: 1px solid #69c"></canvas>-->
 </body>
 <script type="text/javascript">
-    var c = new control({
-        begin: 0});
-
-    var painter = new painterTrend('trend');
-    painter.padding.top = 10;
-    painter.padding.left = 10;
-    painter.padding.right = 20;
-    //var res = {'code':'2301','stockMarket':'TWSE','date':'20200330'};
-    var res = {'code':'8420','stockMarket':'TPEX'};
-    $.post('TrendData', res, function(req) {
-        painter.load(c, req);
-        painter.make();
-    });
+    function getTrendData() {
     
-    var painter2 = new painterTrend('trend2');
-    painter2.padding.top = 10;
-    painter2.padding.left = 10;
-    painter2.padding.right = 20;
-    //var res = {'code':'2327','stockMarket':'TWSE','date':'20200330'};
-    var res = {'code':'2327','stockMarket':'TWSE'};
-    $.post('TrendData', res, function(req) {
-        painter2.load(c, req);
-        painter2.make();
-    });
+    }
+    //var c = new control({
+    //    begin: 0});
+    //
+    //var painter = new painterTrend('trend');
+    //painter.padding.top = 10;
+    //painter.padding.left = 10;
+    //painter.padding.right = 20;
+    ////var res = {'code':'2301','stockMarket':'TWSE','date':'20200330'};
+    //var res = {'code':'2105','stockMarket':'TWSE'};
+    //$.post('TrendData', res, function(req) {
+    //    painter.load(c, req);
+    //    painter.make();
+    //});
+    //
+    //var painter2 = new painterTrend('trend2');
+    //painter2.padding.top = 10;
+    //painter2.padding.left = 10;
+    //painter2.padding.right = 20;
+    ////var res = {'code':'2327','stockMarket':'TWSE','date':'20200330'};
+    //var res = {'code':'2327','stockMarket':'TWSE'};
+    //$.post('TrendData', res, function(req) {
+    //    painter2.load(c, req);
+    //    painter2.make();
+    //});
     
 </script>
 </html>

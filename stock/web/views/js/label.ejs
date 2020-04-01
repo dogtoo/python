@@ -1,5 +1,11 @@
 function label(options) {
   this.options = options;
+  
+  if (typeof this.options.yAxisName === 'undefined') this.options.yAxisName = 'yAxis';
+  if (typeof this.options.xAxisName === 'undefined') this.options.xAxisName = 'xAxis';
+  this.options.yAxis = new yAxis({});
+  this.options.xAxis = new xAxis({});
+  
   if (typeof this.options.x === 'undefined') this.options.x = 0;
   if (typeof this.options.y === 'undefined') this.options.y = 0;
   if (typeof this.options.margin === 'undefined') this.options.margin = 10;
@@ -20,10 +26,10 @@ label.prototype = {
             painter.options.xAxis = painter.implements[painter.options.xAxis];
     },*/
     initialize: function () {
-        //if (typeof this.implements[this.options.yAxisName] != 'undefined')
-        //    this.options.yAxis = this.implements[this.options.yAxisName];
-        //if (typeof this.implements[this.options.xAxisName] != 'undefined')
-        //    this.options.xAxis = this.implements[this.options.xAxisName];
+        if (typeof this.implements[this.options.yAxisName] != 'undefined')
+            this.options.yAxis = this.implements[this.options.yAxisName];
+        if (typeof this.implements[this.options.xAxisName] != 'undefined')
+            this.options.xAxis = this.implements[this.options.xAxisName];
     },
     start: function () {
         var ctx = this.ctx;
@@ -140,12 +146,14 @@ label.prototype = {
         return 'label';
     },
     preData: function(data) {
-        if (data.length > 0) {
-            this.options.x = data[0];
-            this.options.y = data[1];
-        }
+        //if (data.length > 0) {
+        //    this.options.x = data[0];
+        //    this.options.y = data[1];
+        //}
     },mousemove: function(offset) {
         this.implement.start.call(this);
+        //測試用
+        //this.data[this.implName] = [offset.offsetX,offset.offsetY];
         this.implement.paintItems.call(this);
         this.implement.end.call(this);
     }
