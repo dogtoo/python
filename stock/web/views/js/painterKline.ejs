@@ -56,9 +56,16 @@
                         'tline': tline,
                         'sline': sline,
                         'kCross': new cross({
-                            xAxisName: 'kline'
-                        }),
-                        'flabel': new label({'quadrant':1})
+                            xAxisName: 'kline',
+                            tag: new label({
+                                'quadrant':1,
+                                'x':0,
+                                'y':0,
+                                innerHTML:'<label>test</label>',
+                                'width':100,
+                                'height':100,
+                                yAxisName: 'kline'})
+                        })
                     }
                 },
                 {

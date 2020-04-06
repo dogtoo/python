@@ -235,7 +235,36 @@
             }
             return result;
         },
-        $id: function (id) { return document.getElementById(id); }
+        $id: function (id) { return document.getElementById(id); },
+        callObject: function(impl, implName) {
+            let implement_ = this.implement;
+            let options_ = this.options;
+            //let implName_ = this.implName;
+            
+            //this.setImplement(impl, implName);
+            this.implement = impl;
+            //this.implName = implName;
+            this.options = this.implement.options;
+            impl.initialize.call(this);
+            if (impl.start) impl.start.call(this);
+            if (typeof impl.paintItems == 'function') {
+                impl.paintItems.call(this);
+            }
+            else {
+                var dataLength = ((typeof impl.getDataLength == 'function') ? impl.getDataLength.call(this) : this.data.length);
+                for (var i = 0; i < dataLength; i++) {
+                    var x = impl.getX ? impl.getX.call(this, i) : undefined;
+                    var y = impl.getY ? impl.getY.call(this, i) : undefined;
+                    if (typeof x === 'undefined' || typeof y === 'undefined') continue;
+                    impl.paintItem.call(this, i, x, y);
+                }
+            }
+            if (impl.end) impl.end.call(this);
+            
+            this.implement = implement_;
+            this.options = options_;
+            //this.implName = implName_;
+        }
     };
 
     window.extendObject = function (src, dest) {

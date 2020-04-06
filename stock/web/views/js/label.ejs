@@ -1,19 +1,21 @@
 function label(options) {
-  this.options = options;
-  
-  if (typeof this.options.yAxisName === 'undefined') this.options.yAxisName = 'yAxis';
-  if (typeof this.options.xAxisName === 'undefined') this.options.xAxisName = 'xAxis';
-  this.options.yAxis = new yAxis({});
-  this.options.xAxis = new xAxis({});
-  
-  if (typeof this.options.x === 'undefined') this.options.x = 0;
-  if (typeof this.options.y === 'undefined') this.options.y = 0;
-  if (typeof this.options.margin === 'undefined') this.options.margin = 10;
-  if (typeof this.options.quadrant === 'undefined') this.options.quadrant = 2;
-  this.options.quadrant_ = 1;
-  if (typeof this.options.innerHTML === 'undefined') this.options.innerHTML = '<label>test</label>';
-  if (typeof this.options.width === 'undefined') this.options.width = 50;
-  if (typeof this.options.height === 'undefined') this.options.height = 50;
+    this.options = options;
+    
+    if (typeof this.options.yAxisName === 'undefined') this.options.yAxisName = 'yAxis';
+    if (typeof this.options.xAxisName === 'undefined') this.options.xAxisName = 'xAxis';
+    this.options.yAxis = new yAxis({});
+    this.options.xAxis = new xAxis({});
+    
+    if (typeof this.options.x === 'undefined') this.options.x = 0;
+    if (typeof this.options.y === 'undefined') this.options.y = 0;
+    if (typeof this.options.margin === 'undefined') this.options.margin = 10;
+    if (typeof this.options.quadrant === 'undefined') this.options.quadrant = 2;
+    this.options.quadrant_ = 1;
+    //if (typeof this.options.innerHTML === 'undefined') this.options.innerHTML = '<label>test</label>';
+    if (typeof this.options.innerHTML === 'undefined') this.options.innerHTML = '';
+    if (typeof this.options.width === 'undefined') this.options.width = 0;
+    if (typeof this.options.height === 'undefined') this.options.height = 0;
+    this.options.id = Math.floor(Date.now() / 1000) + Math.floor(Math.random() * 100);
 }
 
 label.prototype = {
@@ -32,17 +34,16 @@ label.prototype = {
             this.options.xAxis = this.implements[this.options.xAxisName];
     },
     start: function () {
+        if (this.options.innerHTML === '')
+            return;
         var ctx = this.ctx;
         ctx.zIndex = 1;
         ctx.save();
         ctx.translate(this.paintRegion[paintName + '.x'], this.paintRegion[paintName + '.y']);
         
-        var rdiv = document.getElementById('label');
+        var rdiv = document.getElementById(this.implName+'_'+this.options.id);
         if (rdiv)
             rdiv.parentNode.removeChild(rdiv);
-        
-        if (typeof this.data[this.implName] != 'undefined') this.options.x = this.data[this.implName][0];
-        if (typeof this.data[this.implName] != 'undefined') this.options.y = this.data[this.implName][1];
         
         this.options.quadrant_ = this.options.quadrant;
         if (this.options.quadrant_.toString().match(/1|4/)) {
@@ -106,9 +107,11 @@ label.prototype = {
     //    document.body.appendChild(div);
     //},
     paintItems: function () {
+        if (this.options.innerHTML === '')
+            return;
         if (this.drawPainter) {
             var div = document.createElement("div");
-            div.id = 'label';
+            div.id = this.implName+'_'+this.options.id;
             div.style.width = this.options.width + 'px';
             div.style.height = this.options.height + 'px';
             document.body.appendChild(div);
@@ -131,18 +134,26 @@ label.prototype = {
             //console.log('Q:'+ this.options.quadrant_ + ', top:' + div.style.top + ', left:' + div.style.left);
             //div.style.left =  this.options.x + 'px';
             //div.style.top =  this.options.y + 'px';
+            
+            //if (Object.prototype.toString.call(this.options.yAxis.options.y) === '[object Array]' && this.options.yAxis.options.y.length > 0) {
+            //    //i = Math.round(y / this.options.yAxis.options.kLineWidth) - 1;
+            //    if (Object.prototype.toString.call(this.options.yAxis.options.y[i]) === '[object Array]')
+            //        y = this.options.yAxis.options.y[i][0];
+            //    else
+            //        y = this.options.yAxis.options.y[i];
+            //}
             div.innerHTML = this.options.innerHTML;
             
             //var rdiv = document.getElementById('label');
             //rdiv.parentNode.removeChild(rdiv);
         }
         else {
-            var rdiv = document.getElementById('label');
-            if (rdiv)
-                rdiv.parentNode.removeChild(rdiv);
+            //var rdiv = document.getElementById('label');
+            //if (rdiv)
+            //    rdiv.parentNode.removeChild(rdiv);
         }
     },
-    getName: function() {
+    toString: function() {
         return 'label';
     },
     preData: function(data) {

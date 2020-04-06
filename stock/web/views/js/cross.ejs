@@ -11,6 +11,7 @@ function cross(options) {
   if (typeof this.options.lineWidth === 'undefined') this.options.lineWidth = 1;
   //測試用
   //if (typeof this.options.label === 'undefined') this.options.label = new label({});
+  if (typeof this.options.tag === 'undefined') this.options.tag = new label({'quadrant':1,'x':0,'y':0});
 }
 
 cross.prototype = {
@@ -18,9 +19,9 @@ cross.prototype = {
         this.options.height = this.paintRegion[paintName + '.height'];
         this.options.width = this.paintRegion[paintName + '.width'];
         if (typeof this.implements[this.options.yAxisName] != 'undefined')
-            this.options.yAxis = this.implements[this.options.yAxisName];
+            this.options.yAxis = this.implements[this.options.yAxisName].options.yAxis;
         if (typeof this.implements[this.options.xAxisName] != 'undefined')
-            this.options.xAxis = this.implements[this.options.xAxisName];
+            this.options.xAxis = this.implements[this.options.xAxisName].options.xAxis;
     },
     start : function () {
         var ctx = this.ctx;
@@ -40,10 +41,13 @@ cross.prototype = {
         if (y <= this.paintRegion[paintName + '.y']) y = this.paintRegion[paintName + '.y'];
         x = x - this.paintRegion[paintName + '.x'];
         y = y - this.paintRegion[paintName + '.y'];
-        
+        let i = -1;
         if (Object.prototype.toString.call(this.options.xAxis.options.x) === '[object Array]' && this.options.xAxis.options.x.length > 0) {
-            i = Math.round(x / this.options.xAxis.options.kLineWidth) - 1;
+            i = Math.round(x / this.options.xAxis.options.scale) - 1;
             x = this.options.xAxis.options.x[i];
+            //test
+            if (this.options.xAxis.options.y.length > i && i > 0 && this.options.yAxisName != 'yAxis')
+                y = this.paintRegion[paintName + '.height'] - this.options.xAxis.options.y[i][0];
             //for (var i in this.options.xAxis.options.x) {
             //    var xx = this.options.xAxis.options.x[i];
             //    var x1 = xx - ((typeof this.options.xAxis.options.kLineWidth === 'undefined') ? 0 : this.options.xAxis.options.kLineWidth/2);
@@ -80,7 +84,8 @@ cross.prototype = {
             //    }
             //}
         }
-        
+
+        //console.log('x:'+x+',y:'+y);
         this.options.isRun = false;
         this.ctx.beginPath();
         this.ctx.strokeStyle = this.options.strokeStyle;
@@ -99,9 +104,10 @@ cross.prototype = {
             this.ctx.stroke()
         } else y = this.options.height
         
-        //測試用的
-        //this.data['flabel'] = [x,y];
         
+        this.options.tag.options.x = x;
+        this.options.tag.options.y = y;
+        callObject.call(this, this.options.tag, 'tag');
     },
     reBuild: function() {
         

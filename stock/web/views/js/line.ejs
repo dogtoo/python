@@ -169,8 +169,8 @@ line.prototype = {
         this.options.prevX  = x;
         this.options.prevY  = y;
     },
-    getName: function() {
-        return 'kLine';
+    toString: function() {
+        return 'line';
     },
     preData: function(data) {
         if (Object.prototype.toString.call(data) != '[object Array]') return;
