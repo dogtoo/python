@@ -195,6 +195,7 @@
             let new_count = 0;
             let c_ = 0;
             var result = [];
+            let n_ = 0;
             if (range.length > count) {
                 var diff = high - low;
                 var space = diff / (count-1);
@@ -205,10 +206,10 @@
             else {
                 if (range.length == 2) {
                     new_count = count;
-                    c_ = count - 1;
+                    n_ = count - 1;
                 }
                 else {
-                    let n_ = n;
+                    n_ = n;
                     while( n > 0) {
                         if (count >= range.length + ( (range.length-1) * n ))
                             n++;
@@ -218,17 +219,17 @@
                             n = 0;
                         }
                     }
-                    c_ = (new_count - range.length) / n_;
+                    //c_ = (new_count - range.length) / n_;
                 }
                 
                 for (let r in range) {
                     if (r == 0) continue;
                     //result.push(range[r-1])
                     var diff = range[r-1] - range[r];
-                    var space = diff / (c_+1);
+                    var space = diff / (n_+1);
                     
-                    for (var i = 0; i <= c_; i++) {
-                        result.push(reConvertFormat(range[r-1] - i * space, type, format));
+                    for (var i = 0; i <= n_; i++) {
+                        result.push(reConvertFormat(Math.round((range[r-1] - i * space)*100)/100, type, format));
                     }
                 }
                 result.push(range[range.length-1]);

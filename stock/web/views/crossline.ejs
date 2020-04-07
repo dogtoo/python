@@ -13,6 +13,7 @@
     <script src="../script/js/axis-y.js" type="text/javascript" charset="UTF8"></script>
     <script src="../script/js/cross.js" type="text/javascript" charset="UTF8"></script>
     <script src="../script/js/label.js" type="text/javascript" charset="UTF8"></script>
+    <script src="../script/js/line.js" type="text/javascript" charset="UTF8"></script>
 </head>
 <body>
     <canvas id="crossline" width="500" height="200" style="z-index: 2; border: 1px solid #69c"></canvas>
@@ -27,19 +28,69 @@
     
     var paintStream = [
         {
+            'price':{
+                region: { x: 'padding.left', y: 'padding.top', width: 'f:00', height: {'$sub':['80%','padding.top','padding.bottom']}},
+                'price':new yAxis({
+                    font: '11px Arial',
+                    color: 'black',
+                    align: 'right',
+                    textBaseline: 'top',
+                    dataType: 'number',
+                    dataRange: 'range'
+                })
+            }
+        },
+        {
             'main':{
                 region: {
-                    x: 'padding.left', y: 'padding.top'
-                    , width: {'$sub':['100%','padding.right','padding.left']}, height: {'$sub':['100%','padding.top','padding.bottom']}
+                    x: {'$and':['price.x', 'price.width', 3]}, y: {'$and':['price.y', (determineFontHeight('11px Arial')/2)]}
+                            , width: {'$sub':['100%','price.width','padding.right','padding.left']}, height: 'price.height',
                 },
+                'fline': new line({
+                        yAxisName: 'price',
+                        xAxisName: 'date',
+                        //xAxisFocus: true,
+                        strokeStyle: 'cyan',
+                        lineWidth: 1
+                    }),
                 'kCross': new cross({lineWidth:0.5})
                 //,'s': new label({'quadrant':1})
+            }
+        },
+        {
+            'date':{
+                region: { x: 'main.x', y: {'$and':['main.height', 'main.y', determineFontHeight('11px Arial')/2]}, width: 'main.width', height: 'f:00' },
+                'date':new xAxis({
+                    font: '11px Arial',
+                    color: 'black',
+                    align: 'right',
+                    textBaseline: 'top',
+                    dataType: 'number',
+                    dataRange: 'range',
+                    order:'desc',
+                    degree:1
+                })
             }
         }
     ];
 
     var painter = new painterCrossKline('crossline',paintStream, {});
+    painterCrossKline.prototype.preData = function() {
+        var price = [0,5,10];
+        var date = [1,8];
     
+        var fline = [];
+        fline.push([1,1]);
+        fline.push([1,7]);
+        fline.push([2,7]);
+        fline.push([3,7]);
+        fline.push([3,1]);
+        fline.push([1,1]);
+        this.data.price = price;
+        this.data.date = date;
+        this.data.fline = fline;
+       
+    }
     painterCrossKline.prototype.start = function () {
         this.ctx.beginPath();
         this.ctx.strokeStyle = 'gray';

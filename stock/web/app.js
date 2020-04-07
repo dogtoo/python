@@ -1,4 +1,6 @@
 const Koa = require('koa');
+//const yaml_config = require('node-yaml-config');
+//const config = yaml_config.load('../config.ini');
 const logger = require('koa-logger');
 //const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
@@ -9,6 +11,7 @@ const mongo = require('koa-mongo');
 const fs = require('fs');
 const path = require('path');
 */
+//console.log(config.server);
 const router = require('./routes/index');
 const app = new Koa();
 app.use(logger())
@@ -22,6 +25,7 @@ app.use(views(__dirname + '/views/js', {
     })
 );
 app.use(mongo({
+    //host: '219.85.16.213',
     host: '192.168.1.5',
     port: 27017,
     db: 'twStock',
