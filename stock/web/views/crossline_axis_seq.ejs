@@ -37,8 +37,8 @@
                     textBaseline: 'top',
                     dataType: 'number',
                     dataRange: 'range',
-                    order:'desc',
-                    degree:0.5
+                    order:'asc',
+                    degree:1
                 })
             }
         },
@@ -68,9 +68,8 @@
                     align: 'right',
                     textBaseline: 'top',
                     dataType: 'number',
-                    dataRange: 'range',
-                    order:'desc',
-                    degree:2
+                    dataRange: 'seq',
+                    order:'desc'
                 })
             }
         }
@@ -78,16 +77,17 @@
 
     var painter = new painterCrossKline('crossline',paintStream, {});
     painterCrossKline.prototype.preData = function() {
-        var price = [0.5,14.5,29.5];
-        var date = [0,8];
+        var price = [0,8];
+        var date = [0,1,2,3,4,5,6];
     
         var fline = [];
         fline.push([0,1]);
         fline.push([1,7]);
         fline.push([2,7]);
         fline.push([3,7]);
-        fline.push([3,1]);
-        fline.push([1.5,1]);
+        fline.push([4,1]);
+        fline.push([5,1]);
+        fline.push([6,3]);
         this.data.price = price;
         this.data.date = date;
         this.data.fline = fline;

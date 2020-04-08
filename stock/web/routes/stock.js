@@ -7,6 +7,11 @@ router.get('/crossline', async(ctx) => {
     await ctx.render('crossline')
 });
 
+router.get('/crossline_axis_seq', async(ctx) => {
+    let code = ctx.request.query.code;
+    await ctx.render('crossline_axis_seq')
+});
+
 router.get('/kline', async(ctx) => {
     let code = ctx.request.query.code;
     await ctx.render('kline', {

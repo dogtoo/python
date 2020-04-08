@@ -104,6 +104,8 @@ kLine.prototype = {
     getXY: function(i, axis) {
         if ((this.options.axial === 'ver' && axis.toString() === 'xAxis') 
          || (this.options.axial === 'hor' && axis.toString() === 'yAxis')) {
+            //間距應該改為與方框同寬
+            axis.options.scale = this.options.kLineWidth;
             return i * axis.options.scale;
         } else if ((this.options.axial === 'hor' && axis.toString() === 'xAxis')
                 || (this.options.axial === 'ver' && axis.toString() === 'yAxis') ) {
