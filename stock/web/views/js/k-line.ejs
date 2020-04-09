@@ -63,7 +63,8 @@ kLine.prototype = {
         var diff = 0;
         if (this.options.axial === 'ver') {
             if (this.options.xAxis.options.dataRange === 'seq') {
-                this.options.kLineWidth = Math.round((this.paintRegion[paintName + '.width'] / this.data[this.implName].length)*100) /100;
+                this.options.kLineWidth = (this.paintRegion[paintName + '.width'] / this.data[this.implName].length);
+                //this.options.kLineWidth = Math.round((this.paintRegion[paintName + '.width'] / this.data[this.implName].length)*100) /100;
             } else if (this.options.xAxis.options.dataRange === 'range') {
                 if (this.options.xAxis.options.order == 'desc')
                     diff = convertFormat(this.options.xAxis.options.last, this.options.xAxis.options.dataType)
@@ -72,12 +73,14 @@ kLine.prototype = {
                     diff = convertFormat(this.data[this.implName][0][0], this.options.xAxis.options.dataType)
                          - convertFormat(this.options.xAxis.options.first, this.options.xAxis.options.dataType);
                 diff += 1;
-                this.options.kLineWidth = Math.round((this.paintRegion[paintName + '.width'] / diff)*100) /100;
+                this.options.kLineWidth = (this.paintRegion[paintName + '.width'] / diff);
+                //this.options.kLineWidth = Math.round((this.paintRegion[paintName + '.width'] / diff)*100) /100;
                 dataRange = 'range';
             }
         } else if (this.options.axial === 'hor') {
             if (this.options.yAxis.options.dataRange === 'seq') {
-                this.options.kLineWidth = Math.round((this.paintRegion[paintName + '.height'] / this.data[this.implName].length)*100) /100;
+                this.options.kLineWidth = (this.paintRegion[paintName + '.height'] / this.data[this.implName].length);
+                //this.options.kLineWidth = Math.round((this.paintRegion[paintName + '.height'] / this.data[this.implName].length)*100) /100;
             } else if (this.options.yAxis.options.dataRange === 'range') {
                 if (this.options.yAxis.options.order == 'desc')
                     diff = convertFormat(this.options.yAxis.options.high, this.options.yAxis.options.dataType)
@@ -86,7 +89,8 @@ kLine.prototype = {
                     diff = convertFormat(this.data[this.implName][0][1], this.options.yAxis.options.dataType)
                          - convertFormat(this.options.yAxis.options.low, this.options.yAxis.options.dataType);
                 diff += 1;
-                this.options.kLineWidth = Math.round((this.paintRegion[paintName + '.height'] / diff)*100) /100;
+                this.options.kLineWidth = (this.paintRegion[paintName + '.height'] / diff);
+                //this.options.kLineWidth = Math.round((this.paintRegion[paintName + '.height'] / diff)*100) /100;
                 dataRange = 'range';
             }
         }

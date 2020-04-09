@@ -18,10 +18,18 @@ cross.prototype = {
     initialize : function () {
         this.options.height = this.paintRegion[paintName + '.height'];
         this.options.width = this.paintRegion[paintName + '.width'];
-        if (typeof this.implements[this.options.yAxisName] != 'undefined')
-            this.options.yAxis = this.implements[this.options.yAxisName].options.yAxis;
-        if (typeof this.implements[this.options.xAxisName] != 'undefined')
-            this.options.xAxis = this.implements[this.options.xAxisName].options.xAxis;
+        if (typeof this.implements[this.options.yAxisName] != 'undefined') {
+            if (this.implements[this.options.yAxisName].toString() != 'yAxis') 
+                this.options.yAxis = this.implements[this.options.yAxisName].options.yAxis;
+            else
+                this.options.yAxis = this.implements[this.options.yAxisName];
+        }
+        if (typeof this.implements[this.options.xAxisName] != 'undefined') {
+            if (this.implements[this.options.xAxisName].toString() != 'xAxis') 
+                this.options.xAxis = this.implements[this.options.xAxisName].options.xAxis;
+            else
+                this.options.xAxis = this.implements[this.options.xAxisName];
+        }
     },
     start : function () {
         var ctx = this.ctx;
@@ -46,8 +54,16 @@ cross.prototype = {
             i = Math.round(x / this.options.xAxis.options.scale) - 1;
             x = this.options.xAxis.options.x[i];
             //test
-            if (this.options.xAxis.options.y.length > i && i > 0 && this.options.yAxisName != 'yAxis')
-                y = this.paintRegion[paintName + '.height'] - this.options.xAxis.options.y[i][0];
+            console.log(reConvertFormat(i+32400, 'time', '00:00:00'));
+            console.log(this.data[this.options.xAxisName][i]);
+            if (this.options.xAxis.options.dataRange === 'seq') {
+                this.options.tag.options.innerHTML = '<label>'+this.data[this.options.xAxisName][i][0]+'</label><p><label>'
+                                                              +this.data[this.options.xAxisName][i][1]+'</label><p><label>'
+                                                              +this.data[this.options.xAxisName][i][2]+'</label><p><label>'
+                                                              +this.data[this.options.xAxisName][i][3]+'</label>'
+            }
+            //if (this.options.xAxis.options.y.length > i && i > 0 && this.options.yAxisName != 'yAxis')
+            //    y = this.paintRegion[paintName + '.height'] - this.options.xAxis.options.y[i][0];
             //for (var i in this.options.xAxis.options.x) {
             //    var xx = this.options.xAxis.options.x[i];
             //    var x1 = xx - ((typeof this.options.xAxis.options.kLineWidth === 'undefined') ? 0 : this.options.xAxis.options.kLineWidth/2);

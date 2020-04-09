@@ -198,18 +198,20 @@
             var result = [];
             let n_ = 0;
             let dec_pls = 0;
-            if (type === 'number') {
+            if (type.match(/number|money/)) {
                 try {
                     dec_pls = degree.toString().match(/^\d*\.(\d+)/)[1].length;
                 } catch (e) {
-                    
+                    try {
+                        dec_pls = high.toString().match(/^\d*\.(\d+)/)[1].length;
+                    } catch (e) {}
                 }
             }
             if (range.length > count) {
                 var diff = high - low;
-                var space = diff / (count-1);
-                for (var i = 0; i < count; i++) {
-                    result.push(reConvertFormat(high - i * space, type, format));
+                var space = diff / count;
+                for (var i = 0; i <= count; i++) {
+                    result.push(reConvertFormat(Math.round((high - i * space)*Math.pow(10, dec_pls))/Math.pow(10, dec_pls), type, format));
                 }
             }
             else {
@@ -239,7 +241,7 @@
                     space = Math.round(space * Math.pow(10, dec_pls))/Math.pow(10, dec_pls);
                     //級距在等差內，且計算後的間格小於級距的2倍，都直接用級距替換。
                     //級距與間格差到2倍以上，間格需重計為級距最接近的倍數。
-                    if (degree != Math.abs(space)) {
+                    if (degree != 'undefined' && degree != Math.abs(space)) {
                         n = n_;
                         m_ = space % degree;
                         space -= m_;
@@ -251,7 +253,7 @@
                         result.push(reConvertFormat(Math.round((range[r-1] - i * space)*Math.pow(10, dec_pls))/Math.pow(10, dec_pls), type, format));
                     }
                 }
-                result.push(range[range.length-1]);
+                result.push(reConvertFormat(Math.round(range[range.length-1]*Math.pow(10, dec_pls))/Math.pow(10, dec_pls), type, format));
             }
             return result;
         },

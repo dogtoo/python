@@ -59,7 +59,7 @@ router.post('/KlineData', async(ctx) => {
 });
 
 router.post('/TrendData', async(ctx) => {
-    let trendCodeList = ctx.request.body.trendCodeList;
+    //let trendCodeList = ctx.request.body.trendCodeList;
     let code = ctx.request.body.code;
     let stock_market = ctx.request.body.stockMarket;
     
@@ -72,20 +72,20 @@ router.post('/TrendData', async(ctx) => {
         date = ctx.request.body.date;
     }
     
-    let codeList = [];
-    if (typeof trendCodeList != 'undefined') {
-        for (let i in trendCodeList) {
-            let code_ = trendCodeList[i]['code'];
-            let market_ = trendCodeList[i]['market'];
-            codeList.append({'code':code_, 'mark':market_});
-        }
-    }
-    else 
-    {
-        codeList.append({'code':code, 'market':stock_market});
-    }
+    //let codeList = [];
+    //if (typeof trendCodeList != 'undefined') {
+    //    for (let i in trendCodeList) {
+    //        let code_ = trendCodeList[i]['code'];
+    //        let market_ = trendCodeList[i]['market'];
+    //        codeList.append({'code':code_, 'mark':market_});
+    //    }
+    //}
+    //else 
+    //{
+    //    codeList.append({'code':code, 'market':stock_market});
+    //}
     
-    for (let i in codeList) {
+    //for (let i in codeList) {
         console.log('code:'+code+',date:'+date+',market:'+stock_market);
         //if (code === undefined) code = '1101';
         //if (date === undefined) date = '20200211';
@@ -151,7 +151,7 @@ router.post('/TrendData', async(ctx) => {
         
         let info = await ctx.db.collection(stock_market).find({'code':code},{'_id':0,'type':1}).toArray();
         data = {'trand':trand, 'info':info[0]}
-    }
+    //}
     ctx.response.body = data;
 });
 

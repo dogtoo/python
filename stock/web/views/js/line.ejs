@@ -87,18 +87,18 @@ line.prototype = {
                 }
                 var diff = 0;
                 if (this.options.xAxis.options.order == 'desc') {
-                    console.log('last:'+convertFormat(this.options.xAxis.options.last, this.options.xAxis.options.dataType)
-                              + ', ' +convertFormat(this.data[this.implName][i][0], this.options.xAxis.options.dataType));
+                    //console.log('last:'+convertFormat(this.options.xAxis.options.last, this.options.xAxis.options.dataType)
+                    //          + ', ' +convertFormat(this.data[this.implName][i][0], this.options.xAxis.options.dataType));
                     diff = convertFormat(this.options.xAxis.options.last, this.options.xAxis.options.dataType)
                          - convertFormat(this.data[this.implName][i][0], this.options.xAxis.options.dataType);
                 }
                 else {
-                    console.log('first:'+convertFormat(this.options.xAxis.options.last, this.options.xAxis.options.dataType)
-                              + ', ' +convertFormat(this.data[this.implName][i][0], this.options.xAxis.options.dataType));
+                    //console.log('first:'+convertFormat(this.options.xAxis.options.last, this.options.xAxis.options.dataType)
+                    //          + ', ' +convertFormat(this.data[this.implName][i][0], this.options.xAxis.options.dataType));
                     diff = convertFormat(this.data[this.implName][i][0], this.options.xAxis.options.dataType)
                          - convertFormat(this.options.xAxis.options.first, this.options.xAxis.options.dataType);
                 }
-                console.log('width:'+this.paintRegion[this.paintName + '.width']+', '+ this.options.xAxis.options.scale * (diff-1));
+                //console.log('width:'+this.paintRegion[this.paintName + '.width']+', '+ this.options.xAxis.options.scale * (diff-1));
                 return this.paintRegion[this.paintName + '.width']
                     - this.options.xAxis.options.scale * (diff);
             }
