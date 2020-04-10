@@ -34,7 +34,8 @@ function yAxis(options) {
         } else {
             //if (i == this.data[this.implName].length-1)
             //    return this.paintRegion[this.paintName + '.height'];
-            this.implement.getYScale.call(this, this.options, this.data[this.implName]);
+            //移到start做，每次都做沒什用處
+            //this.implement.getYScale.call(this, this.options, this.data[this.implName]);
             if (this.options.dataRange === 'seq')
                 return i * this.options.scale;
             if (this.options.dataRange === 'range') {

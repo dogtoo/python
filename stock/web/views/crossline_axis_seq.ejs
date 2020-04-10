@@ -51,11 +51,12 @@
                 'fline': new line({
                         yAxisName: 'price',
                         xAxisName: 'date',
-                        //xAxisFocus: true,
+                        xAxisFocus: true,
                         strokeStyle: 'cyan',
                         lineWidth: 1
                     }),
-                'kCross': new cross({lineWidth:0.5})
+                'kCross': new cross({lineWidth:0.5,xAxisName: 'date',
+                            yAxisName: 'price'})
                 //,'s': new label({'quadrant':1})
             }
         },

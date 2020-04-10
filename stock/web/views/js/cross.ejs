@@ -11,7 +11,7 @@ function cross(options) {
   if (typeof this.options.lineWidth === 'undefined') this.options.lineWidth = 1;
   //測試用
   //if (typeof this.options.label === 'undefined') this.options.label = new label({});
-  if (typeof this.options.tag === 'undefined') this.options.tag = new label({'quadrant':1,'x':0,'y':0});
+  if (typeof this.options.tag === 'undefined') this.options.tag = 'undefined';
 }
 
 cross.prototype = {
@@ -35,11 +35,15 @@ cross.prototype = {
         var ctx = this.ctx;
         ctx.save();
         ctx.translate(this.paintRegion[paintName + '.x'], this.paintRegion[paintName + '.y']);
+        if (this.options.tag != 'undefined') {
+            this.options.tag.reMoveElement(this.implName+'_'+this.options.tag.options.id);
+        }            
     },
     end : function () {
         this.ctx.restore();
     },
     paintItems : function(x, y) {
+        if (this.rootOnTouch) return;
         if (typeof x === 'undefined') return;
         if (typeof y === 'undefined') return;
         if (!this.options.isRun) {
@@ -51,16 +55,16 @@ cross.prototype = {
         y = y - this.paintRegion[paintName + '.y'];
         let i = -1;
         if (Object.prototype.toString.call(this.options.xAxis.options.x) === '[object Array]' && this.options.xAxis.options.x.length > 0) {
-            i = Math.round(x / this.options.xAxis.options.scale) - 1;
+            i = Math.round((x -this.options.xAxis.options.scale/2)/ this.options.xAxis.options.scale);
+            if (i >= this.options.xAxis.options.x.length) i = this.options.xAxis.options.x.length - 1;
+            if (i <= -1) i = 0;
             x = this.options.xAxis.options.x[i];
             //test
-            console.log(reConvertFormat(i+32400, 'time', '00:00:00'));
-            console.log(this.data[this.options.xAxisName][i]);
+            //console.log(reConvertFormat(i+32400, 'time', '00:00:00'));
             if (this.options.xAxis.options.dataRange === 'seq') {
-                this.options.tag.options.innerHTML = '<label>'+this.data[this.options.xAxisName][i][0]+'</label><p><label>'
-                                                              +this.data[this.options.xAxisName][i][1]+'</label><p><label>'
-                                                              +this.data[this.options.xAxisName][i][2]+'</label><p><label>'
-                                                              +this.data[this.options.xAxisName][i][3]+'</label>'
+                try {
+                    this.options.tag.options.innerHTML = this.options.tag.options.setTagData.call(this, i);
+                } catch (e) {}
             }
             //if (this.options.xAxis.options.y.length > i && i > 0 && this.options.yAxisName != 'yAxis')
             //    y = this.paintRegion[paintName + '.height'] - this.options.xAxis.options.y[i][0];
@@ -88,7 +92,9 @@ cross.prototype = {
         }
         
         if (Object.prototype.toString.call(this.options.yAxis.options.y) === '[object Array]' && this.options.yAxis.options.y.length > 0) {
-            i = Math.round(y / this.options.yAxis.options.kLineWidth) - 1;
+            i = Math.round((y-this.options.yAxis.options.scale/2) / this.options.yAxis.options.scale) - 1;
+            if (i >= this.options.yAxis.options.y.length) i = this.options.yAxis.options.y.length - 1;
+            if (i <= -1) i = 0;
             y = this.options.yAxis.options.y[i];
             //for (var i in this.options.yAxis.options.y) {
             //    var yy = this.options.yAxis.options.y[i];
@@ -120,10 +126,11 @@ cross.prototype = {
             this.ctx.stroke()
         } else y = this.options.height
         
-        
-        this.options.tag.options.x = x;
-        this.options.tag.options.y = y;
-        callObject.call(this, this.options.tag, 'tag');
+        if (this.options.tag != 'undefined') {
+            this.options.tag.options.x = x;
+            this.options.tag.options.y = y;
+            callObject.call(this, this.options.tag, 'tag');
+        }
     },
     reBuild: function() {
         

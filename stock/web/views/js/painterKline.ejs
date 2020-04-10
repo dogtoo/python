@@ -32,7 +32,8 @@
                             align: 'right',
                             textBaseline: 'top',
                             dataType: 'money',
-                            dataRange: 'range'
+                            dataRange: 'range',
+                            degree: 0.01
                         })
                     }
                 },
@@ -57,14 +58,20 @@
                         'sline': sline,
                         'kCross': new cross({
                             xAxisName: 'kline',
+                            yAxisName: 'price',
                             tag: new label({
                                 'quadrant':1,
                                 'x':0,
                                 'y':0,
-                                innerHTML:'<label>test</label>',
+                                setTagData: function(i) {
+                                    return '<label>日期:'+this.data['kline'][i][0]+'</label><br>'+
+                                           '<label>開盤:'+this.data['kline'][i][1]+'</label><br>'+
+                                           '<label>收盤:'+this.data['kline'][i][2]+'</label><br>'+
+                                           '<label>最高:'+this.data['kline'][i][3]+'</label><br>'+
+                                           '<label>最低:'+this.data['kline'][i][4]+'</label>';
+                                },
                                 'width':100,
-                                'height':100,
-                                yAxisName: 'kline'})
+                                'height':100})
                         })
                     }
                 },
@@ -143,8 +150,11 @@
         var kline = [];
 
         var fline = [];
+        let flineHL = [null,null];
         var tline = [];
+        let tlineHL = [null,null];
         var sline = [];
+        let slineHL = [null,null];
 
         var priceL = [];
         var dateL = [];
@@ -173,8 +183,23 @@
                           , rawData['low'] ]);
 
                 fline.push(MACount(5, i, this.data));
+                l = fline.length - 1;
+                if (flineHL[0] == null || fline[l][1] > flineHL[0])
+                    flineHL[0] = fline[l][1];
+                if (flineHL[1] == null || fline[l][1] < flineHL[1])
+                    flineHL[1] = fline[l][1];
+                
                 tline.push(MACount(10, i, this.data));
+                if (tlineHL[0] == null || tline[l][1] > tlineHL[0])
+                    tlineHL[0] = tline[l][1];
+                if (tlineHL[1] == null || tline[l][1] < tlineHL[1])
+                    tlineHL[1] = tline[l][1];
+                
                 sline.push(MACount(20, i, this.data));
+                if (slineHL[0] == null || sline[l][1] > slineHL[0])
+                    slineHL[0] = sline[l][1];
+                if (slineHL[1] == null || sline[l][1] < slineHL[1])
+                    slineHL[1] = sline[l][1];
                 
                 volume.push(rawData['volume']);
                 if (rawData['close'] > rawData['open'])
@@ -192,6 +217,12 @@
 
         for (var pk in price)
             priceL.push(pk);
+        priceL.push(flineHL[0]);
+        priceL.push(flineHL[1]);
+        priceL.push(tlineHL[0]);
+        priceL.push(tlineHL[1]);
+        priceL.push(slineHL[0]);
+        priceL.push(slineHL[1]);
 
         priceL.sort(function(a, b) {
             return a - b;
@@ -299,8 +330,8 @@
     function MACount(maType, date, data) {
         maType = maType - 1;
         var MA = 0;
-        if (maType > 50)
-            console.log(maType + "date:" + date);
+        //if (maType > 50)
+        //    console.log(maType + "date:" + date);
         if (date > maType) {
             for (var ma = date-maType-1; ma <= date-1; ma++)
                 MA = MA + data[ma]['close'];

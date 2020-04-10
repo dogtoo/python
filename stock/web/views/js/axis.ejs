@@ -29,6 +29,8 @@ axis.prototype = {
         ctx.font = this.options.font;
         ctx.translate(this.paintRegion[paintName + '.x'], this.paintRegion[paintName + '.y']);
         if (this.options.textBaseline) ctx.textBaseline = this.options.textBaseline;
+        if (typeof this.implement.getYScale === 'function') this.implement.getYScale.call(this, this.options, this.data[this.implName]);
+        if (typeof this.implement.getXScale === 'function') this.implement.getXScale.call(this, this.options, this.data[this.implName]);
     },
     end : function () {
         this.ctx.restore();

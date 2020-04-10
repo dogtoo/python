@@ -288,6 +288,7 @@ kLine.prototype = {
         if (this.implement.isTouch.call(this, offset)) {
             //console.log(this.paintName + ' isTouch');
             this.options.onMove = true;
+            this.rootOnTouch = true;
         }
     },
     mousemove: function(offset) {
@@ -334,6 +335,7 @@ kLine.prototype = {
         if (this.options.onMove) {
             this.options.onMove = false;
             this.options.moveAcc = 0;
+            this.rootOnTouch = false;
         }
     },
     reBuild: function() {

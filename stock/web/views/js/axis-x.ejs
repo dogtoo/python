@@ -30,7 +30,8 @@ function xAxis(options){
                 this.options.x[x] - this.options.fontWidth/2 : this.paintRegion[this.paintName + '.width'] - this.options.fontWidth/2;
         } else {
             //if (i == this.data[this.implName].length-1) return this.paintRegion[this.paintName + '.width'] ;
-            this.implement.getXScale.call(this, this.options, this.data[this.implName]);
+            //移到start做，每次都做沒什用處
+            //this.implement.getXScale.call(this, this.options, this.data[this.implName]);
             if (this.options.dataRange === 'seq')
                 return (i * this.options.scale) - this.options.fontWidth/2;
             if (this.options.dataRange === 'range') {

@@ -16,6 +16,7 @@ function label(options) {
     if (typeof this.options.width === 'undefined') this.options.width = 0;
     if (typeof this.options.height === 'undefined') this.options.height = 0;
     this.options.id = Math.floor(Date.now() / 1000) + Math.floor(Math.random() * 100);
+    if (typeof this.options.setTagData === 'undefined') this.options.setTagData = function(i){console.log(i)};
 }
 
 label.prototype = {
@@ -41,9 +42,7 @@ label.prototype = {
         ctx.save();
         ctx.translate(this.paintRegion[paintName + '.x'], this.paintRegion[paintName + '.y']);
         
-        var rdiv = document.getElementById(this.implName+'_'+this.options.id);
-        if (rdiv)
-            rdiv.parentNode.removeChild(rdiv);
+        this.implement.reMoveElement(this.implName+'_'+this.options.id);        
         
         this.options.quadrant_ = this.options.quadrant;
         if (this.options.quadrant_.toString().match(/1|4/)) {
@@ -167,6 +166,14 @@ label.prototype = {
         //this.data[this.implName] = [offset.offsetX,offset.offsetY];
         this.implement.paintItems.call(this);
         this.implement.end.call(this);
+    },
+    reMoveElement: function(id) {
+        var rdiv = document.getElementById(id);
+        if (rdiv)
+            rdiv.parentNode.removeChild(rdiv);
+    },
+    setTagData: function(i) {
+        this.options.setTagData.call(this, i);
     }
 };
 

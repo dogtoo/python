@@ -28,7 +28,7 @@ function Painter(canvasId, paintStream) {
     this.onBuild = false;
     this.touchOffsetX = 0;
     this.touchOffsetY = 0;
-    
+    this.rootOnTouch = false;
     this.drawPainter = false;
 }
 Painter.prototype = {
@@ -186,7 +186,7 @@ Painter.prototype = {
             pctx.paintItems.call(this);
         }
         else {
-            console.log('implName:' + this.implName);
+            //console.log('implName:' + this.implName);
             var dataLength = ((typeof pctx.getDataLength == 'function') ? pctx.getDataLength.call(this) : this.data.length);
             for (var i = 0; i < dataLength; i++) {
                 var x = pctx.getX ? pctx.getX.call(this, i) : undefined;
