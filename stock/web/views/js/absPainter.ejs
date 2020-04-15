@@ -152,14 +152,16 @@ Painter.prototype = {
         }
     },
     //build: function(isImage = false) {
-    build: function(drawPainter) {
+    //build: function(drawPainter) {
+    build: function() {
         var painter = this;
-        painter.drawPainter = drawPainter;
+        //painter.drawPainter = drawPainter;
         if (painter.onBuild) return;
         painter.onBuild = true;
         painter.ctx.clearRect(0, 0, painter.width, painter.height);
         if (painter.start) painter.start.call(painter);
         painter.paintStream.forEach(function(item, index, array){
+            //var d1 = new Date();
             paintName = Object.keys(item)[0];
             for (var p in item[paintName]) {
                 if (p === 'region') continue;
@@ -169,9 +171,13 @@ Painter.prototype = {
                 painter.options = painter.implement.options;
                 painter.paint();
             }
+            //var d2 = new Date();
+            //console.log('paintName:' + paintName + ', ' + parseInt(d2 - d1)/ 1000);
         });
+        //主程序也加上一個end處理
+        if (painter.end) painter.end.call(painter);
         //if (isImage)
-        if (drawPainter)
+        //if (drawPainter)
             painter.imgData = painter.ctx.getImageData(0, 0, painter.width, painter.height);
         painter.onBuild = false;
     },
@@ -235,13 +241,13 @@ Painter.prototype = {
         //console.log('perData: ' + parseInt(d2 - d1)/ 1000);
         
         if (!this.onBuild && this.reBuild) {
-            var d1 = new Date();
+            //var d1 = new Date();
             if (this.reInit)
                 this.init.call(this);
             this.build.call(this);
-            this.build.call(this, true);
-            var d2 = new Date();
-            //console.log('begin:' + this.end + ', end:' + this.begin + ', ' + parseInt(d2 - d1)/ 1000);
+            //this.build.call(this, true);
+            //var d2 = new Date();
+            //console.log('build:' + parseInt(d2 - d1)/ 1000);
             this.reInit = false;
             this.reBuild = false;
         }

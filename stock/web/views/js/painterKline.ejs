@@ -255,6 +255,18 @@
         this.data.yHistory = yHistoryL;
         this.data.hline = hline;
     }
+    painterKline.prototype.end = function () {
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = 'gray';
+        this.ctx.save();
+        this.ctx.translate(this.paintRegion['main.x']
+                       , this.paintRegion['main.y']);
+        for (var i in this.implements.price.options.y) {
+            this.drawHLine('#eeeeee', 0, this.implements.price.options.y[i], this.paintRegion['main.width'], 1, 'solid');
+            this.ctx.stroke();
+        }
+        this.ctx.restore();
+    }
     painterKline.prototype.start = function () {
         this.ctx.beginPath();
         this.ctx.strokeStyle = 'gray';
@@ -268,10 +280,6 @@
         this.ctx.stroke();
         var spaceHeight = 0;
 
-        for (var i in this.implements.price.options.y) {
-            this.drawHLine('#eeeeee', 0, this.implements.price.options.y[i], this.paintRegion['main.width'], 1, 'solid');
-            this.ctx.stroke();
-        }
 
         var v_c = Math.round((this.implements.date.options.x.length)/this.implements.date.options.verticalLineCount);
         for (var i = 0 ; i < this.implements.date.options.x.length ; i+= v_c) {
@@ -299,8 +307,6 @@
             this.ctx.stroke();
         }
         
-        
-        
         var v_c = Math.round((this.implements.date.options.x.length)/this.implements.date.options.verticalLineCount);
         for (var i = 0 ; i < this.implements.date.options.x.length ; i+= v_c) {
             var diff = this.implements.date.options.x.length - i;
@@ -323,8 +329,8 @@
     };
     painterKline.prototype.make = function() {
         this.init();
-        //this.build();
-        this.build(true);
+        this.build();
+        //this.build(true);
     }
 
     function MACount(maType, date, data) {

@@ -108,7 +108,7 @@ label.prototype = {
     paintItems: function () {
         if (this.options.innerHTML === '')
             return;
-        if (this.drawPainter) {
+        //if (this.drawPainter) {
             var div = document.createElement("div");
             div.id = this.implName+'_'+this.options.id;
             div.style.width = this.options.width + 'px';
@@ -145,12 +145,12 @@ label.prototype = {
             
             //var rdiv = document.getElementById('label');
             //rdiv.parentNode.removeChild(rdiv);
-        }
-        else {
-            //var rdiv = document.getElementById('label');
-            //if (rdiv)
-            //    rdiv.parentNode.removeChild(rdiv);
-        }
+        //}
+        //else {
+        //    //var rdiv = document.getElementById('label');
+        //    //if (rdiv)
+        //    //    rdiv.parentNode.removeChild(rdiv);
+        //}
     },
     toString: function() {
         return 'label';
