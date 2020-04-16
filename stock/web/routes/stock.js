@@ -213,8 +213,8 @@ router.post('/lastMonthUsedfunds', async(ctx) => {
             {date:{'$gte':bdate, '$lte':edate}},
             {groupCode:{'$ne':'00'}}
         ];
-    if (typeof group_ != 'undefined' && group_ === 'group') matchAnd.push({groupCode:{'$in':stockCode_.match(/\d{2}/g)}});
-    if (typeof group_ != 'undefined' && group_ === 'stock') matchAnd.push({code:{'$in':stockCode_.match(/\d{4}/g)}});
+    if (typeof group_ != 'undefined' && group_.match(/group|allGroup/) && stockCode_ != '') matchAnd.push({groupCode:{'$in':stockCode_.match(/\d{2}/g)}});
+    if (typeof group_ != 'undefined' && group_ === 'stock' && stockCode_ != '') matchAnd.push({code:{'$in':stockCode_.match(/\d{4}/g)}});
     match.$match = {'$and':matchAnd};
 
     let groupDateCnt = 4; //年
@@ -264,11 +264,34 @@ router.post('/lastMonthUsedfunds', async(ctx) => {
         lookup.$lookup.pipeline[1].$project['name'] = 1;
     }
     
+    let lookupTP = {$lookup:{
+        from: 'TPEX',
+        let: {groupCode:'$_id.groupCode'},
+        pipeline:[
+            { 
+                $match: {
+                    $expr: {
+                        $eq: [ '$groupCode', '$$groupCode']
+                    }
+                }
+            },
+            { $project: { group:1, _id:0}},
+            { $limit:1}
+        ],
+        as:'groupNameTP'
+    }};
+    
+    if (typeof group_ != 'undefined' && group_.match(/group|stock/)) {
+        lookupTP.$lookup.let = {code:'$_id.code'};
+        lookupTP.$lookup.pipeline[0].$match.$expr.$eq = ['$code', '$$code'];
+        lookupTP.$lookup.pipeline[1].$project['name'] = 1;
+    }
+    
     let project = {$project: {
                 _id: 0
                ,date: '$_id.date'
                ,groupCode: '$_id.groupCode'
-               ,groupName: '$groupName.group'
+               ,groupName: [{$arrayElemAt:["$groupName.group",0]},{$arrayElemAt: ["$groupNameTP.group",0]}]
                ,'FII_I':'$FII_I'
                ,'FII_O':'$FII_O'
                ,'FII_diff':{$subtract:['$FII_I', '$FII_O']}
@@ -306,7 +329,7 @@ router.post('/lastMonthUsedfunds', async(ctx) => {
             $sort:{
                 '_id':1
             }
-        }, lookup, project, sort];
+        }, lookup, lookupTP, project, sort];
     console.log(JSON.stringify(args, null, 4));
     let data = await ctx.db.collection('t86').aggregate(args).toArray();
     let out = {};
@@ -320,7 +343,8 @@ router.post('/lastMonthUsedfunds', async(ctx) => {
     let groupH_ = {};
         
     for (let i in data) {
-        groupH_[data[i].groupCode] = data[i].groupName;
+        //console.log(data[i].groupName[1]);
+        groupH_[data[i].groupCode] = (data[i].groupName[0] != null) ? data[i].groupName[0] : data[i].groupName[1];
         let row = data[i];
         if (row.date != date_) {
             if (date_ != ' ') {
@@ -365,7 +389,7 @@ router.post('/lastMonthUsedfunds', async(ctx) => {
         if (typeof out[row.date]['group'] === 'undefined')
             out[row.date] = { 'group':[] };
         out[row.date].group.push({
-            'group': row.groupCode + row.groupName[0],
+            'group': row.groupCode + ((row.groupName[0] != null) ? row.groupName[0] : row.groupName[1]),
             //'FII_I': row.FII_I,
             //'FII_O': row.FII_O
             'FII_I': fv_

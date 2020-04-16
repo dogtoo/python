@@ -79,6 +79,7 @@
                 var ldata_ = [];
                 var lrowG_ = true;
                 var lrowG = [];
+                if (res.group === 'allGroup' && res.stockCode != '') res.group = 'group';
                 if (res.group === 'allGroup') {
                     lrowG = [[],[],[],[]];
                     ldata_ = [[],[],[],[]];
@@ -107,6 +108,7 @@
                     let splcnt = 0;
                     let splidx = 0;
                     let gIdx = 0;
+                    if (!req.hasOwnProperty(m)) return;
                     if (req[m].group.length < 8)
                         splcnt = req[m].group.length;
                     else {
