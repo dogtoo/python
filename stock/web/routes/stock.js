@@ -162,6 +162,28 @@ router.get('/Trend', async(ctx) => {
     })
 });
 
+async function getGroup(ctx, gName) {
+    let group = {
+        '_id':{'group':'$group','groupCode':'$groupCode'},
+        'codes': {'$push':{'code':'$code','name':'$name'}}
+    };
+    let project = {
+        '_id':0,
+        'group':'$_id.group',
+        'groupCode':'$_id.groupCode',
+        'codes':'$codes'
+    }
+    let args = [{'$group':group}, {'$project':project}, {
+            $sort:{
+                'group':1
+            }
+        }];
+    //console.log(JSON.stringify(args, null, 4));
+    let data = await ctx.db.collection(gName).aggregate(args).toArray();
+    //console.log(JSON.stringify(data, null, 4));
+    return data;
+}
+
 router.get('/funds', async(ctx) => {
     var date = new Date();
     let edate = dateFormat(date, 'yyyy/mm/dd');
@@ -175,9 +197,13 @@ router.get('/funds', async(ctx) => {
     date.setMonth(m, 1);
     let bdate = dateFormat(date, 'yyyy/mm/dd');
     console.log(  bdate + ','+ edate);  
+    let tpex = await getGroup(ctx, 'TPEX');
+    let twse = await getGroup(ctx, 'TWSE');
     await ctx.render('funds', {
         bdate: bdate,
-        edate: edate
+        edate: edate,
+        tpex: tpex,
+        twse: twse
     })
 });
 //取得上月外資可用資金
