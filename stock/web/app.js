@@ -14,16 +14,19 @@ const path = require('path');
 //console.log(config.server);
 const router = require('./routes/index');
 const app = new Koa();
+
 app.use(logger())
 app.use(bodyParser());
 app.use(views(__dirname + '/views', {
         extension: 'ejs'
     })
 );
+
+/*
 app.use(views(__dirname + '/views/js', {
         extension: 'js'
     })
-);
+);*/
 app.use(mongo({
     //host: '219.85.16.213',
     host: '192.168.1.5',

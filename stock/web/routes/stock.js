@@ -1,5 +1,6 @@
 const router = require('koa-router')();
 const dateFormat = require('dateformat');
+const path = require('path')
 // Router -> /
 
 router.get('/crossline', async(ctx) => {
@@ -11,11 +12,13 @@ router.get('/crossline_axis_seq', async(ctx) => {
     let code = ctx.request.query.code;
     await ctx.render('crossline_axis_seq')
 });
-
+//var jsPath = path.resolve('./') + '/views/js';
+var jsPath = path.join(__dirname, '../views/js');
 router.get('/kline', async(ctx) => {
     let code = ctx.request.query.code;
     await ctx.render('kline', {
         msg:'stock:' + code
+        ,'jsPath':jsPath
     })
 });
 

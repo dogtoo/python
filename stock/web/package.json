@@ -14,7 +14,6 @@
     "ejs": "^3.0.1",
     "generic-pool": "^3.7.1",
     "jquery": "^3.4.1",
-    "node-yaml-config": "^0.0.5",
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.2.1",
     "koa-compose": "^4.1.0",
@@ -25,6 +24,9 @@
     "mongodb": "^3.5.2",
     "mongoose": "^5.8.11",
     "muri": "^1.3.0",
-    "nodemon": "^2.0.2"
+    "node-yaml-config": "^0.0.5",
+    "nodemon": "^2.0.2",
+    "react": "^15.2.1",
+    "react-dom": "^15.2.1"
   }
 }
